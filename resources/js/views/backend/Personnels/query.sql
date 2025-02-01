@@ -1,0 +1,18 @@
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('KAHEMBE',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MURARA',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('BUJOVU',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MAJENGO',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MABANGA NORD',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MABANGA SUD',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES('KASIKA',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('KATOYI',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('NDOSHO',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MUGUNGA',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('VIRUNGA',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MIKENO',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('MAPENDO',1,'001'); 
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('LES VOLCANS',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('KATINDO',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('KESHERO',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('HIMBI',1,'001');
+INSERT INTO quartiers (nomQuartier,idCommune,codeQuartier) VALUES ('LAC-VERT',1,'001');
