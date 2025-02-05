@@ -186,7 +186,7 @@
                             </thead>
                             <tbody>
                               <tr v-for="item in fetchData" :key="item.id">
-                                <td>{{ item.codeRecu }}</td>
+                                <td>{{ item.codePaieGroup }}</td>
                                 <td>{{ item.noms }}</td>
                                 <td>{{ item.montant_paie }}$</td>
                                 <td>{{ item.modepaie }}</td>

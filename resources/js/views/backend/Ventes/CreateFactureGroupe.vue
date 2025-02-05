@@ -12,7 +12,7 @@
 
             <v-layout row wrap>   
 
-                <v-flex xs12 sm12 md10 lg10>
+                <v-flex xs12 sm12 md4 lg4>
                   <div class="mr-1">
                     <v-autocomplete label="Selectionnez l'Organisation" prepend-inner-icon="mdi-map"
                       :rules="[(v) => !!v || 'Ce champ est requis']" :items="clientList" item-text="noms" item-value="id"
@@ -53,7 +53,7 @@
                       </div>
                 </v-flex>
   
-                <v-flex xs12 sm12 md12 lg12>
+                <v-flex xs12 sm12 md6 lg6>
                   <div class="mr-1">
                     <v-text-field type="date" label="Date Facture" prepend-inner-icon="event" dense
                       :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.dateGroup">
@@ -62,7 +62,7 @@
                 </v-flex> 
 
   
-                <v-flex xs12 sm12 md12 lg12>
+                <v-flex xs12 sm12 md6 lg6>
                   <div class="mr-1">
                         <v-autocomplete label="Etat de la Facture" :items="[
                         { designation: 'Cash' },
@@ -74,7 +74,15 @@
                         item-text="designation" item-value="designation" v-model="svData.etat_facture_group">
                     </v-autocomplete>
                   </div>
-                </v-flex>                
+                </v-flex>   
+                 
+                <v-flex xs12 sm12 md6 lg6>
+                  <div class="mr-1">
+                    <v-text-field label="Libellé" prepend-inner-icon="event" dense
+                      :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.libelle_group">
+                    </v-text-field>
+                  </div>
+                </v-flex> 
 
             </v-layout>
 
@@ -92,7 +100,7 @@
                     <tr v-for="(item, index) in svData.detailData" :key="index">
 
                         <td class="long-cell">
-                            <v-autocomplete v-model="item.id_tva" :items="item.chambreList"
+                            <v-autocomplete v-model="item.id_reservation" :items="chambreList"
                                 label="Selectionnez la Reservation" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="designationReservation" item-value="id" @change="updateChambre(index)"
                                 ></v-autocomplete>                            
@@ -117,8 +125,8 @@
             <table>
                 <tr>
                     <td>
-                        <!-- <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div> -->
-                        <!-- <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear> -->
+                        <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div>
+                        <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear>
                     </td>
                     <td>
                         <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate2" color="success">Payer Cash</v-btn></div>  
@@ -162,7 +170,7 @@
                             <th class="text-left">Action</th>
                             <th class="text-left">N°FAC</th>
                             <th class="text-left">dateGroup</th>
-                            <th class="text-left">Service</th>
+                            <!-- <th class="text-left">Service</th> -->
                             <th class="text-left">Client</th>
                             <th class="text-left">Téléphone</th>
                             <th class="text-left">Libellé</th>
@@ -240,12 +248,12 @@
                             </td>
                             <td>{{ item.id }}</td>
                             <td>{{ item.dateGroup | formatDate }}</td>
-                            <td>{{ item.nom_service }}</td>
+                            <!-- <td>{{ item.nom_service }}</td> -->
                             <td>{{ item.noms }}</td>
                             <td>{{ item.contact }}</td>
-                            <td>{{ item.libelle }}</td>
+                            <td>{{ item.libelle_group }}</td>
                             <td>{{ item.RestePaie }}$</td>
-                            <td>{{ item.etat_facture }}</td>
+                            <td>{{ item.etat_facture_group }}</td>
                             <td>{{ item.author }}</td>
                             <td>
                                     {{ item.created_at | formatDate }}
@@ -327,13 +335,11 @@ export default {
                     nomClient: '',                  
                     montantFacture: 0,
                     montantPaie:0,
-                    montantReste:0,
-
-                    chambreList: [],
+                    montantReste:0,                    
                 }],                
             },
             fetchData: [],
-            produitList: [],
+            chambreList: [],
             clientList: [],
             CmdList: [],  
       
@@ -367,35 +373,13 @@ export default {
                 nomClient: '',                  
                 montantFacture: 0,
                 montantPaie:0,
-                montantReste:0,
-
-                chambreList: [],
+                montantReste:0
             });
             this.fetchListChambre();
         },
        refreshData()
         {
             this.fetchListClient();
-            this.get_produit_for_service(this.svData.refService);
-        },
-        async get_produit_for_service(refService) {
-          this.isLoading(true);
-            await axios
-                .get(`${this.apiBaseURL}/fetch_stock_data_byservice/${refService}`)
-                .then((res) => {
-                var chart = res.data.data;
-                if (chart) {
-                    this.produitList = chart;
-                } else {
-                    this.produitList = [];
-                }
-                this.isLoading(false);
-                })
-                .catch((err) => {
-                this.errMsg();
-                this.makeFalse();
-                reject(err);
-                });
         },
         async updateChambre(index)
             {
@@ -406,20 +390,9 @@ export default {
                     const donnees = response.data.data;
                     // Assuming you want to get the first item
                     if (donnees.length > 0) {
-
-                        if(this.svData.detailData[index].qteVente <= this.svData.detailData[index].qteDisponible)
-                        {
-                            this.svData.detailData[index].montantFacture = donnees[0].totalFacture; // Update price per unit
-                            this.svData.detailData[index].montantPaie = donnees[0].totalPaie; // Dummy price
-                            this.svData.detailData[index].montantReste= donnees[0].RestePaie;
-                        }
-                        else
-                        {
-                            this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-                            this.svData.detailData[index].qteVente = 0;
-                        }
-
-                       
+                        this.svData.detailData[index].montantFacture = donnees[0].totalFacture; // Update price per unit
+                        this.svData.detailData[index].montantPaie = donnees[0].totalPaie; // Dummy price
+                        this.svData.detailData[index].montantReste= donnees[0].RestePaie;                       
                     } else {
                         console.warn('No data found for the specified unit.');
                     }
@@ -467,9 +440,7 @@ export default {
                 nomClient: '',                  
                 montantFacture: 0,
                 montantPaie:0,
-                montantReste:0,
-
-                chambreList: [],
+                montantReste:0
             }];
             this.$refs.form.reset(); // Reset the form validation state            
             this.fetchListChambre();
@@ -590,14 +561,10 @@ export default {
             );
         },
         fetchListChambre() {
-
             this.editOrFetch(`${this.apiBaseURL}/fetch_hotel_reservation_search`).then(
-                ({ data }) => {
-                    const donnees = data.data;
-                    this.svData.detailData = this.svData.detailData.map(item => ({
-                        ...item, // Spread existing properties
-                        chambreList: donnees // Update 
-                    }));
+            ({ data }) => {
+                var donnees = data.data;
+                    this.chambreList = donnees;
                 }
             );
         },
@@ -662,16 +629,16 @@ export default {
         }
 
         },
-        showVenteDetailPaieFactGroupe(refEnteteGroup, name,totalFacture,totalPaie,RestePaie) {
+        showVenteDetailPaieFactGroupe(refEnteteVenteGroup, name,totalFacture,totalPaie,RestePaie) {
 
-        if (refEnteteGroup != '') {
+        if (refEnteteVenteGroup != '') {
 
             this.$refs.VenteDetailPaieFactGroupe.$data.etatModal = true;
-            this.$refs.VenteDetailPaieFactGroupe.$data.refEnteteGroup = refEnteteGroup;
+            this.$refs.VenteDetailPaieFactGroupe.$data.refEnteteVenteGroup = refEnteteVenteGroup;
             this.$refs.VenteDetailPaieFactGroupe.$data.totalFacture = totalFacture;
             this.$refs.VenteDetailPaieFactGroupe.$data.totalPaie = totalPaie;
             this.$refs.VenteDetailPaieFactGroupe.$data.RestePaie = RestePaie;
-            this.$refs.VenteDetailPaieFactGroupe.$data.svData.refEnteteGroup = refEnteteGroup;
+            this.$refs.VenteDetailPaieFactGroupe.$data.svData.refEnteteVenteGroup = refEnteteVenteGroup;
             this.$refs.VenteDetailPaieFactGroupe.fetchDataList();
             this.$refs.VenteDetailPaieFactGroupe.get_mode_Paiement();
             this.$refs.VenteDetailPaieFactGroupe.getInfoFacture();

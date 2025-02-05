@@ -29,7 +29,7 @@ class thotel_paiement_chambreController extends Controller
 
         $data = DB::table('thotel_paiement_chambre')
         ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','thotel_paiement_chambre.refReservation')
-        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refClient')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
         ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
         ->join('tvente_client','tvente_client.id','=','thotel_reservation_chambre.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')
@@ -77,13 +77,12 @@ class thotel_paiement_chambreController extends Controller
         
     }
 
-
     public function fetch_data_entete(Request $request,$refEntete)
     { 
 
         $data = DB::table('thotel_paiement_chambre')
         ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','thotel_paiement_chambre.refReservation')
-        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refClient')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
         ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
         ->join('tvente_client','tvente_client.id','=','thotel_reservation_chambre.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')
@@ -127,15 +126,13 @@ class thotel_paiement_chambreController extends Controller
         }       
         $data->orderBy("thotel_paiement_chambre.created_at", "desc");
         return $this->apiData($data->paginate(10));
-    }    
-
-
+    } 
 
     function fetch_single_data($id)
     {
         $data= DB::table('thotel_paiement_chambre')
         ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','thotel_paiement_chambre.refReservation')
-        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refClient')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
         ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
         ->join('tvente_client','tvente_client.id','=','thotel_reservation_chambre.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')

@@ -1302,7 +1302,7 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::post("update_hotel_incident_reservation_salle/{id}", 'thotel_incident_reservation_salleController@update_data');
     Route::get("delete_hotel_incident_reservation_salle/{id}", 'thotel_incident_reservation_salleController@delete_data');
 
-    Route::get("fetch_hotel_paiement_chambre", 'thotel_paiement_chambreController@all');
+    Route::get("fetch_hotel_paiement_chambres", 'thotel_paiement_chambreController@all');
     Route::get("fetch_hotel_paiement_chambre/{refEntete}", 'thotel_paiement_chambreController@fetch_data_entete');
     Route::get("fetch_single_hotel_paiement_chambre/{id}", 'thotel_paiement_chambreController@fetch_single_data');    
     Route::post("insert_hotel_paiement_chambre", 'thotel_paiement_chambreController@insert_data');

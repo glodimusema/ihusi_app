@@ -278,6 +278,7 @@
                             <template v-slot:default>
                               <thead>
                                 <tr>
+                                  <th class="text-left">N°</th>
                                   <th class="text-left">Client</th>
                                   <th class="text-left">Chambre</th>
                                   <th class="text-left">N°Chambre</th>
@@ -299,6 +300,7 @@
                               </thead>
                               <tbody>
                                 <tr v-for="item in fetchData" :key="item.id">
+                                  <td>{{ item.id }}</td>
                                   <td>{{ item.noms }}</td>
                                   <td>{{ item.nom_chambre }}</td>
                                   <td>{{ item.numero_chambre }}</td>
@@ -609,7 +611,7 @@
         this.fetchDataList();
 
         this.$refs.PaiementChambre.$data.titleComponent =
-          "Paiement Reservation Pour pour " + name+" : "+totalFacture;
+          "Paiement Reservation Pour pour " + name + " N° : "+refReservation;
 
       } else {
         this.showError("Personne n'a fait cette action");

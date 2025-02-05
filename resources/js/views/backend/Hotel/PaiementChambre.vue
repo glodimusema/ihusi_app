@@ -220,7 +220,7 @@
                                     </v-list-item>
 
                                     <v-list-item link
-                                      @click="desactiverData(item.id, item.author, item.created_at, item.montant_paie, item.refReservation, item.date_paie)">
+                                      @click="deleteData(item.id)">
                                       <v-list-item-icon>
                                         <v-icon color="red">print</v-icon>
                                       </v-list-item-icon>
@@ -458,24 +458,7 @@ export default {
     },
     backPage() {
       this.$router.go(-1);
-    },
-    desactiverData(valeurs, user_created, date_entree, noms, numEntete, datepaie) {
-      //
-      var tables = 'thotel_paiement_chambre';
-      var user_name = this.userData.name;
-      var user_id = this.userData.id;
-      var detail_information = "Suppression d'un paiement du montant de : " + noms + " en date du " + datepaie + " pour la Reservation des Chambres n° " + numEntete + " par l'utilisateur " + user_name + "";
-
-      this.confirmMsg().then(({ res }) => {
-        this.delGlobal(`${this.apiBaseURL}/desactiver_data?tables=${tables}&user_name=${user_name}&user_id=${user_id}&valeurs=${valeurs}&user_created=${user_created}&date_entree=${date_entree}&detail_information=${detail_information}`).then(
-          ({ data }) => {
-            this.showMsg(data.data);
-            this.onPageChange();
-          }
-        );
-      });
     }
-    //
 
   },
   filters: {

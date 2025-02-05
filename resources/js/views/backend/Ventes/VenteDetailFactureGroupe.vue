@@ -45,7 +45,7 @@
                             </v-autocomplete>
 
                             <v-autocomplete label="Selectionnez la Vente de la Chambre" prepend-inner-icon="mdi-map"
-                                :rules="[(v) => !!v || 'Ce champ est requis']" :items="chambreList" item-text="designationReservation"
+                                :items="venteList" item-text="designationVente"
                                 item-value="id" dense outlined v-model="svData.id_vente" chips clearable>
                             </v-autocomplete>  
   
@@ -263,7 +263,7 @@
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
             this.insertOrUpdate(
-              `${this.apiBaseURL}/update_vente_detail_vente/${this.svData.id}`,
+              `${this.apiBaseURL}/update_vente_detail_facture_groupe/${this.svData.id}`,
               JSON.stringify(this.svData)
             )
               .then(({ data }) => {
@@ -281,14 +281,12 @@
           }
           else { 
   
-            if(this.svData.qteVente <= this.svData.qteDisponible)
-            {
-                this.svData.refEnteteGroup = this.refEnteteGroup;
+            this.svData.refEnteteGroup = this.refEnteteGroup;
                 this.svData.author = this.userData.name;
                 this.svData.refUser = this.userData.id;
   
                 this.insertOrUpdate(
-                `${this.apiBaseURL}/insert_vente_detail_vente`,
+                `${this.apiBaseURL}/insert_vente_detail_facture_groupe`,
                 JSON.stringify(this.svData)
               )
                 .then(({ data }) => {
@@ -302,12 +300,6 @@
                 .catch((err) => {
                   this.svErr(), this.isLoading(false);
                 });
-            }
-            else
-            {
-                this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-                this.svData.qteVente = 0;
-            }
   
   
           }

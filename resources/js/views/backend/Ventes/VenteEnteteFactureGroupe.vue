@@ -430,18 +430,18 @@
           this.showError("Personne n'a fait cette action");
         }
         // 
-  
+   
       },
-      showVenteDetailPaieFactGroupe(refEnteteGroup, name,totalFacture,totalPaie,RestePaie) {
+      showVenteDetailPaieFactGroupe(refEnteteVenteGroup, name,totalFacture,totalPaie,RestePaie) {
   
-        if (refEnteteGroup != '') {
+        if (refEnteteVenteGroup != '') {
   
           this.$refs.VenteDetailPaieFactGroupe.$data.etatModal = true;
-          this.$refs.VenteDetailPaieFactGroupe.$data.refEnteteGroup = refEnteteGroup;
+          this.$refs.VenteDetailPaieFactGroupe.$data.refEnteteVenteGroup = refEnteteVenteGroup;
           this.$refs.VenteDetailPaieFactGroupe.$data.totalFacture = totalFacture;
           this.$refs.VenteDetailPaieFactGroupe.$data.totalPaie = totalPaie;
           this.$refs.VenteDetailPaieFactGroupe.$data.RestePaie = RestePaie;
-          this.$refs.VenteDetailPaieFactGroupe.$data.svData.refEnteteGroup = refEnteteGroup;
+          this.$refs.VenteDetailPaieFactGroupe.$data.svData.refEnteteVenteGroup = refEnteteVenteGroup;
           this.$refs.VenteDetailPaieFactGroupe.fetchDataList();
           this.$refs.VenteDetailPaieFactGroupe.get_mode_Paiement();
           this.$refs.VenteDetailPaieFactGroupe.getInfoFacture();

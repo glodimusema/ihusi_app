@@ -47,7 +47,7 @@ class tvente_detail_paiement_groupeController extends Controller
         'tvente_detail_paiement_groupe.created_at'
         //Entete Paiement groupe
         ,'tvente_entete_paiement_groupe.code','refFactureGroup','tvente_entete_paiement_groupe.module_id',
-        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author','nom_module',
+        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author',
         'tvente_entete_paiement_groupe.created_at','tvente_entete_paiement_groupe.refUser'
         ,'tvente_entete_facture_groupe.code as codeEnteteFacture','refOrganisation','etat_facture_group',
         'dateGroup','libelle_group','montant_group','reduction_group','totaltva_group','paie_group',
@@ -101,7 +101,7 @@ class tvente_detail_paiement_groupeController extends Controller
         'tvente_detail_paiement_groupe.created_at'
         //Entete Paiement groupe
         ,'tvente_entete_paiement_groupe.code','refFactureGroup','tvente_entete_paiement_groupe.module_id',
-        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author','nom_module',
+        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author',
         'tvente_entete_paiement_groupe.created_at','tvente_entete_paiement_groupe.refUser'
         ,'tvente_entete_facture_groupe.code as codeEnteteFacture','refOrganisation','etat_facture_group',
         'dateGroup','libelle_group','montant_group','reduction_group','totaltva_group','paie_group',
@@ -120,7 +120,7 @@ class tvente_detail_paiement_groupeController extends Controller
         ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0),2) as totalFactureGroup')
         ->selectRaw('IFNULL(paie_group,0) as totalPaieGroup')
         ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as RestePaieGroup')
-        ->Where('refEntetepaieGroup',$refEntete);
+        ->Where('refEnteteVenteGroup',$refEntete);
         if (!is_null($request->get('query'))) {
             # code...
             $query = $this->Gquery($request);
@@ -153,7 +153,7 @@ class tvente_detail_paiement_groupeController extends Controller
         'tvente_detail_paiement_groupe.created_at'
         //Entete Paiement groupe
         ,'tvente_entete_paiement_groupe.code','refFactureGroup','tvente_entete_paiement_groupe.module_id',
-        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author','nom_module',
+        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author',
         'tvente_entete_paiement_groupe.created_at','tvente_entete_paiement_groupe.refUser'
         ,'tvente_entete_facture_groupe.code as codeEnteteFacture','refOrganisation','etat_facture_group',
         'dateGroup','libelle_group','montant_group','reduction_group','totaltva_group','paie_group',
@@ -204,7 +204,7 @@ class tvente_detail_paiement_groupeController extends Controller
         'tvente_detail_paiement_groupe.created_at'
         //Entete Paiement groupe
         ,'tvente_entete_paiement_groupe.code','refFactureGroup','tvente_entete_paiement_groupe.module_id',
-        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author','nom_module',
+        'datePaieGroup','libelle_paie_group','tvente_entete_paiement_groupe.author',
         'tvente_entete_paiement_groupe.created_at','tvente_entete_paiement_groupe.refUser'
         ,'tvente_entete_facture_groupe.code as codeEnteteFacture','refOrganisation','etat_facture_group',
         'dateGroup','libelle_group','montant_group','reduction_group','totaltva_group','paie_group',
@@ -378,10 +378,17 @@ class tvente_detail_paiement_groupeController extends Controller
                 $idmax_paie_data= $maxid_data->code_entete;
             }
     
+            $refEnteteVente = 0;
+            if ($row999->id_vente === null) {
+                $refEnteteVente = 0;
+            } else {
+                $refEnteteVente = $row999->id_vente;
+            }  
+          
 
             $data16 = tvente_paiement::create([
                 'refEntetepaie'       =>  $idmax_paie_data,
-                'refEnteteVente'       => $row999->id_vente,
+                'refEnteteVente'       => $refEnteteVente,
                 'montant_paie'    =>  $montants,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
@@ -397,7 +404,7 @@ class tvente_detail_paiement_groupeController extends Controller
 
             $data17 = DB::update(
                 'update tvente_entete_vente set paie = paie + (:paiement) where id = :refEnteteVente',
-                ['paiement' => $montants,'refEnteteVente' => $row999->id_vente]
+                ['paiement' => $montants,'refEnteteVente' => $refEnteteVente]
             );       
 
 
@@ -406,6 +413,13 @@ class tvente_detail_paiement_groupeController extends Controller
         foreach ($data999 as $row100) 
         { 
             $montants=0;
+            $refReservation = 0;
+            if ($row100->id_reservation === null) {
+                $refReservation = 0;
+            } else {
+                $refReservation = $row100->id_reservation;
+            }
+
             $ventes_data = DB::table('thotel_reservation_chambre')
             ->select('thotel_reservation_chambre.id','refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
             'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
@@ -416,14 +430,14 @@ class tvente_detail_paiement_groupeController extends Controller
             ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFacture')
             ->selectRaw('IFNULL(totalPaie,0) as totalPaie')
             ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaie')
-            ->Where('thotel_reservation_chambre.id',$row100->id_reservation)
+            ->Where('thotel_reservation_chambre.id','=', $refReservation)
             ->first(); 
             if ($ventes_data) {
                 $montants = $ventes_data->RestePaie;
             } 
     
             $data15 = thotel_paiement_chambre::create([
-                'refReservation'       =>  $row100->id_reservation,            
+                'refReservation'       =>  $refReservation,            
                 'montant_paie'    =>  $montants,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
@@ -439,7 +453,7 @@ class tvente_detail_paiement_groupeController extends Controller
 
             $data17 = DB::update(
                 'update thotel_reservation_chambre set totalPaie = totalPaie + (:paiement) where id = :refReservation',
-                ['paiement' => $montants,'refReservation' => $row100->id_reservation]
+                ['paiement' => $montants,'refReservation' => $refReservation]
             );       
 
 
