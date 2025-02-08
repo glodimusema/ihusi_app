@@ -212,13 +212,21 @@
                                         </v-list-item-icon>
                                         <v-list-item-title style="margin-left: -20px">Modifier</v-list-item-title>
                                       </v-list-item>
+
+                                      <v-list-item link @click="printBill(item.refEnteteVenteGroup)">
+                                        <v-list-item-icon>
+                                            <v-icon color="blue">print</v-icon>
+                                        </v-list-item-icon>
+                                        <v-list-item-title style="margin-left: -20px">Imprimer la Facture
+                                        </v-list-item-title>
+                                        </v-list-item> 
   
-                                      <v-list-item link @click="printRecuPrivee(item.id)">
+                                      <!-- <v-list-item link @click="printRecuPrivee(item.id)">
                                         <v-list-item-icon>
                                           <v-icon color="blue">print</v-icon>
                                         </v-list-item-icon>
                                         <v-list-item-title style="margin-left: -20px">Imprimer Reçu</v-list-item-title>
-                                      </v-list-item>
+                                      </v-list-item> -->
   
                                       <v-list-item link @click="deleteData(item.id)">
                                           <v-list-item-icon>
@@ -360,6 +368,9 @@
             reject(err);
           });
       },
+        printBill(id_facture) {            
+            window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_by_numero?id_facture=` + id_facture + "&author=" + this.userData.name);
+        },
   
       validate() {
         if (this.$refs.form.validate()) {

@@ -49,6 +49,8 @@ class tvente_entete_facture_groupeController extends Controller
         "compte_client",'refSousCompte','nom_ssouscompte','numero_ssouscompte')
 
         ->selectRaw('CONCAT("F",YEAR(dateGroup),"",MONTH(dateGroup),"00",tvente_entete_facture_groupe.id) as codeFacture')
+        ->selectRaw('ROUND(IFNULL(reduction_group,0),2) as totalReduction')
+        ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0)),0),2) as totalMontant')
         ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0),2) as totalFacture')
         ->selectRaw('IFNULL(paie_group,0) as totalPaie')
         ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as RestePaie');

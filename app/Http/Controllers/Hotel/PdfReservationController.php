@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
+use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 class PdfReservationController extends Controller
 {
     
@@ -519,9 +521,6 @@ class PdfReservationController extends Controller
     }
 
 
-
-
-
         //=============== FACTURE SALLE =====================================================================
 
         function pdf_facture_salle(Request $request)
@@ -625,8 +624,7 @@ class PdfReservationController extends Controller
                         $RestePaie=$row->RestePaie;
                         $codeOperation=$row->codeOperation;
                     }
-    //ClasseChambre
-    
+       
                     //Info Entreprise
                     $nomEse='';
                     $adresseEse='';
@@ -3089,6 +3087,3526 @@ function showSalle($date1, $date2)
     return $output;
 
 }
+
+
+// ============== RAPPORT DES FACTURES D'HEBERGEMENT BY ORGANISATION =============================================
+
+public function fetch_rapport_facture_hebergement_date_organisation(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('date1') && $request->get('date2') && $request->get('id_prisecharge') && $request->get('author')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $id_prisecharge = $request->get('id_prisecharge');
+        $author = $request->get('author');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printRapportHebergement_Organisation($date1, $date2,$id_prisecharge,$author);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+         
+
+    } else {
+        // code...
+    }  
+    
+}
+function printRapportHebergement_Organisation($date1, $date2,$id_prisecharge,$author)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+         $nomProvince = '';
+         $villeProvince = '';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme; 
+             $nomProvince = $row->nomProvince;  
+             $villeProvince = $row->solutionEntreprise;      
+         }
+ 
+
+
+
+         $totalFacture = 0;
+         $totalPaie = 0;
+         $restePaie = 0;
+         $totalReduction = 0;
+         // 
+         $data2 =  DB::table('thotel_reservation_chambre')
+         ->select(DB::raw('ROUND(SUM( IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) ),4) as totalFacture, 
+         ROUND(SUM( IFNULL(totalPaie,0) ),4) as totalPaie, ROUND(SUM( IFNULL(reduction,0) ),4) as totalReduction,
+         ROUND(SUM(ROUND(( (IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) ),4)),4) as restePaie'))
+         ->where([
+            ['thotel_reservation_chambre.created_at','>=', $date1],
+            ['thotel_reservation_chambre.created_at','<=', $date2],
+            ['thotel_reservation_chambre.id_prise_charge','=', $id_prisecharge],
+         ])    
+         ->first(); 
+         if ($data2) 
+         {  
+           $totalFacture = $data2->totalFacture;
+           $totalPaie = $data2->totalPaie;
+           $restePaie = $data2->restePaie;
+           $totalReduction = $data2->totalReduction;                    
+         }
+
+         $codeClient='';
+         $nomClient='';
+
+         $data3=DB::table('tvente_client')       
+         ->select('tvente_client.id','tvente_client.author','tvente_client.created_at','noms','sexe',
+         'contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece','lieulivraisonCarte',
+         'nationnalite','datenaissance','lieunaissance','profession','occupation','nombreEnfant',
+         'dateArriverGoma','arriverPar','refCategieClient')
+         ->where([
+            ['tvente_client.id','=', $id_prisecharge],
+        ])      
+        ->get();
+        foreach ($data3 as $row) 
+        {
+            $codeClient=$row->id;
+            $nomClient=$row->noms;              
+        }
+
+        $current = Carbon::now();
+        $carbon = $current;
+        // $carbon = Carbon::createFromFormat('Y-m-d H:i', $current);
+        $resteLettre = $this->chiffreEnLettre($restePaie);
+  
+        $output='';          
+
+        $output='
+
+          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+          <!-- saved from url=(0016)http://localhost -->
+          <html>
+          <head>
+            <title>rptFactureHotels</title>
+            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+            <style type="text/css">
+              .cs5971619E {color:#000000;background-color:#000000;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+              .csE5AC9E0D {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+              .cs91032837 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .cs3B0DD49A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+              .cs479D8C74 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .csDC7EEB9 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+              .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+              .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+              .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs7FA6C52A {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; text-decoration: underline;padding-left:2px;padding-right:2px;}
+              .cs9E712815 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .csE9F2AA97 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+              .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+            </style>
+          </head>
+          <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+          <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:662px;height:474px;position:relative;">
+            <tr>
+              <td style="width:0px;height:0px;"></td>
+              <td style="height:0px;width:8px;"></td>
+              <td style="height:0px;width:18px;"></td>
+              <td style="height:0px;width:36px;"></td>
+              <td style="height:0px;width:57px;"></td>
+              <td style="height:0px;width:25px;"></td>
+              <td style="height:0px;width:3px;"></td>
+              <td style="height:0px;width:14px;"></td>
+              <td style="height:0px;width:4px;"></td>
+              <td style="height:0px;width:18px;"></td>
+              <td style="height:0px;width:47px;"></td>
+              <td style="height:0px;width:35px;"></td>
+              <td style="height:0px;width:52px;"></td>
+              <td style="height:0px;width:52px;"></td>
+              <td style="height:0px;width:12px;"></td>
+              <td style="height:0px;width:28px;"></td>
+              <td style="height:0px;width:36px;"></td>
+              <td style="height:0px;width:15px;"></td>
+              <td style="height:0px;width:49px;"></td>
+              <td style="height:0px;width:25px;"></td>
+              <td style="height:0px;width:53px;"></td>
+              <td style="height:0px;width:19px;"></td>
+              <td style="height:0px;width:56px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:23px;"></td>
+              <td class="cs739196BC" colspan="15" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:5px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:2px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" rowspan="2" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Hotel&nbsp;IHUSI</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:20px;"></td>
+              <td></td>
+              <td></td>
+              <td class="cs101A94F7" colspan="2" rowspan="4" style="width:93px;height:85px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:93px;height:85px;">
+                <img alt="" src="'.$pic2.'" style="width:93px;height:85px;" /></div>
+              </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>'.$villeProvince.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NIF:&nbsp;A0706188K&nbsp;--&nbsp;IDNAT&nbsp;:&nbsp;19-G4701</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:21px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" rowspan="2" style="width:289px;height:23px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>N42429X</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:2px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NRC&nbsp;:&nbsp;RCCM&nbsp;:&nbsp;'.$rccmEse.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="csE9F2AA97" colspan="21" style="width:650px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;FACTURES&nbsp;DES&nbsp;FACTURES&nbsp;&nbsp;Du&nbsp;'.$date1.'&nbsp;au&nbsp;'.$date2.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="8" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Code&nbsp;:&nbsp;'.$codeClient.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="8" style="width:279px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="8" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Nom&nbsp;:&nbsp;'.$nomClient.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="8" style="width:279px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;par&nbsp;:&nbsp;'.$author.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="cs91032837" colspan="2" style="width:52px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:84px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Num&#233;ro</nobr></td>
+              <td class="cs479D8C74" colspan="8" style="width:233px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Description&nbsp;/&nbsp;Point&nbsp;de&nbsp;vente</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;du</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>R&#233;duction</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;pay&#233;</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Reste&nbsp;&#224;&nbsp;payer</nobr></td>
+            </tr>
+            ';
+
+                                  $output .= $this->showRapportHebergement_Organisation($date1,$date2,$id_prisecharge); 
+
+                                  $output.='
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs91032837" colspan="8" style="width:232px;height:22px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalFacture.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalReduction.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$restePaie.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs9E712815" colspan="4" style="width:126px;height:22px;line-height:18px;text-align:left;vertical-align:bottom;"><nobr>A&nbsp;payer&nbsp;:</nobr></td>
+              <td class="csE9F2AA97" colspan="2" style="width:60px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>USD</nobr></td>
+              <td class="csE9F2AA97" colspan="4" style="width:149px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>'.$restePaie.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:8px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="7" style="width:153px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;'.$carbon.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="11" style="width:393px;height:22px;line-height:15px;text-align:right;vertical-align:top;"><nobr>Nous&nbsp;disons&nbsp;dollars&nbsp;americains&nbsp;.'.$resteLettre.'.</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="3" style="width:65px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Client</nobr></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="5" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>R&#233;ceptionniste</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:45px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:1px;"></td>
+              <td></td>
+              <td class="cs5971619E" colspan="21" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:1px;"></td>
+              <td></td>
+              <td class="cs101A94F7" colspan="21" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:10px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="14" style="width:388px;height:22px;line-height:15px;text-align:left;vertical-align:top;"><nobr>Web&nbsp;:&nbsp;'.$siteEse.'&nbsp;Tel&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;0813532300</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+              <td></td>
+            </tr>
+          </table>
+          </body>
+          </html>
+
+        ';  
+       
+        return $output; 
+
+}
+function showRapportHebergement_Organisation($date1,$date2,$id_prisecharge)
+{
+        $data = DB::table('thotel_reservation_chambre')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
+        ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+        ->join('tvente_client as clientHotel','clientHotel.id','=','thotel_reservation_chambre.refClient')
+        ->join('tvente_client as priseCharge','priseCharge.id','=','thotel_reservation_chambre.id_prise_charge')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','clientHotel.refCategieClient')
+        ->select('thotel_reservation_chambre.id','refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
+        'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
+        'type_reservation','nom_accompagner','pays_provenance',
+        'thotel_reservation_chambre.author','thotel_reservation_chambre.created_at','clientHotel.noms',
+        'clientHotel.sexe','clientHotel.contact','clientHotel.mail','clientHotel.adresse',
+        'clientHotel.pieceidentite','clientHotel.numeroPiece','clientHotel.dateLivrePiece',
+        'clientHotel.lieulivraisonCarte','clientHotel.nationnalite','clientHotel.datenaissance',
+        'clientHotel.lieunaissance','clientHotel.profession','clientHotel.occupation','clientHotel.nombreEnfant',
+        'clientHotel.dateArriverGoma','clientHotel.arriverPar','clientHotel.refCategieClient',
+        'clientHotel.photo','clientHotel.slug','thotel_reservation_chambre.devise',
+        'thotel_reservation_chambre.taux','tvente_categorie_client.designation as CategorieClient', 
+        "thotel_chambre.nom_chambre","numero_chambre","refClasse", "thotel_classe_chambre.designation as ClasseChambre",
+        "thotel_classe_chambre.prix_chambre","thotel_reservation_chambre.refUser"
+        
+        ,'priseCharge.noms as noms_charge','priseCharge.sexe as sexe_charge','priseCharge.contact as contact__charge',
+        'priseCharge.mail as mail_charge','priseCharge.adresse as adresse_charge')
+        ->selectRaw('((prix_unitaire)/thotel_reservation_chambre.taux) as prix_unitaireFC')
+        ->selectRaw('TIMESTAMPDIFF(DAY, date_entree, date_sortie) as NombreJour')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))) as prixTotalSans')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction) as prixTotal')
+        ->selectRaw('((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction)/thotel_reservation_chambre.taux) as prixTotalFC')
+        ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFacture')
+        ->selectRaw('IFNULL(totalPaie,0) as totalPaie')
+        ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaie')
+        ->selectRaw('((IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0))/thotel_reservation_chambre.taux) as RestePaieFC')
+        ->selectRaw("DATE_FORMAT(thotel_reservation_chambre.created_at,'%d/%M/%Y') as jour_reservation")
+        ->selectRaw('CONCAT("F",YEAR(thotel_reservation_chambre.created_at),"",MONTH(thotel_reservation_chambre.created_at),"00",thotel_reservation_chambre.id) as codeReservation')
+        ->where([
+            ['thotel_reservation_chambre.created_at','>=', $date1],
+            ['thotel_reservation_chambre.created_at','<=', $date2],
+            ['thotel_reservation_chambre.id_prise_charge','=', $id_prisecharge],
+         ])
+        ->orderBy("thotel_reservation_chambre.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+            $output .='
+              	<tr style="vertical-align:top;">
+                  <td style="width:0px;height:46px;"></td>
+                  <td></td>
+                  <td class="csE5AC9E0D" colspan="2" style="width:52px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_reservation.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="3" style="width:84px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>'.$row->codeReservation.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="8" style="width:233px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>Chambre&nbsp;:&nbsp;'.$row->numero_chambre.'</nobr><br/><nobr>Client&nbsp;:&nbsp;'.$row->noms.'</nobr><br/><nobr>Prise&nbsp;en&nbsp;charge&nbsp;:&nbsp;'.$row->noms_charge.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->prixTotalSans.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->reduction.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:77px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->totalPaie.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:74px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->RestePaie.'$</nobr></td>
+                </tr>
+            ';           
+   
+    }
+
+    return $output;
+
+}
+
+
+// ============== RAPPORT DES FACTURES D'HEBERGEMENT BY ORGANISATION =============================================
+
+public function fetch_rapport_facture_hebergement_date(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('date1') && $request->get('date2') && $request->get('author')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $author = $request->get('author');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printRapportHebergement($date1, $date2,$author);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+         
+
+    } else {
+        // code...
+    }  
+    
+}
+function printRapportHebergement($date1, $date2,$author)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+         $nomProvince = '';
+         $villeProvince = '';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme; 
+             $nomProvince = $row->nomProvince;  
+             $villeProvince = $row->solutionEntreprise;      
+         }
+ 
+
+
+
+         $totalFacture = 0;
+         $totalPaie = 0;
+         $restePaie = 0;
+         $totalReduction = 0;
+         // 
+         $data2 =  DB::table('thotel_reservation_chambre')
+         ->select(DB::raw('ROUND(SUM( IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) ),4) as totalFacture, 
+         ROUND(SUM( IFNULL(totalPaie,0) ),4) as totalPaie, ROUND(SUM( IFNULL(reduction,0) ),4) as totalReduction,
+         ROUND(SUM(ROUND(( (IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) ),4)),4) as restePaie'))
+         ->where([
+            ['thotel_reservation_chambre.created_at','>=', $date1],
+            ['thotel_reservation_chambre.created_at','<=', $date2]
+         ])    
+         ->first(); 
+         if ($data2) 
+         {  
+           $totalFacture = $data2->totalFacture;
+           $totalPaie = $data2->totalPaie;
+           $restePaie = $data2->restePaie;
+           $totalReduction = $data2->totalReduction;                    
+         }
+
+         $codeClient='00';
+         $nomClient='RAS';
+
+        $current = Carbon::now();
+        $carbon = $current;
+        // $carbon = Carbon::createFromFormat('Y-m-d H:i', $current);
+        $resteLettre = $this->chiffreEnLettre($restePaie);
+  
+        $output='';          
+
+        $output='
+
+          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+          <!-- saved from url=(0016)http://localhost -->
+          <html>
+          <head>
+            <title>rptFactureHotels</title>
+            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+            <style type="text/css">
+              .cs5971619E {color:#000000;background-color:#000000;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+              .csE5AC9E0D {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+              .cs91032837 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .cs3B0DD49A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+              .cs479D8C74 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .csDC7EEB9 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+              .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+              .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+              .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs7FA6C52A {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; text-decoration: underline;padding-left:2px;padding-right:2px;}
+              .cs9E712815 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .csE9F2AA97 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+              .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+            </style>
+          </head>
+          <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+          <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:662px;height:474px;position:relative;">
+            <tr>
+              <td style="width:0px;height:0px;"></td>
+              <td style="height:0px;width:8px;"></td>
+              <td style="height:0px;width:18px;"></td>
+              <td style="height:0px;width:36px;"></td>
+              <td style="height:0px;width:57px;"></td>
+              <td style="height:0px;width:25px;"></td>
+              <td style="height:0px;width:3px;"></td>
+              <td style="height:0px;width:14px;"></td>
+              <td style="height:0px;width:4px;"></td>
+              <td style="height:0px;width:18px;"></td>
+              <td style="height:0px;width:47px;"></td>
+              <td style="height:0px;width:35px;"></td>
+              <td style="height:0px;width:52px;"></td>
+              <td style="height:0px;width:52px;"></td>
+              <td style="height:0px;width:12px;"></td>
+              <td style="height:0px;width:28px;"></td>
+              <td style="height:0px;width:36px;"></td>
+              <td style="height:0px;width:15px;"></td>
+              <td style="height:0px;width:49px;"></td>
+              <td style="height:0px;width:25px;"></td>
+              <td style="height:0px;width:53px;"></td>
+              <td style="height:0px;width:19px;"></td>
+              <td style="height:0px;width:56px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:23px;"></td>
+              <td class="cs739196BC" colspan="15" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:5px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:2px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" rowspan="2" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Hotel&nbsp;IHUSI</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:20px;"></td>
+              <td></td>
+              <td></td>
+              <td class="cs101A94F7" colspan="2" rowspan="4" style="width:93px;height:85px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:93px;height:85px;">
+                <img alt="" src="'.$pic2.'" style="width:93px;height:85px;" /></div>
+              </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>'.$villeProvince.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NIF:&nbsp;A0706188K&nbsp;--&nbsp;IDNAT&nbsp;:&nbsp;19-G4701</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:21px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" rowspan="2" style="width:289px;height:23px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>N42429X</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:2px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:289px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NRC&nbsp;:&nbsp;RCCM&nbsp;:&nbsp;'.$rccmEse.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="csE9F2AA97" colspan="21" style="width:650px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;FACTURES&nbsp;DES&nbsp;FACTURES&nbsp;&nbsp;Du&nbsp;'.$date1.'&nbsp;au&nbsp;'.$date2.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="8" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Code&nbsp;:&nbsp;'.$codeClient.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="8" style="width:279px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="8" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Nom&nbsp;:&nbsp;'.$nomClient.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="8" style="width:279px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;par&nbsp;:&nbsp;'.$author.'</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="cs91032837" colspan="2" style="width:52px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:84px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Num&#233;ro</nobr></td>
+              <td class="cs479D8C74" colspan="8" style="width:233px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Description&nbsp;/&nbsp;Point&nbsp;de&nbsp;vente</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;du</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>R&#233;duction</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;pay&#233;</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Reste&nbsp;&#224;&nbsp;payer</nobr></td>
+            </tr>
+            ';
+
+                                  $output .= $this->showRapportHebergement($date1,$date2); 
+
+                                  $output.='
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs91032837" colspan="8" style="width:232px;height:22px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalFacture.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalReduction.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$restePaie.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs9E712815" colspan="4" style="width:126px;height:22px;line-height:18px;text-align:left;vertical-align:bottom;"><nobr>A&nbsp;payer&nbsp;:</nobr></td>
+              <td class="csE9F2AA97" colspan="2" style="width:60px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>USD</nobr></td>
+              <td class="csE9F2AA97" colspan="4" style="width:149px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>'.$restePaie.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:8px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="7" style="width:153px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;'.$carbon.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="11" style="width:393px;height:22px;line-height:15px;text-align:right;vertical-align:top;"><nobr>Nous&nbsp;disons&nbsp;dollars&nbsp;americains&nbsp;.'.$resteLettre.'.</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="3" style="width:65px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Client</nobr></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="5" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>R&#233;ceptionniste</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:45px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:1px;"></td>
+              <td></td>
+              <td class="cs5971619E" colspan="21" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:1px;"></td>
+              <td></td>
+              <td class="cs101A94F7" colspan="21" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:10px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="14" style="width:388px;height:22px;line-height:15px;text-align:left;vertical-align:top;"><nobr>Web&nbsp;:&nbsp;'.$siteEse.'&nbsp;Tel&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;0813532300</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="9" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+              <td></td>
+            </tr>
+          </table>
+          </body>
+          </html>
+
+        ';  
+       
+        return $output; 
+
+}
+function showRapportHebergement($date1,$date2)
+{
+        $data = DB::table('thotel_reservation_chambre')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
+        ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+        ->join('tvente_client as clientHotel','clientHotel.id','=','thotel_reservation_chambre.refClient')
+        ->join('tvente_client as priseCharge','priseCharge.id','=','thotel_reservation_chambre.id_prise_charge')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','clientHotel.refCategieClient')
+        ->select('thotel_reservation_chambre.id','refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
+        'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
+        'type_reservation','nom_accompagner','pays_provenance',
+        'thotel_reservation_chambre.author','thotel_reservation_chambre.created_at','clientHotel.noms',
+        'clientHotel.sexe','clientHotel.contact','clientHotel.mail','clientHotel.adresse',
+        'clientHotel.pieceidentite','clientHotel.numeroPiece','clientHotel.dateLivrePiece',
+        'clientHotel.lieulivraisonCarte','clientHotel.nationnalite','clientHotel.datenaissance',
+        'clientHotel.lieunaissance','clientHotel.profession','clientHotel.occupation','clientHotel.nombreEnfant',
+        'clientHotel.dateArriverGoma','clientHotel.arriverPar','clientHotel.refCategieClient',
+        'clientHotel.photo','clientHotel.slug','thotel_reservation_chambre.devise',
+        'thotel_reservation_chambre.taux','tvente_categorie_client.designation as CategorieClient', 
+        "thotel_chambre.nom_chambre","numero_chambre","refClasse", "thotel_classe_chambre.designation as ClasseChambre",
+        "thotel_classe_chambre.prix_chambre","thotel_reservation_chambre.refUser"
+        
+        ,'priseCharge.noms as noms_charge','priseCharge.sexe as sexe_charge','priseCharge.contact as contact__charge',
+        'priseCharge.mail as mail_charge','priseCharge.adresse as adresse_charge')
+        ->selectRaw('((prix_unitaire)/thotel_reservation_chambre.taux) as prix_unitaireFC')
+        ->selectRaw('TIMESTAMPDIFF(DAY, date_entree, date_sortie) as NombreJour')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))) as prixTotalSans')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction) as prixTotal')
+        ->selectRaw('((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction)/thotel_reservation_chambre.taux) as prixTotalFC')
+        ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFacture')
+        ->selectRaw('IFNULL(totalPaie,0) as totalPaie')
+        ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaie')
+        ->selectRaw('((IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0))/thotel_reservation_chambre.taux) as RestePaieFC')
+        ->selectRaw("DATE_FORMAT(thotel_reservation_chambre.created_at,'%d/%M/%Y') as jour_reservation")
+        ->selectRaw('CONCAT("F",YEAR(thotel_reservation_chambre.created_at),"",MONTH(thotel_reservation_chambre.created_at),"00",thotel_reservation_chambre.id) as codeReservation')
+       ->where([
+            ['thotel_reservation_chambre.created_at','>=', $date1],
+            ['thotel_reservation_chambre.created_at','<=', $date2]
+         ])
+        ->orderBy("thotel_reservation_chambre.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+            $output .='
+              	<tr style="vertical-align:top;">
+                  <td style="width:0px;height:46px;"></td>
+                  <td></td>
+                  <td class="csE5AC9E0D" colspan="2" style="width:52px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_reservation.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="3" style="width:84px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>'.$row->codeReservation.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="8" style="width:233px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>Chambre&nbsp;:&nbsp;'.$row->numero_chambre.'</nobr><br/><nobr>Client&nbsp;:&nbsp;'.$row->noms.'</nobr><br/><nobr>Prise&nbsp;en&nbsp;charge&nbsp;:&nbsp;'.$row->noms_charge.'</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->prixTotalSans.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->reduction.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:77px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->totalPaie.'$</nobr></td>
+                  <td class="cs3B0DD49A" colspan="2" style="width:74px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->RestePaie.'$</nobr></td>
+                </tr>
+            ';           
+   
+    }
+
+    return $output;
+
+}
+
+// ============== RAPPORT DES FACTURES D'HEBERGEMENT BY ORGANISATION =============================================
+
+
+public function fetch_rapport_facture_hebergement_by_numero(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('id_facture') && $request->get('author')) {
+        // code...
+        $id_facture = $request->get('id_facture');
+        $author = $request->get('author');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printRapportHebergement_ByNumero($id_facture,$author);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+         
+
+    } else {
+        // code...
+    }  
+    
+}
+function printRapportHebergement_ByNumero($id_facture,$author)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+         $nomProvince = '';
+         $villeProvince = '';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme; 
+             $nomProvince = $row->nomProvince;  
+             $villeProvince = $row->solutionEntreprise;      
+         }
+
+         $totalFacture = 0;
+         $totalPaie = 0;
+         $restePaie = 0;
+         $totalReduction = 0;
+         $codeClient='';
+         $nomClient='';
+         $codeFacture = '';
+         // 
+         $data2 =  DB::table('tvente_entete_facture_groupe')      
+         ->join('tvente_client','tvente_client.id','=','tvente_entete_facture_groupe.refOrganisation')   
+         ->select('tvente_entete_facture_groupe.id','refOrganisation','tvente_entete_facture_groupe.author',
+         'tvente_entete_facture_groupe.created_at','noms','sexe',
+         'contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece','lieulivraisonCarte',
+         'nationnalite','datenaissance','lieunaissance','profession','occupation','nombreEnfant',
+         'dateArriverGoma','arriverPar','refCategieClient')
+         ->selectRaw('CONCAT("F",YEAR(dateGroup),"",MONTH(dateGroup),"00",tvente_entete_facture_groupe.id) as codeFacture')
+         ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0)),0),2) as totalFacture')
+         ->selectRaw('ROUND(IFNULL(paie_group,0),3) as totalPaie')
+         ->selectRaw('ROUND(IFNULL(reduction_group,0),2) as totalReduction')
+         ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as restePaie')
+         ->where([
+            ['tvente_entete_facture_groupe.id','=', $id_facture],
+         ])    
+         ->first(); 
+         if ($data2) 
+         {  
+            $totalFacture = $data2->totalFacture;
+            $totalPaie = $data2->totalPaie;
+            $restePaie = $data2->restePaie;
+            $totalReduction = $data2->totalReduction; 
+            $codeClient = $data2->refOrganisation;
+            $nomClient = $data2->noms; 
+            $codeFacture = $data2->codeFacture;                      
+         }
+
+        
+
+        $current = Carbon::now();
+        $carbon = $current;
+        // $carbon = Carbon::createFromFormat('Y-m-d H:i', $current);
+        $resteLettre = $this->chiffreEnLettre($restePaie);
+  
+        $output='';          
+
+        $output='
+
+              <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+              <!-- saved from url=(0016)http://localhost -->
+              <html>
+              <head>
+                <title>rptFactureGlobaleOrganisation</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                  .cs5971619E {color:#000000;background-color:#000000;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                  .csE5AC9E0D {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+                  .cs91032837 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+                  .cs3B0DD49A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+                  .cs479D8C74 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+                  .csDC7EEB9 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+                  .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+                  .csB8EAE05B {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; text-decoration: underline;padding-left:2px;padding-right:2px;}
+                  .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                  .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+                  .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                  .cs9E712815 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
+                  .csE9F2AA97 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                  .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                  .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+              </head>
+              <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+              <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:662px;height:474px;position:relative;">
+                <tr>
+                  <td style="width:0px;height:0px;"></td>
+                  <td style="height:0px;width:8px;"></td>
+                  <td style="height:0px;width:18px;"></td>
+                  <td style="height:0px;width:36px;"></td>
+                  <td style="height:0px;width:57px;"></td>
+                  <td style="height:0px;width:25px;"></td>
+                  <td style="height:0px;width:1px;"></td>
+                  <td style="height:0px;width:2px;"></td>
+                  <td style="height:0px;width:14px;"></td>
+                  <td style="height:0px;width:4px;"></td>
+                  <td style="height:0px;width:18px;"></td>
+                  <td style="height:0px;width:47px;"></td>
+                  <td style="height:0px;width:35px;"></td>
+                  <td style="height:0px;width:52px;"></td>
+                  <td style="height:0px;width:52px;"></td>
+                  <td style="height:0px;width:12px;"></td>
+                  <td style="height:0px;width:28px;"></td>
+                  <td style="height:0px;width:36px;"></td>
+                  <td style="height:0px;width:15px;"></td>
+                  <td style="height:0px;width:1px;"></td>
+                  <td style="height:0px;width:48px;"></td>
+                  <td style="height:0px;width:25px;"></td>
+                  <td style="height:0px;width:53px;"></td>
+                  <td style="height:0px;width:19px;"></td>
+                  <td style="height:0px;width:52px;"></td>
+                  <td style="height:0px;width:4px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:23px;"></td>
+                  <td class="cs739196BC" colspan="16" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:5px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:2px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" rowspan="2" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Hotel&nbsp;IHUSI</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:20px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs101A94F7" colspan="2" rowspan="4" style="width:93px;height:85px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:93px;height:85px;">
+                    <img alt="" src="'.$pic2.'" style="width:93px;height:85px;" /></div>
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>'.$villeProvince.'</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NIF:&nbsp;A0706188K&nbsp;--&nbsp;IDNAT&nbsp;:&nbsp;19-G4701</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:21px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" rowspan="2" style="width:285px;height:23px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>N42429X</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:2px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NRC&nbsp;:&nbsp;RCCM&nbsp;:&nbsp;'.$rccmEse.'</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="csE9F2AA97" colspan="13" style="width:312px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>RESUME&nbsp;DES&nbsp;FACTURES&nbsp;n&#176;&nbsp;'.$codeFacture.'</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td class="cs8A513397" colspan="9" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Code&nbsp;:&nbsp;'.'.$codeClient.'.'</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs6105B8F3" colspan="10" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td class="cs8A513397" colspan="9" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Nom&nbsp;:&nbsp;'.$nomClient.'</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs6105B8F3" colspan="10" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;par&nbsp;:&nbsp;'.$author.'</nobr></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:24px;"></td>
+                  <td></td>
+                  <td class="cs91032837" colspan="2" style="width:52px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                  <td class="cs479D8C74" colspan="4" style="width:84px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Num&#233;ro</nobr></td>
+                  <td class="cs479D8C74" colspan="8" style="width:233px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Description&nbsp;/&nbsp;Point&nbsp;de&nbsp;vente</nobr></td>
+                  <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;du</nobr></td>
+                  <td class="cs479D8C74" colspan="3" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>R&#233;duction</nobr></td>
+                  <td class="cs479D8C74" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;pay&#233;</nobr></td>
+                  <td class="cs479D8C74" colspan="3" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Reste&nbsp;&#224;&nbsp;payer</nobr></td>
+                </tr>
+                ';
+
+                                      $output .= $this->showRapportHebergement_ByNumero($id_facture); 
+
+                                      $output.='
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:24px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs91032837" colspan="8" style="width:232px;height:22px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                  <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalFacture.'$</nobr></td>
+                  <td class="csDC7EEB9" colspan="3" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalReduction.'$</nobr></td>
+                  <td class="csDC7EEB9" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'$</nobr></td>
+                  <td class="csDC7EEB9" colspan="3" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$restePaie.'$</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs9E712815" colspan="4" style="width:126px;height:22px;line-height:18px;text-align:left;vertical-align:bottom;"><nobr>A&nbsp;payer&nbsp;:</nobr></td>
+                  <td class="csE9F2AA97" colspan="3" style="width:60px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>USD</nobr></td>
+                  <td class="csE9F2AA97" colspan="5" style="width:149px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>'.$restePaie.'$</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:8px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="8" style="width:153px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;'.$carbon.'</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="13" style="width:393px;height:22px;line-height:15px;text-align:right;vertical-align:top;"><nobr>Nous&nbsp;disons&nbsp;dollars&nbsp;americains&nbsp;.'.$resteLettre.'.</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="csB8EAE05B" colspan="3" style="width:65px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Client</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td class="csB8EAE05B" colspan="5" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>R&#233;ceptionniste</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:45px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:1px;"></td>
+                  <td></td>
+                  <td class="cs5971619E" colspan="24" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:1px;"></td>
+                  <td></td>
+                  <td class="cs101A94F7" colspan="24" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:10px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs6105B8F3" colspan="16" style="width:388px;height:22px;line-height:15px;text-align:left;vertical-align:top;"><nobr>Web&nbsp;:&nbsp;'.$siteEse.'&nbsp;Tel&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;0813532300</nobr></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+              </body>
+              </html>
+
+        ';  
+       
+        return $output; 
+
+}
+function showRapportHebergement_ByNumero($id_facture)
+{
+        $data = DB::table('tvente_detail_facture_groupe')
+        ->join('tvente_entete_facture_groupe','tvente_entete_facture_groupe.id','=','tvente_detail_facture_groupe.refEnteteGroup')
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_facture_groupe.module_id')
+        ->join('tvente_client as Organiation','Organiation.id','=','tvente_entete_facture_groupe.refOrganisation')
+        ->join('tvente_categorie_client as CatOrg','CatOrg.id','=','Organiation.refCategieClient')  
+
+        ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','tvente_detail_facture_groupe.id_reservation')
+        ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
+        ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+        ->join('tvente_client as clientHotel','clientHotel.id','=','thotel_reservation_chambre.refClient')
+        ->join('tvente_client as priseCharge','priseCharge.id','=','thotel_reservation_chambre.id_prise_charge')
+        ->join('tvente_categorie_client as CatClient','CatClient.id','=','clientHotel.refCategieClient')
+        
+        ->select('tvente_detail_facture_groupe.id','refEnteteGroup','tvente_detail_facture_groupe.id_vente',
+        'tvente_detail_facture_groupe.id_reservation','tvente_detail_facture_groupe.active',
+        'tvente_entete_facture_groupe.code','refOrganisation','tvente_detail_facture_groupe.created_at',
+        'tvente_entete_facture_groupe.module_id','etat_facture_group','dateGroup',
+        'libelle_group','montant_group','reduction_group','totaltva_group','paie_group','date_paie_current_group',
+        'nombre_print_group','tvente_detail_facture_groupe.author','tvente_detail_facture_groupe.refUser'
+
+        ,'Organiation.noms','Organiation.sexe','Organiation.contact','Organiation.mail','Organiation.adresse',
+        'Organiation.pieceidentite','Organiation.numeroPiece','Organiation.dateLivrePiece',
+        'Organiation.lieulivraisonCarte','Organiation.nationnalite','Organiation.datenaissance',
+        'Organiation.lieunaissance','Organiation.profession','Organiation.occupation',
+        'Organiation.nombreEnfant','Organiation.dateArriverGoma','Organiation.arriverPar',
+        'Organiation.refCategieClient','Organiation.photo','Organiation.slug',
+        "CatOrg.designation"
+        
+        ,'refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
+        'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
+        'type_reservation','nom_accompagner','pays_provenance','clientHotel.noms as nomsClient',
+        'clientHotel.sexe as sexeClient','clientHotel.contact as Client','clientHotel.mail as mailClient',
+        'clientHotel.adresse as adresseClient','clientHotel.pieceidentite as pieceidentiteClient',
+        'clientHotel.numeroPiece as numeroPieceClient','clientHotel.dateLivrePiece as dateLivrePieceClient',
+        'clientHotel.lieulivraisonCarte as lieulivraisonCarteClient','clientHotel.nationnalite as nationnaliteClient',
+        'clientHotel.datenaissance as datenaissanceClient',
+        'clientHotel.lieunaissance as lieunaissanceClient','clientHotel.profession as professionClient',
+        'clientHotel.occupation as occupationClient','clientHotel.nombreEnfant as nombreEnfantClient',
+        'clientHotel.dateArriverGoma as dateArriverGomaClient','clientHotel.arriverPar as arriverParClient',
+        'clientHotel.refCategieClient as refCategieClientClient',
+        'clientHotel.photo as photoCLient','CatClient.designation as CategorieClient', 
+        "thotel_chambre.nom_chambre","numero_chambre","refClasse", "thotel_classe_chambre.designation as ClasseChambre",
+        "thotel_classe_chambre.prix_chambre"
+        
+        ,'priseCharge.noms as noms_charge','priseCharge.sexe as sexe_charge','priseCharge.contact as contact_charge',
+        'priseCharge.mail as mail_charge','priseCharge.adresse as adresse_charge')
+
+        ->selectRaw('CONCAT("F",YEAR(dateGroup),"",MONTH(dateGroup),"00",tvente_entete_facture_groupe.id) as codeFacture')
+        ->selectRaw('CONCAT("F",YEAR(thotel_reservation_chambre.created_at),"",MONTH(thotel_reservation_chambre.created_at),"00",thotel_reservation_chambre.id) as codeReservation')
+        ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0),2) as totalFacture')
+        ->selectRaw('IFNULL(paie_group,0) as totalPaie')
+        ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as RestePaie')
+        
+        ->selectRaw('((prix_unitaire)/thotel_reservation_chambre.taux) as prix_unitaireFCHotel')
+        ->selectRaw('TIMESTAMPDIFF(DAY, date_entree, date_sortie) as NombreJour')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))) as prixTotalSansHotel')
+        ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction) as prixTotalHotel')
+        ->selectRaw('((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction)/thotel_reservation_chambre.taux) as prixTotalFCHotel')
+        ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFactureHotel')
+        ->selectRaw('IFNULL(totalPaie,0) as totalPaieHotel')
+        ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaieHotel')
+        ->selectRaw('((IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0))/thotel_reservation_chambre.taux) as RestePaieFCHotel')
+        ->selectRaw("DATE_FORMAT(thotel_reservation_chambre.created_at,'%d/%M/%Y') as jour_reservation")
+        ->where([
+          ['tvente_detail_facture_groupe.refEnteteGroup','=', $id_facture],
+        ])
+        ->orderBy("tvente_detail_facture_groupe.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+          $output .='
+            	<tr style="vertical-align:top;">
+                <td style="width:0px;height:46px;"></td>
+                <td></td>
+                <td class="csE5AC9E0D" colspan="2" style="width:52px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_reservation.'</nobr></td>
+                <td class="cs3B0DD49A" colspan="4" style="width:84px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>'.$row->codeReservation.'</nobr></td>
+                <td class="cs3B0DD49A" colspan="8" style="width:233px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>Chambre&nbsp;:&nbsp;'.$row->numero_chambre.'</nobr><br/><nobr>Client&nbsp;:&nbsp;'.$row->nomsClient.'</nobr><br/><nobr>Prise&nbsp;en&nbsp;charge&nbsp;:&nbsp;'.$row->noms.'</nobr></td>
+                <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->prixTotalSansHotel.'$</nobr></td>
+                <td class="cs3B0DD49A" colspan="3" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->reduction.'$</nobr></td>
+                <td class="cs3B0DD49A" colspan="2" style="width:77px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->totalPaieHotel.'$</nobr></td>
+                <td class="cs3B0DD49A" colspan="3" style="width:74px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->RestePaieHotel.'$</nobr></td>
+              </tr>
+          ';  
+  
+    }
+
+    return $output;
+
+}
+
+
+// ============== FACTURES D'HEBERGEMENT ET CONSOMMATION =============================================
+
+public function fetch_facture_hebergement_consommation(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('id_facture') && $request->get('author')) {
+        // code...
+        $id_facture = $request->get('id_facture');
+        $author = $request->get('author');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printFactureHebergementConsommation($id_facture,$author);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+         
+
+    } else {
+        // code...
+    }  
+    
+}
+function printFactureHebergementConsommation($id_facture,$author)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+         $nomProvince = '';
+         $villeProvince = '';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme; 
+             $nomProvince = $row->nomProvince;  
+             $villeProvince = $row->solutionEntreprise;      
+         }
+ 
+
+
+
+         $totalFacture = 0;
+         $totalPaie = 0;
+         $restePaie = 0;
+         $totalReduction = 0;
+         // 
+         $data2 =  DB::table('thotel_reservation_chambre')
+         ->select(DB::raw('ROUND(SUM( IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) ),4) as totalFacture, 
+         ROUND(SUM( IFNULL(totalPaie,0) ),4) as totalPaie, ROUND(SUM( IFNULL(reduction,0) ),4) as totalReduction,
+         ROUND(SUM(ROUND(( (IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) ),4)),4) as restePaie'))
+         ->where([
+            ['thotel_reservation_chambre.id','=', $id_facture],
+         ])    
+         ->first(); 
+         if ($data2) 
+         {  
+           $totalFacture = $data2->totalFacture;
+           $totalPaie = $data2->totalPaie;
+           $restePaie = $data2->restePaie;
+           $totalReduction = $data2->totalReduction;                    
+         }
+
+         $date_entree='';
+         $date_sortie='';
+         $heure_debut='';                
+         $heure_sortie='';
+         $prix_unitaire='';
+         $reduction='';
+         $type_reservation='';
+         $nom_accompagner='';
+         $pays_provenance='';
+         $author='';
+         $noms='';
+         $sexe='';
+         $contact='';
+         $mail='';
+         $adresse='';
+         $pieceidentite='';
+         $numeroPiece='';
+         $dateLivrePiece='';
+         $lieulivraisonCarte='';
+         $nationnalite='';
+         $datenaissance='';
+         $lieunaissance='';
+         $profession='';
+         $occupation='';
+         $nombreEnfant='';
+         $dateArriverGoma='';
+         $arriverPar='';
+         $devise='';
+         $CategorieClient='';
+         $nom_chambre='';
+         $numero_chambre='';
+         $codeOperation='';
+         $prix_unitaireFC='';
+         $NombreJour='';
+         $prixTotalSans='';
+         $prixTotal='';
+         $prixTotalFC='';
+         $totalFacture='';
+         $totalPaie='';
+         $RestePaie='';
+         $RestePaieFC='';
+         $dateReservation='';
+         $ClasseChambre='';
+         $noms_charge = '';
+         
+         $data3 = DB::table('thotel_reservation_chambre')
+         ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
+         ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+         ->join('tvente_client as clientHotel','clientHotel.id','=','thotel_reservation_chambre.refClient')
+         ->join('tvente_client as priseCharge','priseCharge.id','=','thotel_reservation_chambre.id_prise_charge')
+         ->join('tvente_categorie_client','tvente_categorie_client.id','=','clientHotel.refCategieClient')
+         ->select('thotel_reservation_chambre.id','refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
+         'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
+         'type_reservation','nom_accompagner','pays_provenance',
+         'thotel_reservation_chambre.author','thotel_reservation_chambre.created_at','clientHotel.noms',
+         'clientHotel.sexe','clientHotel.contact','clientHotel.mail','clientHotel.adresse',
+         'clientHotel.pieceidentite','clientHotel.numeroPiece','clientHotel.dateLivrePiece',
+         'clientHotel.lieulivraisonCarte','clientHotel.nationnalite','clientHotel.datenaissance',
+         'clientHotel.lieunaissance','clientHotel.profession','clientHotel.occupation','clientHotel.nombreEnfant',
+         'clientHotel.dateArriverGoma','clientHotel.arriverPar','clientHotel.refCategieClient',
+         'clientHotel.photo','clientHotel.slug','thotel_reservation_chambre.devise',
+         'thotel_reservation_chambre.taux','tvente_categorie_client.designation as CategorieClient', 
+         "thotel_chambre.nom_chambre","numero_chambre","refClasse", "thotel_classe_chambre.designation as ClasseChambre",
+         "thotel_classe_chambre.prix_chambre","thotel_reservation_chambre.refUser"
+         
+         ,'priseCharge.noms as noms_charge','priseCharge.sexe as sexe_charge','priseCharge.contact as contact__charge',
+         'priseCharge.mail as mail_charge','priseCharge.adresse as adresse_charge')
+         ->selectRaw("DATE_FORMAT(heure_debut,'%H:%i:%s') as heure_debut") 
+         ->selectRaw("DATE_FORMAT(heure_sortie,'%H:%i:%s') as heure_sortie") 
+         ->selectRaw('CONCAT("RCH",YEAR(thotel_reservation_chambre.created_at),"",MONTH(thotel_reservation_chambre.created_at),"00",thotel_reservation_chambre.id) as codeOperation')
+         ->selectRaw('((prix_unitaire)/thotel_reservation_chambre.taux) as prix_unitaireFC')
+         ->selectRaw('TIMESTAMPDIFF(DAY, date_entree, date_sortie) as NombreJour')
+         ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))) as prixTotalSans')
+         ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction) as prixTotal')
+         ->selectRaw('((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction)/thotel_reservation_chambre.taux) as prixTotalFC')
+         ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFacture')
+         ->selectRaw('IFNULL(totalPaie,0) as totalPaie')
+         ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaie')
+         ->selectRaw('((IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0))/thotel_reservation_chambre.taux) as RestePaieFC')
+         ->where('thotel_reservation_chambre.id', $id_facture)
+         ->first();
+         $output='';
+         if ($data3) 
+         {         
+             $date_entree=$data3->date_entree;
+             $date_sortie=$data3->date_sortie;
+             $heure_debut=$data3->heure_debut;                
+             $heure_sortie=$data3->heure_sortie;
+             $prix_unitaire=$data3->prix_unitaire;
+             $reduction=$data3->reduction;
+             $type_reservation=$data3->type_reservation;
+             $nom_accompagner=$data3->nom_accompagner;
+             $pays_provenance=$data3->pays_provenance;
+             $author=$data3->author;
+             $noms=$data3->noms;
+             $sexe=$data3->sexe;
+             $contact=$data3->contact;
+             $mail=$data3->mail;
+             $adresse=$data3->adresse;
+             $pieceidentite=$data3->pieceidentite;
+             $numeroPiece=$data3->numeroPiece;
+             $dateLivrePiece=$data3->dateLivrePiece;
+             $lieulivraisonCarte=$data3->lieulivraisonCarte;
+             $nationnalite=$data3->nationnalite;
+             $datenaissance=$data3->datenaissance;
+             $lieunaissance=$data3->lieunaissance;
+             $profession=$data3->profession;
+             $occupation=$data3->occupation;
+             $nombreEnfant=$data3->nombreEnfant;
+             $dateArriverGoma=$data3->dateArriverGoma;
+             $arriverPar=$data3->arriverPar;
+             $devise=$data3->devise;
+             $CategorieClient=$data3->CategorieClient;
+             $nom_chambre=$data3->nom_chambre;
+             $numero_chambre=$data3->numero_chambre;
+             $codeOperation=$data3->codeOperation;
+             $prix_unitaireFC=$data3->prix_unitaireFC;
+             $NombreJour=$data3->NombreJour;
+             $prixTotalSans=$data3->prixTotalSans;
+             $prixTotal=$data3->prixTotal;
+             $prixTotalFC=$data3->prixTotalFC;
+             $totalFacture=$data3->totalFacture;
+             $totalPaie=$data3->totalPaie;
+             $RestePaie=$data3->RestePaie;
+             $RestePaieFC=$data3->RestePaieFC;
+             $dateReservation=$data3->created_at;
+             $ClasseChambre=$data3->ClasseChambre;
+             $noms_charge = $data3->noms_charge;
+          }
+
+
+          $sommePHT=0;
+          $sommeTVA=0;
+          $sommePTTF=0;
+          // 
+          $data4 =  DB::table('tvente_detail_vente')
+          ->join('tvente_produit','tvente_produit.id','=','tvente_detail_vente.refProduit')
+          ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+  
+          ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_detail_vente.refEnteteVente')        
+          ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
+          ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
+          ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+          ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
+          ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
+ 
+          ->select(DB::raw('ROUND(SUM(((qteVente*puVente) - montantreduction)),4) as sommePHT, 
+          ROUND(SUM(montanttva),4) as sommeTVA,
+           ROUND(SUM(ROUND(((qteVente*puVente) - montantreduction + montanttva),4)),4) as sommePTTF'))
+          ->where([
+             ['tvente_entete_vente.refReservation','=', $id_facture]
+         ])    
+        ->first(); 
+        $output='';
+        if ($data4) 
+        {                                
+           $sommePHT=$data4->sommePHT;
+           $sommeTVA=$data4->sommeTVA;
+           $sommePTTF=$data4->sommePTTF;                           
+        }
+
+        $montant_total = floatval($sommePTTF) + floatval($totalFacture);
+        $current = Carbon::now();
+        $carbon = $current;
+        // $carbon = Carbon::createFromFormat('Y-m-d H:i', $current);
+        $resteLettre = $this->chiffreEnLettre($montant_total);
+  
+        $output='';          
+
+        $output='
+
+          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+          <!-- saved from url=(0016)http://localhost -->
+          <html>
+          <head>
+            <title>rptFactureChambreConsommation</title>
+            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+            <style type="text/css">
+              .cs7568F84A {color:#000000;background-color:#E0FFFF;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+              .cs91032837 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .csFBCBEF30 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+              .cs4A517927 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+              .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+              .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+              .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+              .cs479D8C74 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+              .csDC7EEB9 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+              .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+              .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+              .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+              .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+              .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs7FA6C52A {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; text-decoration: underline;padding-left:2px;padding-right:2px;}
+              .cs9E712815 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
+              .csE9F2AA97 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+              .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+              .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+            </style>
+          </head>
+          <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+          <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:668px;height:548px;position:relative;">
+            <tr>
+              <td style="width:0px;height:0px;"></td>
+              <td style="height:0px;width:10px;"></td>
+              <td style="height:0px;width:45px;"></td>
+              <td style="height:0px;width:51px;"></td>
+              <td style="height:0px;width:46px;"></td>
+              <td style="height:0px;width:5px;"></td>
+              <td style="height:0px;width:35px;"></td>
+              <td style="height:0px;width:29px;"></td>
+              <td style="height:0px;width:13px;"></td>
+              <td style="height:0px;width:22px;"></td>
+              <td style="height:0px;width:14px;"></td>
+              <td style="height:0px;width:28px;"></td>
+              <td style="height:0px;width:10px;"></td>
+              <td style="height:0px;width:50px;"></td>
+              <td style="height:0px;width:50px;"></td>
+              <td style="height:0px;width:1px;"></td>
+              <td style="height:0px;width:37px;"></td>
+              <td style="height:0px;width:5px;"></td>
+              <td style="height:0px;width:19px;"></td>
+              <td style="height:0px;width:13px;"></td>
+              <td style="height:0px;width:15px;"></td>
+              <td style="height:0px;width:37px;"></td>
+              <td style="height:0px;width:20px;"></td>
+              <td style="height:0px;width:47px;"></td>
+              <td style="height:0px;width:12px;"></td>
+              <td style="height:0px;width:39px;"></td>
+              <td style="height:0px;width:15px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:23px;"></td>
+              <td class="cs739196BC" colspan="15" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:12px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$nomEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs101A94F7" colspan="5" rowspan="5" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+              </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$busnessName.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$numImpotEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;'.$numImpotEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$adresseEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:23px;"></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="15" style="width:434px;height:23px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs6105B8F3" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Site-web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs8A513397" colspan="15" style="width:434px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:10px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs4A517927" colspan="2" style="width:92px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;:</nobr></td>
+              <td class="cs4A517927" colspan="15" style="width:360px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$codeOperation.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs4A517927" colspan="2" style="width:92px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Client&nbsp;:</nobr></td>
+              <td class="cs4A517927" colspan="15" style="width:360px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$noms.' - '.$contact.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs4A517927" colspan="2" style="width:92px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Date&nbsp;Reserv.&nbsp;:</nobr></td>
+              <td class="cs4A517927" colspan="15" style="width:360px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$dateReservation.' - '.$type_reservation.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td class="cs4A517927" colspan="2" style="width:92px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Prise&nbsp;en&nbsp;charge&nbsp;:</nobr></td>
+              <td class="cs4A517927" colspan="15" style="width:360px;height:20px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$noms_charge.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:11px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="cs91032837" colspan="2" style="width:94px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;Chambre</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:85px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Heure&nbsp;Entr&#233;e</nobr></td>
+              <td class="cs479D8C74" colspan="4" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date&nbsp;Entr&#233;e</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:87px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date&nbsp;Sortie</nobr></td>
+              <td class="cs479D8C74" style="width:49px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Jour</nobr></td>
+              <td class="cs479D8C74" colspan="4" style="width:61px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>PU&nbsp;(USD)</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:64px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>PT&nbsp;(USD)</nobr></td>
+              <td class="cs479D8C74" colspan="2" style="width:66px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Reduction</nobr></td>
+              <td class="cs479D8C74" colspan="3" style="width:65px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant($)</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="csFBCBEF30" colspan="2" style="width:94px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$nom_chambre.'</nobr></td>
+              <td class="csDC7EEB9" colspan="3" style="width:85px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$heure_debut.'</nobr></td>
+              <td class="csDC7EEB9" colspan="4" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$date_entree.'</nobr></td>
+              <td class="csDC7EEB9" colspan="3" style="width:87px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$date_sortie.'</nobr></td>
+              <td class="csDC7EEB9" style="width:49px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$NombreJour.'</nobr></td>
+              <td class="csDC7EEB9" colspan="4" style="width:61px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$prix_unitaire.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="3" style="width:64px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$prixTotalSans.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="2" style="width:66px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$reduction.'$</nobr></td>
+              <td class="csDC7EEB9" colspan="3" style="width:65px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalFacture.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="cs7568F84A" colspan="25" style="width:656px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>CONSOMMATION</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td class="cs1E4BB091" style="width:43px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+              <td class="csEE1F9023" colspan="6" style="width:178px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;Facture&nbsp;-&nbsp;Client</nobr></td>
+              <td class="csEE1F9023" colspan="5" style="width:123px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Service&nbsp;(Point&nbsp;de&nbsp;vente)</nobr></td>
+              <td class="csEE1F9023" colspan="7" style="width:139px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Produit</nobr></td>
+              <td class="csEE1F9023" style="width:36px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Qt&#233;</nobr></td>
+              <td class="csEE1F9023" colspan="2" style="width:66px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
+              <td class="csEE1F9023" colspan="3" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PT</nobr></td>
+            </tr>
+              ';
+
+                    $output .= $this->showFactureHebergement_Consommation($id_facture); 
+
+                    $output.='
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:24px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="csDB0B2364" colspan="2" style="width:55px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+              <td class="cs5A34C077" colspan="4" style="width:112px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$sommePTTF.'$</nobr></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:11px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs9E712815" colspan="5" style="width:126px;height:22px;line-height:18px;text-align:left;vertical-align:bottom;"><nobr>A&nbsp;payer&nbsp;:</nobr></td>
+              <td class="csE9F2AA97" colspan="3" style="width:60px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>USD</nobr></td>
+              <td class="csE9F2AA97" colspan="6" style="width:149px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>'.$montant_total.'$</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:6px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td class="cs5EA817F2" colspan="5" style="width:153px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;'.$carbon.'</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs5EA817F2" colspan="16" style="width:393px;height:22px;line-height:15px;text-align:right;vertical-align:top;"><nobr>Nous&nbsp;disons&nbsp;dollars&nbsp;americains&nbsp;.'.$resteLettre.'.</nobr></td>
+              <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+              <td style="width:0px;height:22px;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="3" style="width:65px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Client</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="cs7FA6C52A" colspan="5" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>R&#233;ceptionniste</nobr></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+          </body>
+          </html>
+        ';  
+       
+        return $output; 
+
+}
+function showFactureHebergement_Consommation($id_facture)
+{
+        $data = DB::table('tvente_detail_vente')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_vente.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+    
+        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_detail_vente.refEnteteVente')        
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
+            
+        ->select('tvente_detail_vente.id','refEnteteVente','refProduit','tvente_detail_vente.compte_vente',
+        'tvente_detail_vente.compte_variationstock','tvente_detail_vente.compte_perte','tvente_detail_vente.compte_produit',
+        'tvente_detail_vente.compte_destockage','puVente','qteVente','uniteVente','puBase','qteBase',
+        'tvente_detail_vente.uniteBase','cmupVente','tvente_detail_vente.devise','tvente_detail_vente.taux',
+        'montanttva','montantreduction',
+        'tvente_detail_vente.active','tvente_detail_vente.author','tvente_detail_vente.refUser',
+        'tvente_detail_vente.created_at','idStockService',
+        //Produit
+        'tvente_produit.designation','tvente_produit.refCategorie','tvente_produit.refUniteBase',
+        'tvente_produit.pu','tvente_produit.qte','tvente_produit.cmup','tvente_produit.taux',
+        'tvente_produit.Oldcode','tvente_produit.Newcode','tvente_produit.tvaapplique',
+        'tvente_produit.estvendable','tvente_categorie_produit.designation as Categorie',
+        //client 
+        'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
+        'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
+        'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug',
+        "tvente_categorie_client.designation as CategorieClient","compte_client",
+
+        'nom_service', "tvente_module.nom_module",'tvente_entete_vente.code','refClient','refService','refReservation','module_id',
+        'dateVente','libelle','tvente_entete_vente.montant','tvente_entete_vente.paie','reduction','totaltva',
+        'priseencharge')
+       ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
+       ->selectRaw('ROUND(((qteVente*puVente) - montantreduction + montanttva),2) as PTVenteTVA')
+       ->selectRaw('ROUND((IFNULL(montant,0)),2) as totalFacture')
+       ->selectRaw('ROUND((montanttva),2) as TotalTVA')
+       ->selectRaw('ROUND((((IFNULL(montant,0)) - montantreduction)+(montanttva)),2) as PTTTC')
+       ->selectRaw('((qteVente*puVente)/tvente_detail_vente.taux) as PTVenteFC')
+       ->selectRaw('(qteBase*puBase) as PTBase')
+       ->selectRaw('IFNULL(paie,0) as totalPaie')
+       ->selectRaw('(IFNULL(montant,0)-IFNULL(paie,0)) as RestePaie')
+        ->selectRaw('CONCAT("S",YEAR(dateVente),"",MONTH(dateVente),"00",refEnteteVente) as codeFacture')
+        ->where([
+            ['tvente_entete_vente.refReservation','=', $id_facture]
+         ])
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+
+          $output .='
+              	<tr style="vertical-align:top;">
+                  <td style="width:0px;height:24px;"></td>
+                  <td></td>
+                  <td class="cs463A9CD7" style="width:43px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateVente.'</nobr></td>
+                  <td class="cs6AEC9C2" colspan="6" style="width:178px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'&nbsp;&nbsp;-&nbsp;'.$row->noms.'</nobr></td>
+                  <td class="cs6AEC9C2" colspan="5" style="width:123px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_service.'</nobr></td>
+                  <td class="cs6AEC9C2" colspan="7" style="width:139px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->designation.'</nobr></td>
+                  <td class="cs6AEC9C2" style="width:36px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteVente.'</nobr></td>
+                  <td class="cs6AEC9C2" colspan="2" style="width:66px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puVente.'$</nobr></td>
+                  <td class="cs6AEC9C2" colspan="3" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTVente.'$ ('.$row->montantreduction.'$)</nobr></td>
+                </tr>
+          ';      
+   
+      }
+
+    return $output;
+
+}
+
+// ============== RAPPORT DES FACTURES D'HEBERGEMENT BY ORGANISATION =============================================
+
+
+// public function fetch_resume_hebergement_consommation_bynumero(Request $request)
+// {
+//     //refDepartement
+
+//     if ($request->get('id_facture') && $request->get('author')) {
+//         // code...
+//         $id_facture = $request->get('id_facture');
+//         $author = $request->get('author');
+
+//         $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+//         $html .= $this->printResumeHebergementConsommation_ByNumero($id_facture,$author);       
+//         $html .='<script>window.print()</script>';
+
+//         echo($html); 
+         
+
+//     } else {
+//         // code...
+//     }  
+    
+// }
+// function printResumeHebergementConsommation_ByNumero($id_facture,$author)
+// {
+
+//          //Info Entreprise
+//          $nomEse='';
+//          $adresseEse='';
+//          $Tel1Ese='';
+//          $Tel2Ese='';
+//          $siteEse='';
+//          $emailEse='';
+//          $idNatEse='';
+//          $numImpotEse='';
+//          $rccEse='';
+//          $siege='';
+//          $busnessName='';
+//          $pic='';
+//          $pic2 = $this->displayImg("fichier", 'logo.png');
+//          $logo='';
+//          $nomProvince = '';
+//          $villeProvince = '';
+ 
+//          $data1 = DB::table('entreprises')
+//          ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+//          ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+//          ->join('pays','pays.id','=','entreprises.idPays')
+//          ->join('provinces','provinces.id','=','entreprises.idProvince')
+//          ->join('users','users.id','=','entreprises.ceo')        
+//          ->select('entreprises.id as id','entreprises.id as idEntreprise',
+//          'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+//          'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+//          'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+//          'entreprises.idforme','entreprises.etat',
+//          'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+//          'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+//          'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+//          'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+//              //forme
+//              'forme_juridiques.nomForme','secteurs.nomSecteur',
+//              //users
+//              'users.name','users.email','users.avatar','users.telephone','users.adresse',
+//              //
+//              'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+//          ->get();
+//          $output='';
+//          foreach ($data1 as $row) 
+//          {                                
+//              $nomEse=$row->nomEntreprise;
+//              $adresseEse=$row->adresseEntreprise;
+//              $Tel1Ese=$row->telephoneEntreprise;
+//              $Tel2Ese=$row->telephone;
+//              $siteEse=$row->siteweb;
+//              $emailEse=$row->emailEntreprise;
+//              $idNatEse=$row->rccm;
+//              $numImpotEse=$row->rccm;
+//              $busnessName=$row->nomSecteur;
+//              $rccmEse=$row->rccm;
+//              $pic = $this->displayImg("fichier", 'logo.png');
+//              $siege=$row->nomForme; 
+//              $nomProvince = $row->nomProvince;  
+//              $villeProvince = $row->solutionEntreprise;      
+//          }
+
+//          $totalFacture = 0;
+//          $totalPaie = 0;
+//          $restePaie = 0;
+//          $totalReduction = 0;
+//          $codeClient='';
+//          $nomClient='';
+//          $codeFacture = '';
+//          // 
+//          $data2 =  DB::table('tvente_entete_facture_groupe')      
+//          ->join('tvente_client','tvente_client.id','=','tvente_entete_facture_groupe.refOrganisation')   
+//          ->select('tvente_entete_facture_groupe.id','refOrganisation','tvente_entete_facture_groupe.author',
+//          'tvente_entete_facture_groupe.created_at','noms','sexe',
+//          'contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece','lieulivraisonCarte',
+//          'nationnalite','datenaissance','lieunaissance','profession','occupation','nombreEnfant',
+//          'dateArriverGoma','arriverPar','refCategieClient')
+//          ->selectRaw('CONCAT("F",YEAR(dateGroup),"",MONTH(dateGroup),"00",tvente_entete_facture_groupe.id) as codeFacture')
+//          ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0)),0),2) as totalFacture')
+//          ->selectRaw('ROUND(IFNULL(paie_group,0),3) as totalPaie')
+//          ->selectRaw('ROUND(IFNULL(reduction_group,0),2) as totalReduction')
+//          ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as restePaie')
+//          ->where([
+//             ['tvente_entete_facture_groupe.id','=', $id_facture],
+//          ])    
+//          ->first(); 
+//          if ($data2) 
+//          {  
+//             $totalFacture = $data2->totalFacture;
+//             $totalPaie = $data2->totalPaie;
+//             $restePaie = $data2->restePaie;
+//             $totalReduction = $data2->totalReduction; 
+//             $codeClient = $data2->refOrganisation;
+//             $nomClient = $data2->noms; 
+//             $codeFacture = $data2->codeFacture;                      
+//          }
+
+        
+
+//         $current = Carbon::now();
+//         $carbon = $current;
+//         // $carbon = Carbon::createFromFormat('Y-m-d H:i', $current);
+//         $resteLettre = $this->chiffreEnLettre($restePaie);
+  
+//         $output='';          
+
+//         $output='
+
+//               <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+//               <!-- saved from url=(0016)http://localhost -->
+//               <html>
+//               <head>
+//                 <title>rptFactureGlobaleOrganisation</title>
+//                 <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+//                 <style type="text/css">
+//                   .cs5971619E {color:#000000;background-color:#000000;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+//                   .csE5AC9E0D {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+//                   .cs91032837 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+//                   .cs3B0DD49A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+//                   .cs479D8C74 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+//                   .csDC7EEB9 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; }
+//                   .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+//                   .csB8EAE05B {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; text-decoration: underline;padding-left:2px;padding-right:2px;}
+//                   .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+//                   .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+//                   .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+//                   .cs9E712815 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
+//                   .csE9F2AA97 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+//                   .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+//                   .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+//                 </style>
+//               </head>
+//               <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+//               <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:662px;height:474px;position:relative;">
+//                 <tr>
+//                   <td style="width:0px;height:0px;"></td>
+//                   <td style="height:0px;width:8px;"></td>
+//                   <td style="height:0px;width:18px;"></td>
+//                   <td style="height:0px;width:36px;"></td>
+//                   <td style="height:0px;width:57px;"></td>
+//                   <td style="height:0px;width:25px;"></td>
+//                   <td style="height:0px;width:1px;"></td>
+//                   <td style="height:0px;width:2px;"></td>
+//                   <td style="height:0px;width:14px;"></td>
+//                   <td style="height:0px;width:4px;"></td>
+//                   <td style="height:0px;width:18px;"></td>
+//                   <td style="height:0px;width:47px;"></td>
+//                   <td style="height:0px;width:35px;"></td>
+//                   <td style="height:0px;width:52px;"></td>
+//                   <td style="height:0px;width:52px;"></td>
+//                   <td style="height:0px;width:12px;"></td>
+//                   <td style="height:0px;width:28px;"></td>
+//                   <td style="height:0px;width:36px;"></td>
+//                   <td style="height:0px;width:15px;"></td>
+//                   <td style="height:0px;width:1px;"></td>
+//                   <td style="height:0px;width:48px;"></td>
+//                   <td style="height:0px;width:25px;"></td>
+//                   <td style="height:0px;width:53px;"></td>
+//                   <td style="height:0px;width:19px;"></td>
+//                   <td style="height:0px;width:52px;"></td>
+//                   <td style="height:0px;width:4px;"></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:23px;"></td>
+//                   <td class="cs739196BC" colspan="16" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:5px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:2px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" rowspan="2" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Hotel&nbsp;IHUSI</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:20px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs101A94F7" colspan="2" rowspan="4" style="width:93px;height:85px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:93px;height:85px;">
+//                     <img alt="" src="'.$pic2.'" style="width:93px;height:85px;" /></div>
+//                   </td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>'.$villeProvince.'</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NIF:&nbsp;A0706188K&nbsp;--&nbsp;IDNAT&nbsp;:&nbsp;19-G4701</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:21px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" rowspan="2" style="width:285px;height:23px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>N42429X</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:2px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>NRC&nbsp;:&nbsp;RCCM&nbsp;:&nbsp;'.$rccmEse.'</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="csE9F2AA97" colspan="13" style="width:312px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>RESUME&nbsp;DES&nbsp;FACTURES&nbsp;n&#176;&nbsp;'.$codeFacture.'</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td class="cs8A513397" colspan="9" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Code&nbsp;:&nbsp;'.'.$codeClient.'.'</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs6105B8F3" colspan="10" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td class="cs8A513397" colspan="9" style="width:173px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Nom&nbsp;:&nbsp;'.$nomClient.'</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs6105B8F3" colspan="10" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;par&nbsp;:&nbsp;'.$author.'</nobr></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:24px;"></td>
+//                   <td></td>
+//                   <td class="cs91032837" colspan="2" style="width:52px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+//                   <td class="cs479D8C74" colspan="4" style="width:84px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Num&#233;ro</nobr></td>
+//                   <td class="cs479D8C74" colspan="8" style="width:233px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Description&nbsp;/&nbsp;Point&nbsp;de&nbsp;vente</nobr></td>
+//                   <td class="cs479D8C74" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;du</nobr></td>
+//                   <td class="cs479D8C74" colspan="3" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>R&#233;duction</nobr></td>
+//                   <td class="cs479D8C74" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;pay&#233;</nobr></td>
+//                   <td class="cs479D8C74" colspan="3" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>Reste&nbsp;&#224;&nbsp;payer</nobr></td>
+//                 </tr>
+//                 ';
+
+//                                       $output .= $this->showRapportHebergement_ByNumero($id_facture); 
+
+//                                       $output.='
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:24px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs91032837" colspan="8" style="width:232px;height:22px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+//                   <td class="csDC7EEB9" colspan="2" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalFacture.'$</nobr></td>
+//                   <td class="csDC7EEB9" colspan="3" style="width:63px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalReduction.'$</nobr></td>
+//                   <td class="csDC7EEB9" colspan="2" style="width:77px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'$</nobr></td>
+//                   <td class="csDC7EEB9" colspan="3" style="width:74px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>'.$restePaie.'$</nobr></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs9E712815" colspan="4" style="width:126px;height:22px;line-height:18px;text-align:left;vertical-align:bottom;"><nobr>A&nbsp;payer&nbsp;:</nobr></td>
+//                   <td class="csE9F2AA97" colspan="3" style="width:60px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>USD</nobr></td>
+//                   <td class="csE9F2AA97" colspan="5" style="width:149px;height:22px;line-height:18px;text-align:right;vertical-align:bottom;"><nobr>'.$restePaie.'$</nobr></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:8px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="8" style="width:153px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;'.$carbon.'</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="13" style="width:393px;height:22px;line-height:15px;text-align:right;vertical-align:top;"><nobr>Nous&nbsp;disons&nbsp;dollars&nbsp;americains&nbsp;.'.$resteLettre.'.</nobr></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="csB8EAE05B" colspan="3" style="width:65px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>Client</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="csB8EAE05B" colspan="5" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:top;"><nobr>R&#233;ceptionniste</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:45px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:1px;"></td>
+//                   <td></td>
+//                   <td class="cs5971619E" colspan="24" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:1px;"></td>
+//                   <td></td>
+//                   <td class="cs101A94F7" colspan="24" style="width:654px;height:1px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:10px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs6105B8F3" colspan="16" style="width:388px;height:22px;line-height:15px;text-align:left;vertical-align:top;"><nobr>Web&nbsp;:&nbsp;'.$siteEse.'&nbsp;Tel&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;0813532300</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//                 <tr style="vertical-align:top;">
+//                   <td style="width:0px;height:22px;"></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td></td>
+//                   <td class="cs5EA817F2" colspan="10" style="width:285px;height:22px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Imprim&#233;&nbsp;le&nbsp;:&nbsp;'.$carbon.'</nobr></td>
+//                   <td></td>
+//                   <td></td>
+//                 </tr>
+//               </table>
+//               </body>
+//               </html>
+
+//         ';  
+       
+//         return $output; 
+
+// }
+// function showRapportHebergement_ByNumero($id_facture)
+// {
+//         $data = DB::table('tvente_detail_facture_groupe')
+//         ->join('tvente_entete_facture_groupe','tvente_entete_facture_groupe.id','=','tvente_detail_facture_groupe.refEnteteGroup')
+//         ->join('tvente_module','tvente_module.id','=','tvente_entete_facture_groupe.module_id')
+//         ->join('tvente_client as Organiation','Organiation.id','=','tvente_entete_facture_groupe.refOrganisation')
+//         ->join('tvente_categorie_client as CatOrg','CatOrg.id','=','Organiation.refCategieClient')  
+
+//         ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','tvente_detail_facture_groupe.id_reservation')
+//         ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refChmabre')
+//         ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+//         ->join('tvente_client as clientHotel','clientHotel.id','=','thotel_reservation_chambre.refClient')
+//         ->join('tvente_client as priseCharge','priseCharge.id','=','thotel_reservation_chambre.id_prise_charge')
+//         ->join('tvente_categorie_client as CatClient','CatClient.id','=','clientHotel.refCategieClient')
+        
+//         ->select('tvente_detail_facture_groupe.id','refEnteteGroup','tvente_detail_facture_groupe.id_vente',
+//         'tvente_detail_facture_groupe.id_reservation','tvente_detail_facture_groupe.active',
+//         'tvente_entete_facture_groupe.code','refOrganisation','tvente_detail_facture_groupe.created_at',
+//         'tvente_entete_facture_groupe.module_id','etat_facture_group','dateGroup',
+//         'libelle_group','montant_group','reduction_group','totaltva_group','paie_group','date_paie_current_group',
+//         'nombre_print_group','tvente_detail_facture_groupe.author','tvente_detail_facture_groupe.refUser'
+
+//         ,'Organiation.noms','Organiation.sexe','Organiation.contact','Organiation.mail','Organiation.adresse',
+//         'Organiation.pieceidentite','Organiation.numeroPiece','Organiation.dateLivrePiece',
+//         'Organiation.lieulivraisonCarte','Organiation.nationnalite','Organiation.datenaissance',
+//         'Organiation.lieunaissance','Organiation.profession','Organiation.occupation',
+//         'Organiation.nombreEnfant','Organiation.dateArriverGoma','Organiation.arriverPar',
+//         'Organiation.refCategieClient','Organiation.photo','Organiation.slug',
+//         "CatOrg.designation"
+        
+//         ,'refClient','refChmabre','id_prise_charge','date_entree','date_sortie',
+//         'heure_debut','heure_sortie','libelle','prix_unitaire','reduction','observation',
+//         'type_reservation','nom_accompagner','pays_provenance','clientHotel.noms as nomsClient',
+//         'clientHotel.sexe as sexeClient','clientHotel.contact as Client','clientHotel.mail as mailClient',
+//         'clientHotel.adresse as adresseClient','clientHotel.pieceidentite as pieceidentiteClient',
+//         'clientHotel.numeroPiece as numeroPieceClient','clientHotel.dateLivrePiece as dateLivrePieceClient',
+//         'clientHotel.lieulivraisonCarte as lieulivraisonCarteClient','clientHotel.nationnalite as nationnaliteClient',
+//         'clientHotel.datenaissance as datenaissanceClient',
+//         'clientHotel.lieunaissance as lieunaissanceClient','clientHotel.profession as professionClient',
+//         'clientHotel.occupation as occupationClient','clientHotel.nombreEnfant as nombreEnfantClient',
+//         'clientHotel.dateArriverGoma as dateArriverGomaClient','clientHotel.arriverPar as arriverParClient',
+//         'clientHotel.refCategieClient as refCategieClientClient',
+//         'clientHotel.photo as photoCLient','CatClient.designation as CategorieClient', 
+//         "thotel_chambre.nom_chambre","numero_chambre","refClasse", "thotel_classe_chambre.designation as ClasseChambre",
+//         "thotel_classe_chambre.prix_chambre"
+        
+//         ,'priseCharge.noms as noms_charge','priseCharge.sexe as sexe_charge','priseCharge.contact as contact_charge',
+//         'priseCharge.mail as mail_charge','priseCharge.adresse as adresse_charge')
+
+//         ->selectRaw('CONCAT("F",YEAR(dateGroup),"",MONTH(dateGroup),"00",tvente_entete_facture_groupe.id) as codeFacture')
+//         ->selectRaw('CONCAT("F",YEAR(thotel_reservation_chambre.created_at),"",MONTH(thotel_reservation_chambre.created_at),"00",thotel_reservation_chambre.id) as codeReservation')
+//         ->selectRaw('ROUND(IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0),2) as totalFacture')
+//         ->selectRaw('IFNULL(paie_group,0) as totalPaie')
+//         ->selectRaw('ROUND((IFNULL((IFNULL(montant_group,0) + IFNULL(totaltva_group,0) - IFNULL(reduction_group,0)),0) - IFNULL(paie_group,0)),2) as RestePaie')
+        
+//         ->selectRaw('((prix_unitaire)/thotel_reservation_chambre.taux) as prix_unitaireFCHotel')
+//         ->selectRaw('TIMESTAMPDIFF(DAY, date_entree, date_sortie) as NombreJour')
+//         ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))) as prixTotalSansHotel')
+//         ->selectRaw('(((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction) as prixTotalHotel')
+//         ->selectRaw('((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction)/thotel_reservation_chambre.taux) as prixTotalFCHotel')
+//         ->selectRaw('IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0) as totalFactureHotel')
+//         ->selectRaw('IFNULL(totalPaie,0) as totalPaieHotel')
+//         ->selectRaw('(IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0)) as RestePaieHotel')
+//         ->selectRaw('((IFNULL((((TIMESTAMPDIFF(DAY, date_entree, date_sortie))*(prix_unitaire))-reduction),0)-IFNULL(totalPaie,0))/thotel_reservation_chambre.taux) as RestePaieFCHotel')
+//         ->selectRaw("DATE_FORMAT(thotel_reservation_chambre.created_at,'%d/%M/%Y') as jour_reservation")
+//         ->where([
+//           ['tvente_detail_facture_groupe.refEnteteGroup','=', $id_facture],
+//         ])
+//         ->orderBy("tvente_detail_facture_groupe.created_at", "asc")
+//         ->get();
+//         $output='';
+
+//         foreach ($data as $row) 
+//         {
+//           $output .='
+//             	<tr style="vertical-align:top;">
+//                 <td style="width:0px;height:46px;"></td>
+//                 <td></td>
+//                 <td class="csE5AC9E0D" colspan="2" style="width:52px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_reservation.'</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="4" style="width:84px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>'.$row->codeReservation.'</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="8" style="width:233px;height:44px;line-height:12px;text-align:left;vertical-align:middle;"><nobr>Chambre&nbsp;:&nbsp;'.$row->numero_chambre.'</nobr><br/><nobr>Client&nbsp;:&nbsp;'.$row->nomsClient.'</nobr><br/><nobr>Prise&nbsp;en&nbsp;charge&nbsp;:&nbsp;'.$row->noms.'</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="2" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->prixTotalSansHotel.'$</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="3" style="width:63px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->reduction.'$</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="2" style="width:77px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->totalPaieHotel.'$</nobr></td>
+//                 <td class="cs3B0DD49A" colspan="3" style="width:74px;height:44px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>'.$row->RestePaieHotel.'$</nobr></td>
+//               </tr>
+//           ';  
+  
+//     }
+
+//     return $output;
+
+// }
+
+
+
+
+
+
+
 
 
 

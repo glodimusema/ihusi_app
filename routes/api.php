@@ -901,7 +901,9 @@ Route::group(['namespace'   =>  "Ventes"], function(){
 
     Route::get("fetch_rapport_detailtransfert_date_service", 'PdfVenteController@fetch_rapport_detailtransfert_date_service');
     Route::get("fetch_rapport_detailusage_date_service", 'PdfVenteController@fetch_rapport_detailusage_date_service');
-
+ 
+    Route::get("fetch_rapport_detailtransfert_date_service_source", 'PdfVenteController@fetch_rapport_detailtransfert_date_service_source');
+    Route::get("fetch_rapport_detailtransfert_date_service_destination", 'PdfVenteController@fetch_rapport_detailtransfert_date_service_destination');
 
     Route::get("fetch_vente_entete_cuisine", 'tvente_entete_cuisineController@all');
     Route::get("fetch_data_encours_cuisine", 'tvente_entete_cuisineController@fetch_data_encours');
@@ -1064,11 +1066,12 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_single_vente_detail_transfert/{id}", 'tvente_detail_transfertController@fetch_single_data');    
     Route::post("insert_vente_detail_transfert", 'tvente_detail_transfertController@insert_data');
     Route::post("insert_vente_global_transfert", 'tvente_detail_transfertController@insert_dataGlobal');
+    Route::post("insert_vente_global_transfert_usage", 'tvente_detail_transfertController@insert_dataGlobalUsage');
     Route::post("insert_vente_data_transfert", 'tvente_detail_transfertController@insert_dataTransfert');
     Route::post("update_vente_detail_transfert/{id}", 'tvente_detail_transfertController@update_data');
     Route::get("delete_vente_detail_transfert/{id}", 'tvente_detail_transfertController@delete_data');
 
-    //insert_dataTransfert
+    //insert_dataGlobalUsage
 
     Route::get("fetch_vente_detail_unite", 'tvente_detail_uniteController@all');
     Route::get("fetch_data_detail_unite_vente", 'tvente_detail_uniteController@fetch_data_detail_unite_vente');
@@ -1336,10 +1339,17 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::get("fetch_rapport_hotel_date", 'PdfReservationController@fetch_rapport_hotel_date');
     Route::get("pdf_fiche_hotel", 'PdfReservationController@pdf_fiche_hotel');
     Route::get("pdf_facture_hotel", 'PdfReservationController@pdf_facture_hotel'); 
-    Route::get("pdf_facture_salle", 'PdfReservationController@pdf_facture_salle');       
+    Route::get("pdf_facture_salle", 'PdfReservationController@pdf_facture_salle');  
+    //  
+    Route::get("fetch_facture_hebergement_consommation", 'PdfReservationController@fetch_facture_hebergement_consommation');
+    Route::get("fetch_rapport_facture_hebergement_date_organisation", 'PdfReservationController@fetch_rapport_facture_hebergement_date_organisation');
+    Route::get("fetch_rapport_facture_hebergement_date", 'PdfReservationController@fetch_rapport_facture_hebergement_date');
+    Route::get("fetch_rapport_facture_hebergement_by_numero", 'PdfReservationController@fetch_rapport_facture_hebergement_by_numero');
 });
 
-
+//fetch_rapport_facture_hebergement_date_organisation
+//fetch_rapport_facture_hebergement_date
+//fetch_rapport_facture_hebergement_by_numero
 //pdf_facture_salle
 //======== PARTIE TRESORERIE ========================================================================
 

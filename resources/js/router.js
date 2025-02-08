@@ -207,6 +207,7 @@ import VenteGrandeCategorieProduit from './views/backend/Ventes/VenteGrandeCateg
 import CreateRestoreProduct from './views/backend/Ventes/CreateRestoreProduct.vue'
 import ApprovCommandes from './views/backend/Ventes/ApprovCommandes.vue'
 import CreateAjustement from './views/backend/Ventes/CreateAjustement.vue'
+import TranfertUsage from './views/backend/Ventes/TranfertUsage.vue'
 
 import VenteEnteteFactureGroupe from './views/backend/Ventes/VenteEnteteFactureGroupe.vue'
 import CreateFactureGroupe from './views/backend/Ventes/CreateFactureGroupe.vue'
@@ -1444,10 +1445,15 @@ const Router = new VueRouter({
         name: 'CreateFactureGroupe',
         component: CreateFactureGroupe,
     },
-    {
+    { 
         path: '/admin/CreateAjustement',
         name: 'CreateAjustement',
         component: CreateAjustement,
+    },
+    { 
+        path: '/admin/TranfertUsage',
+        name: 'TranfertUsage',
+        component: TranfertUsage,
     },
     { 
         path: '/admin/ApprovCommandes',

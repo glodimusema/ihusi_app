@@ -696,86 +696,86 @@ class tvente_detail_utilisationController extends Controller
                 $taux=$row->taux;                           
              }
     
-         $montants=0;
-         $devises='USD';
-         $refProduit=0;
-         $data99=DB::table('tvente_stock_service') 
-         ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
-         'devise','taux','active','refUser','author')
-         ->where([
-            ['tvente_stock_service.id','=', $data['idStockService']]
-         ])      
-         ->get();
-         foreach ($data99 as $row) 
-         {
-             $refProduit =  $row->refProduit;
-             $montants =  $row->cmup;           
-         }
+            $montants=0;
+            $devises='USD';
+            $refProduit=0;
+            $data99=DB::table('tvente_stock_service') 
+            ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
+            'devise','taux','active','refUser','author')
+            ->where([
+                ['tvente_stock_service.id','=', $data['idStockService']]
+            ])      
+            ->get();
+            foreach ($data99 as $row) 
+            {
+                $refProduit =  $row->refProduit;
+                $montants =  $row->cmup;           
+            }
 
 
 
-         $qte=$data['qteVente'];
-         $idDetail=$refProduit;
-         $idFacture=$idmax;
+            $qte=$data['qteVente'];
+            $idDetail=$refProduit;
+            $idFacture=$idmax;
+    
+            $compte_achat = 0;
+            $compte_vente =0;
+            $compte_variationstock=0;
+            $compte_perte=0;
+            $compte_produit=0;
+            $compte_destockage=0;
+            $compte_stockage=0;
+            $cmupVente=0;
+    
+            $data3=DB::table('tvente_produit')
+            ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
+            ->select('compte_achat','compte_vente','compte_variationstock','tvente_categorie_produit.code',
+            'compte_perte','compte_produit','compte_destockage','compte_stockage','cmup')
+            ->where([
+                ['tvente_produit.id','=', $refProduit]
+            ])      
+            ->get();
+            foreach ($data3 as $row) 
+            {
+                $compte_achat =  $row->compte_achat;
+                $compte_vente = $row->compte_vente;
+                $compte_variationstock= $row->compte_variationstock;
+                $compte_perte= $row->compte_perte;
+                $compte_produit= $row->compte_produit;
+                $compte_destockage= $row->compte_destockage;
+                $compte_stockage= $row->compte_stockage; 
+                $cmupVente=$row->cmup;         
+            } 
+            $uniteVente = '';
+            $uniteBase = '';
+            $puBase=0;
+            $qteBase=0;
+            $estunite='';
+            $cmupVente=0;
+    
+            $uniteVente = $data['nom_unite'];
+            $uniteBase = $data['nom_unite'];           
+            $qteBase =  1;
+            $puBase = $montants;      
+            $estunite = 'OUI';
+            $cmupVente = $montants; 
  
-         $compte_achat = 0;
-         $compte_vente =0;
-         $compte_variationstock=0;
-         $compte_perte=0;
-         $compte_produit=0;
-         $compte_destockage=0;
-         $compte_stockage=0;
-         $cmupVente=0;
+            $qteVente = $qteBase * floatval($data['qteVente']);
+            if($estunite = "OUI")
+            {
+            $puBase=  floatval($montants);
+            }
+            else
+            {
+            $puBase=  floatval($montants) / floatval($qteBase);
+            }
+            
+            $montanttva=0;
+            $pourtageTVA=0;
+            $montantreduction = 0;
  
-         $data3=DB::table('tvente_produit')
-          ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
-          ->select('compte_achat','compte_vente','compte_variationstock','tvente_categorie_produit.code',
-          'compte_perte','compte_produit','compte_destockage','compte_stockage','cmup')
-          ->where([
-             ['tvente_produit.id','=', $refProduit]
-         ])      
-         ->get();
-         foreach ($data3 as $row) 
-         {
-             $compte_achat =  $row->compte_achat;
-             $compte_vente = $row->compte_vente;
-             $compte_variationstock= $row->compte_variationstock;
-             $compte_perte= $row->compte_perte;
-             $compte_produit= $row->compte_produit;
-             $compte_destockage= $row->compte_destockage;
-             $compte_stockage= $row->compte_stockage; 
-             $cmupVente=$row->cmup;         
-         } 
-         $uniteVente = '';
-         $uniteBase = '';
-         $puBase=0;
-         $qteBase=0;
-         $estunite='';
-         $cmupVente=0;
- 
-         $uniteVente = $data['nom_unite'];
-         $uniteBase = $data['nom_unite'];           
-         $qteBase =  1;
-         $puBase = $montants;      
-         $estunite = 'OUI';
-         $cmupVente = $montants; 
- 
-        $qteVente = $qteBase * floatval($data['qteVente']);
-        if($estunite = "OUI")
-        {
-           $puBase=  floatval($montants);
-        }
-        else
-        {
-           $puBase=  floatval($montants) / floatval($qteBase);
-        }
         
-       $montanttva=0;
-       $pourtageTVA=0;
-       $montantreduction = 0;
- 
-        
-       $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
+            $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
     
             $data222 = tvente_detail_utilisation::create([
                 'refEnteteVente'       =>  $idmax,

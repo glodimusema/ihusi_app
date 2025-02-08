@@ -831,7 +831,11 @@ export default {
                 text: "Création Transfert",
                 href: "/admin/TransfertStock",
               },
-              { //TransfertStock
+              { //ApprovCommandes
+                text: "Transfert/Usage",
+                href: "/admin/TranfertUsage",
+              },
+              { //TransfertStock  TranfertUsage
                 text: "Liste Transfert",
                 href: "/admin/VenteEnteteTransfert",
               },
@@ -920,7 +924,7 @@ export default {
                 {
                   icon: "store",
                   text: "Rapports",
-                  href: "/admin/RapportsJour_Vente",
+                  href: "/admin/RapportsJour_Reservation",
                 },
               ],
             },

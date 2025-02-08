@@ -363,6 +363,94 @@ trait GlobalMethod{
     }  
 
 
+    function chiffreEnLettre($a)
+    {
+        $convert = explode('.',$a);
+        if (isset($convert[1]) && $convert[1]!=''){
+        return $this->chiffreEnLettre($convert[0]).' Virgule '.'  '.$this->chiffreEnLettre($convert[1]).' Centimes' ;
+        }
+        if ($a<0) return 'moins '.$this->chiffreEnLettre(-$a);
+        if ($a<17){
+        switch ($a){
+        case 0: return 'Zero';
+        case 1: return 'Un';
+        case 2: return 'Deux';
+        case 3: return 'Trois';
+        case 4: return 'Quatre';
+        case 5: return 'Cinq';
+        case 6: return 'Six';
+        case 7: return 'Sept';
+        case 8: return 'Huit';
+        case 9: return 'Neuf';
+        case 10: return 'Dix';
+        case 11: return 'Onze';
+        case 12: return 'Douze';
+        case 13: return 'Treize';
+        case 14: return 'Quatorze';
+        case 15: return 'Quinze';
+        case 16: return 'Seize';
+
+        case 17: return 'Dix-sept';
+        case 18: return 'Dix-huit';
+        case 19: return 'Dix-neuf';
+
+        }
+        } else if ($a<20){
+        return 'dix-'.$this->chiffreEnLettre($a-10);
+        } else if ($a<100){
+        if ($a%10==0){
+        switch ($a){
+        case 20: return 'Vingt';
+        case 30: return 'Trente';
+        case 40: return 'Quarante';
+        case 50: return 'Cinquante';
+        case 60: return 'Soixante';
+        case 70: return 'Soixante-dix';
+        case 80: return 'Quatre-vingt';
+        case 90: return 'Quatre-vingt-dix';
+        }
+        } elseif (substr($a, -1)==1){
+        if( ((int)($a/10)*10)<70 ){
+        return $this->chiffreEnLettre((int)($a/10)*10).'-et-un';
+        } elseif ($a==71) {
+        return 'Soixante-et-onze';
+        } elseif ($a==81) {
+        return 'Quatre-vingt-un';
+        } elseif ($a==91) {
+        return 'Quatre-vingt-onze';
+        }
+        } elseif ($a<70){
+        return $this->chiffreEnLettre($a-$a%10).'-'.$this->chiffreEnLettre($a%10);
+        } elseif ($a<80){
+        return $this->chiffreEnLettre(60).'-'.$this->chiffreEnLettre($a%20);
+        } else{
+        return $this->chiffreEnLettre(80).'-'.$this->chiffreEnLettre($a%20);
+        }
+        } else if ($a==100){
+        return 'Cent';
+        } else if ($a<200){
+        return $this->chiffreEnLettre(100).' '.$this->chiffreEnLettre($a%100);
+        } else if ($a<1000){
+        return $this->chiffreEnLettre((int)($a/100)).' '.$this->chiffreEnLettre(100).' '.$this->chiffreEnLettre($a%100);
+        } else if ($a==1000){
+        return 'Mille';
+        } else if ($a<2000){
+        return $this->chiffreEnLettre(1000).' '.$this->chiffreEnLettre($a%1000).' ';
+        } else if ($a<1000000){
+        return $this->chiffreEnLettre((int)($a/1000)).' '.$this->chiffreEnLettre(1000).' '.$this->chiffreEnLettre($a%1000);
+        }
+        else if ($a==1000000){
+        return 'Millions';
+        }
+        else if ($a<2000000){
+        return $this->chiffreEnLettre(1000000).' '.$this->chiffreEnLettre($a%1000000).' ';
+        }
+        else if ($a<1000000000){
+        return $this->chiffreEnLettre((int)($a/1000000)).' '.$this->chiffreEnLettre(1000000).' '.$this->chiffreEnLettre($a%1000000);
+        }
+    }
+
+
 
 
 

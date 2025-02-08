@@ -66,6 +66,18 @@
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintRapportHebergement" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES RESUMES(HOTEL)
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip> 
+                            <br>
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintRapportSalle" block color="  blue" dark>
                                             <v-icon>print</v-icon> RAPPORT DES RESERVATIONS(SALLE)
                                         </v-btn>
@@ -75,6 +87,18 @@
                             </v-tooltip>
                             <br>
 
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintRapportHebergementOrganisation" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES RESUMES/ORG.
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip> 
+                            <br>
+
                             
                             </v-col>
                         </v-row>
@@ -82,16 +106,17 @@
                     </v-flex>
                    
 
-                    <!-- <v-flex md3>
+                    <v-flex md3>
                        
                         <div class="mr-1">
-                            <v-autocomplete label="Selectionnez le Compte" prepend-inner-icon="home"
-                                :rules="[(v) => !!v || 'Ce champ est requis']" :items="BanqueList"
-                                item-text="nom_banque" item-value="id" dense outlined v-model="svData.refCompte"
+                            <v-autocomplete label="Selectionnez le Client" prepend-inner-icon="home"
+                                :rules="[(v) => !!v || 'Ce champ est requis']" :items="ClientList"
+                                item-text="noms" item-value="id" dense outlined v-model="svData.id_prisecharge"
                                 chips clearable >
                             </v-autocomplete>
                         </div>
-                    </v-flex> -->
+                    </v-flex>
+                    
 
                     <v-flex md1>
                         <v-tooltip bottom color="black">
@@ -139,7 +164,7 @@ export default {
                 remise: 0,
                 ceo: "",
                 selectionAgent:[],
-                refCompte: "", 
+                id_prisecharge: "", 
                 refTrajectoire:0,
                 refTypetarification:0,
                 refBanque:0,
@@ -153,7 +178,7 @@ export default {
 
             },
             fetchData: null,
-            BanqueList: [],
+            ClientList: [],
             ModeList: [],
             titreModal: "",
             typetarifList: [],    
@@ -200,7 +225,16 @@ export default {
                 this.fetch_data(`${this.apiBaseURL}/fetch_abonnement_carte?page=`);                
             }
            
-        },
+        },      
+      fetchListClient() {
+        this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_client_2`).then(
+          ({ data }) => {
+            var donnees = data.data;
+            this.ClientList = donnees;
+
+          }
+        );
+      },
         PrintRapportHotel() {
 
             // if (this.userData.id_role == 1 || this.userData.id_role == 2) {
@@ -208,6 +242,38 @@ export default {
                 var date2 = this.dates[1];
                 if (date1 <= date2) {
                     window.open(`${this.apiBaseURL}/fetch_rapport_hotel_date?date1=` + date1 + "&date2=" + date2);
+                   
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+            // } else {
+            //     this.showError("Cette action est reservée uniquement aux administrateurs du système!!!");
+            // }          
+           //fetch_rapport_paie_date
+        },
+        PrintRapportHebergement() {
+
+            // if (this.userData.id_role == 1 || this.userData.id_role == 2) {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_date?date1=` + date1 + "&date2=" + date2+ "&author=" + this.userData.name);
+                   
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+            // } else {
+            //     this.showError("Cette action est reservée uniquement aux administrateurs du système!!!");
+            // }          
+           //fetch_rapport_paie_date
+        },
+        PrintRapportHebergementOrganisation() {
+
+            // if (this.userData.id_role == 1 || this.userData.id_role == 2) {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_date_organisation?date1=` + date1 + "&date2=" + date2+ "&id_prisecharge=" + this.svData.id_prisecharge+ "&author=" + this.userData.name);
                    
                 } else {
                     this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
@@ -254,12 +320,12 @@ export default {
             
         },
 
-       
+        
 
 
     },
     created() { 
-       
+        this.fetchListClient()
     },
 };
 </script>

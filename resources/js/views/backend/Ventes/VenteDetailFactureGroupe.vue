@@ -146,6 +146,14 @@
                                           </v-list-item-title>
                                         </v-list-item>  
 
+                                        <v-list-item link @click="printBill(item.refEnteteGroup)">
+                                        <v-list-item-icon>
+                                            <v-icon color="blue">print</v-icon>
+                                        </v-list-item-icon>
+                                        <v-list-item-title style="margin-left: -20px">Imprimer la Facture
+                                        </v-list-item-title>
+                                        </v-list-item> 
+
                                         <v-list-item link @click="editData(item.id)">
                                           <v-list-item-icon>
                                             <v-icon color="blue">edit</v-icon>
@@ -306,6 +314,9 @@
   
         }
       },
+        printBill(id_facture) {            
+            window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_by_numero?id_facture=` + id_facture + "&author=" + this.userData.name);
+        },
         fetchListChambre() {
             //deviseList
             this.editOrFetch(`${this.apiBaseURL}/fetch_hotel_reservation_search`).then(
@@ -345,10 +356,6 @@
             }
           );
         });
-      },
-  
-      printBill(id) {
-        window.open(`${this.apiBaseURL}/pdf_bonentree_data?id=` + id);
       },
       fetchDataList() {
         this.fetch_data(`${this.apiBaseURL}/fetch_vente_detail_facture_groupe/${this.refEnteteGroup}?page=`);

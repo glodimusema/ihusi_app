@@ -2249,15 +2249,7 @@ function showDetailVente_Etatfacture($date1,$date2,$etat_facture)
         ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
         ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
-        // ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
-    
-        // ->join('tfin_ssouscompte as comptevente','comptevente.id','=','tvente_categorie_produit.compte_vente')
-        // ->join('tfin_ssouscompte as comptevariation','comptevariation.id','=','tvente_categorie_produit.compte_variationstock')
-        // ->join('tfin_ssouscompte as compteperte','compteperte.id','=','tvente_categorie_produit.compte_perte')
-        // ->join('tfin_ssouscompte as compteproduit','compteproduit.id','=','tvente_categorie_produit.compte_produit')
-        // ->join('tfin_ssouscompte as comptedestockage','comptedestockage.id','=','tvente_categorie_produit.compte_destockage')
-      
-    
+            
         ->select('tvente_detail_vente.id','refEnteteVente','refProduit','tvente_detail_vente.compte_vente',
         'tvente_detail_vente.compte_variationstock','tvente_detail_vente.compte_perte','tvente_detail_vente.compte_produit',
         'tvente_detail_vente.compte_destockage','puVente','qteVente','uniteVente','puBase','qteBase',
@@ -2275,21 +2267,9 @@ function showDetailVente_Etatfacture($date1,$date2,$etat_facture)
         'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
         'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug',
         "tvente_categorie_client.designation as CategorieClient","compte_client",
-        // 'compteclient.refSousCompte','compteclient.nom_ssouscompte','compteclient.numero_ssouscompte',
-        //ente vente
+
         'nom_service', "tvente_module.nom_module",'tvente_entete_vente.code','refClient','refService','refReservation','module_id',
         'dateVente','libelle','tvente_entete_vente.montant','tvente_entete_vente.paie','reduction','totaltva',
-        //compte produit
-        // 'comptevente.refSousCompte as refSousCompteVente','comptevente.nom_ssouscompte as nom_ssouscompteVente',
-        // 'comptevente.numero_ssouscompte as numero_ssouscompteVente'
-        // ,'comptevariation.refSousCompte as refSousCompteVariation','comptevariation.nom_ssouscompte as nom_ssouscompteVariation',
-        // 'comptevariation.numero_ssouscompte as numero_ssouscompteVariation'
-        // ,'compteperte.refSousCompte as refSousComptePerte','compteperte.nom_ssouscompte as nom_ssouscomptePerte',
-        // 'compteperte.numero_ssouscompte as numero_ssouscomptePerte'
-        // ,'compteproduit.refSousCompte as refSousCompteProduit','compteproduit.nom_ssouscompte as nom_ssouscompteProduit',
-        // 'compteproduit.numero_ssouscompte as numero_ssouscompteProduit'
-        // ,'comptedestockage.refSousCompte as refSousCompteDestockage','comptedestockage.nom_ssouscompte as nom_ssouscompteDestockage',
-        // 'comptedestockage.numero_ssouscompte as numero_ssouscompteDestockage',
         'priseencharge')
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction + montanttva),2) as PTVenteTVA')
@@ -4571,537 +4551,6 @@ function showDetailUsage_Service_Type($date1,$date2,$idService,$type_sortie)
     return $output;
 
 }
-
-//==================== RAPPORT DETAIL TRANSFERT SELON LES SERVICES =======================================
-
-public function fetch_rapport_detailtransfert_date_service(Request $request)
-{
-    //refDepartement
-
-    if ($request->get('date1') && $request->get('date2')&& $request->get('idService')) {
-        // code...
-        $date1 = $request->get('date1');
-        $date2 = $request->get('date2');
-        $idService = $request->get('idService');
-
-        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
-        $html .= $this->printRapportDetailTransfert_Service($date1, $date2,$idService);       
-        $html .='<script>window.print()</script>';
-
-        echo($html);          
-
-    } else {
-        // code...
-    }  
-    
-}
-function printRapportDetailTransfert_Service($date1, $date2,$idService)
-{
-
-         //Info Entreprise
-         $nomEse='';
-         $adresseEse='';
-         $Tel1Ese='';
-         $Tel2Ese='';
-         $siteEse='';
-         $emailEse='';
-         $idNatEse='';
-         $numImpotEse='';
-         $rccEse='';
-         $siege='';
-         $busnessName='';
-         $pic='';
-         $pic2 = $this->displayImg("fichier", 'logo.png');
-         $logo='';
- 
-         $data1 = DB::table('entreprises')
-         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
-         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
- 
-         ->join('pays','pays.id','=','entreprises.idPays')
-         ->join('provinces','provinces.id','=','entreprises.idProvince')
-         ->join('users','users.id','=','entreprises.ceo')        
-         ->select('entreprises.id as id','entreprises.id as idEntreprise',
-         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
-         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
-         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
-         'entreprises.idforme','entreprises.etat',
-         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
-         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
-         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
-         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
-             //forme
-             'forme_juridiques.nomForme','secteurs.nomSecteur',
-             //users
-             'users.name','users.email','users.avatar','users.telephone','users.adresse',
-             //
-             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
-         ->get();
-         $output='';
-         foreach ($data1 as $row) 
-         {                                
-             $nomEse=$row->nomEntreprise;
-             $adresseEse=$row->adresseEntreprise;
-             $Tel1Ese=$row->telephoneEntreprise;
-             $Tel2Ese=$row->telephone;
-             $siteEse=$row->siteweb;
-             $emailEse=$row->emailEntreprise;
-             $idNatEse=$row->rccm;
-             $numImpotEse=$row->rccm;
-             $busnessName=$row->nomSecteur;
-             $rccmEse=$row->rccm;
-             $pic = $this->displayImg("fichier", 'logo.png');
-             $siege=$row->nomForme;         
-         }
- 
-
-
-
-         $sommePHT=0;
-         $sommeTVA='';
-         $sommePTTF='';
-         // 
-         $data2 =  DB::table('tvente_detail_transfert')
-         ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
-         ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
-         ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
-         ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
-         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
-
-         ->select(DB::raw('ROUND(SUM(((qteTransfert*puTransfert))),2) as sommePHT'
-         ))
-         ->where([
-            ['date_transfert','>=', $date1],
-            ['date_transfert','<=', $date2],
-            ['servicesDestination.id','=', $idService],
-        ])    
-         ->get(); 
-         $output='';
-         foreach ($data2 as $row) 
-         {                                
-            $sommePHT=$row->sommePHT;
-            $sommeTVA='';
-            $sommePTTF='';                           
-         }
-
-
-
-
-         $CategorieClient='';
-
-         $data3=DB::table('tvente_detail_transfert')  
-         ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
-         ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
-         ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
-         ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
-         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
-        
-         ->select('servicesDestination.nom_service')
-         ->where([
-            ['date_transfert','>=', $date1],
-            ['date_transfert','<=', $date2],
-            ['servicesDestination.id','=', $idService]
-        ])      
-        ->get();      
-        $output='';
-        foreach ($data3 as $row) 
-        {
-            $CategorieClient=$row->nom_service;              
-        }
-
-
-          
-
-        $output='
-
-                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-                <!-- saved from url=(0016)http://localhost -->
-                <html>
-                <head>
-                    <title>rpt_DetailFactureAbonne</title>
-                    <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-                    <style type="text/css">
-                        .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .cs49AA1D99 {color:#000000;background-color:#E0E0E0;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                        .cs8AAF79E9 {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
-                        .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                        .csE6D2AE99 {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
-                        .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                        .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                        .cs6E02D7D2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                        .cs6C28398D {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                        .cs612ED82F {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; padding-left:2px;}
-                        .csFFC1C457 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; padding-left:2px;}
-                        .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                        .csCE72709D {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;}
-                        .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
-                        .csFBB219FE {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;}
-                        .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                        .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-                    </style>
-                </head>
-                <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-                <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:925px;height:383px;position:relative;">
-                    <tr>
-                        <td style="width:0px;height:0px;"></td>
-                        <td style="height:0px;width:10px;"></td>
-                        <td style="height:0px;width:102px;"></td>
-                        <td style="height:0px;width:36px;"></td>
-                        <td style="height:0px;width:71px;"></td>
-                        <td style="height:0px;width:124px;"></td>
-                        <td style="height:0px;width:66px;"></td>
-                        <td style="height:0px;width:23px;"></td>
-                        <td style="height:0px;width:149px;"></td>
-                        <td style="height:0px;width:43px;"></td>
-                        <td style="height:0px;width:60px;"></td>
-                        <td style="height:0px;width:10px;"></td>
-                        <td style="height:0px;width:30px;"></td>
-                        <td style="height:0px;width:41px;"></td>
-                        <td style="height:0px;width:12px;"></td>
-                        <td style="height:0px;width:47px;"></td>
-                        <td style="height:0px;width:75px;"></td>
-                        <td style="height:0px;width:25px;"></td>
-                        <td style="height:0px;width:1px;"></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:23px;"></td>
-                        <td class="cs739196BC" colspan="6" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:9px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:1px;"></td>
-                        <td></td>
-                        <td class="csFBB219FE" colspan="10" rowspan="2" style="width:682px;height:23px;line-height:21px;text-align:left;vertical-align:middle;"><nobr>'.$nomEse.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td class="cs101A94F7" colspan="4" rowspan="7" style="width:175px;height:144px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:175px;height:144px;">
-                            <img alt="" src="'.$pic2.'" style="width:175px;height:144px;" /></div>
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="10" style="width:682px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$busnessName.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="10" style="width:682px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$idNatEse.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csFFC1C457" colspan="10" style="width:682px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$adresseEse.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csFFC1C457" colspan="10" style="width:682px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Email&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csFFC1C457" colspan="10" style="width:682px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Site&nbsp;web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:12px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="10" rowspan="2" style="width:682px;height:23px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>T&#233;l&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'&nbsp;&nbsp;24h/24</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:11px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:8px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:32px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="csB6F858D0" colspan="11" style="width:625px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;VENTES</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:19px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:23px;"></td>
-                        <td></td>
-                        <td class="cs56F73198" colspan="4" style="width:329px;height:21px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
-                        <td class="cs56F73198" colspan="12" style="width:577px;height:21px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$CategorieClient.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:9px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:24px;"></td>
-                        <td></td>
-                        <td class="cs8AAF79E9" style="width:101px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
-                        <td class="cs8AAF79E9" colspan="3" style="width:230px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
-                        <td class="cs8AAF79E9" colspan="2" style="width:88px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>DATE&nbsp;FACT.</nobr></td>
-                        <td class="cs8AAF79E9" style="width:148px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>ARTICLE</nobr></td>
-                        <td class="cs8AAF79E9" style="width:42px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>Qt&#233;</nobr></td>
-                        <td class="cs8AAF79E9" style="width:59px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>PU(USD)</nobr></td>
-                        <td class="cs8AAF79E9" colspan="3" style="width:80px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>PHT(USD)</nobr></td>
-                        <td class="cs8AAF79E9" colspan="2" style="width:58px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>Created</nobr></td>
-                        <td class="csE6D2AE99" colspan="3" style="width:101px;height:22px;line-height:14px;text-align:center;vertical-align:middle;"><nobr>Author</nobr></td>
-                    </tr>
-                    ';
-
-                            $output .= $this->showDetailTransfert_Service($date1,$date2,$idService); 
-
-                            $output.='
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:24px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="cs49AA1D99" colspan="2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL&nbsp;($)&nbsp;:</nobr></td>
-                        <td class="cs9FE9304F" colspan="3" style="width:80px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$sommePHT.'</nobr></td>
-                        <td class="cs9FE9304F" colspan="2" style="width:58px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$sommeTVA.'</nobr></td>
-                        <td class="csEAC52FCD" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$sommePTTF.'</nobr></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:10px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="cs12FE94AA" colspan="3" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
-                </body>
-                </html>
-        
-        ';  
-       
-        return $output; 
-
-}
-function showDetailTransfert_Service($date1,$date2,$idService)
-{
-        $data = DB::table('tvente_detail_transfert')  
-        ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
-        ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
-        ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
-        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
-        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')        
-        ->select('tvente_detail_transfert.id','refEnteteTransfert','refProduit','refDestination','puTransfert',
-        'qteTransfert','uniteTransfert','tvente_detail_transfert.puBase','tvente_detail_transfert.qteBase',
-        'tvente_detail_transfert.uniteBase','tvente_detail_transfert.author','tvente_detail_transfert.refUser',
-        'tvente_detail_transfert.created_at','refService','date_transfert',"servicesOrigine.nom_service as ServiceOrigine",
-        "servicesDestination.nom_service as ServiceDestination"
-
-        ,"tvente_produit.designation as designation",'refCategorie','refUniteBase','pu','qte',
-        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
-        "tvente_categorie_produit.designation as Categorie",'compte_achat','compte_vente',
-        'compte_variationstock','tvente_categorie_produit.code','compte_perte','compte_produit','compte_destockage','compte_stockage'    
-        ) 
-        ->selectRaw('ROUND(((qteTransfert*puTransfert)),2) as PTTransfert')
-       ->selectRaw('ROUND(((qteTransfert*puTransfert)),2) as PTTransfertTVA')
-       ->selectRaw('ROUND((IFNULL((qteTransfert*puTransfert),0)),2) as totalFacture')
-    //    ->selectRaw('ROUND((montanttva),2) as TotalTVA')
-       ->selectRaw('CONCAT("S",YEAR(date_transfert),"",MONTH(date_transfert),"00",refEnteteTransfert) as codeFacture')
-       ->where([
-            ['date_transfert','>=', $date1],
-            ['date_transfert','<=', $date2],
-            ['servicesDestination.id','=', $idService]
-        ])
-        ->orderBy("tvente_detail_transfert.created_at", "asc")
-        ->get();
-        $output='';
-
-        foreach ($data as $row) 
-        {
-            $output .='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs6E02D7D2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->codeFacture.'</td>
-                <td class="cs6E02D7D2" colspan="3" style="width:230px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.' Vers '.$row->ServiceDestination.'</td>
-                <td class="cs6E02D7D2" colspan="2" style="width:88px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->date_transfert.'</td>
-                <td class="cs6E02D7D2" style="width:148px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
-                <td class="cs6E02D7D2" style="width:42px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->qteTransfert.' ('.$row->uniteTransfert.')</td>
-                <td class="cs6E02D7D2" style="width:59px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->puTransfert.'</td>
-                <td class="cs6E02D7D2" colspan="3" style="width:80px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->PTTransfert.'</td>
-                <td class="cs6E02D7D2" colspan="2" style="width:58px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->created_at.'</td>
-                <td class="cs6C28398D" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->author.'</td>
-            </tr>
-        '; 
-           
-   
-    }
-
-    return $output;
-
-}
-
 
 
 //=========== RAPPORT DES VENTES PAR SERVICE ET CATEGORIE =================================================
@@ -8632,55 +8081,127 @@ function showCategorieFicheStockServiceByCategorie($date1,$date2,$idCategorie,$i
 //DATA 
 // function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idService)
 // {
-//     // Récupérer les données de stock, mouvements et ventes en une seule requête
-//     $data1 = DB::table('tvente_stock_service')
+
+//     $data11 = DB::table('tvente_stock_service')
+//     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//     ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
+//         $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
+//         ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
+//             //  ->where('dtEnteteTransSortie.refService', '=', $idService)
+//              ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+//     })
+//     // Utilisez distinct() avant select()
+//     ->distinct()
+//     ->select(
+//         "tvente_stock_service.id",
+//         'tvente_stock_service.refService',
+//         'tvente_stock_service.refProduit',
+//         "tvente_produit.designation as designation",
+//         "refCategorie",
+//         "tvente_stock_service.pu",
+//         "tvente_categorie_produit.designation as Categorie",
+//         "tvente_stock_service.qte",
+//         "tvente_stock_service.uniteBase",
+//         "tvente_stock_service.cmup",
+//         DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie')
+//     )
+//     ->where([
+//         ['tvente_produit.refCategorie', '=', $refCategorie],
+//         ['tvente_stock_service.refService', '=', $idService]
+//     ])
+//     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+//     ->orderBy("tvente_produit.designation", "asc")
+//     ->get();
+
+
+//     // Récupérer les données de stock, mouvements et ventes en une seule requête 
+//     $data22 = DB::table('tvente_stock_service')
 //         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
 //         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
 //         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-//         ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-//             $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-//             ->join('tvente_services as serviceSource', 'serviceSource.id', '=', 'dtEnteteTransSortie.refService')
-//                  ->where('dtEnteteTransSortie.refService', '=', $idService)
-//                  ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
-//         })
-//         ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-//             $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-//                  ->where('dtEntree.refDestination', '=', $idService)
-//                  ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-//         })
-//         ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-//             $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-//             ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-//                  ->where('dtEnteteAppro.refService', '=', $idService)
-//                  ->where('dtEnteteAppro.dateEntree', '<', $date1);
-//         })
-//         ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-//             $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-//             ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-//                  ->where('dtEnteteVente.refService', '=', $idService)
-//                  ->where('dtEnteteVente.dateVente', '<', $date1);
-//         })
-//         ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-//             $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-//             ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-//                  ->where('dtEnteteUse.refService', '=', $idService)
-//                  ->where('dtEnteteUse.dateUse', '<', $date1);
-//         })        
-
-//         //mvtEnteteTransEntree  mvtEnteteTransSortie
-
 //         ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-//             $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
+//             $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
 //             ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-//                  ->where('mvtEnteteTransSortie.refService', '=', $idService)
+//                 //  ->where('mvtEnteteTransSortie.refService', '=', $idService)
 //                  ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
 //         })
+
+//         // Utilisez distinct() avant select()
+//         ->distinct()
+//         ->select(
+//             "tvente_stock_service.id",
+//             'tvente_stock_service.refService',
+//             'tvente_stock_service.refProduit',
+//             "tvente_produit.designation as designation",
+//             "refCategorie",
+//             "tvente_stock_service.pu",
+//             "tvente_categorie_produit.designation as Categorie",
+//             "tvente_stock_service.qte",
+//             "tvente_stock_service.uniteBase",
+//             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+//             DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
+
+//         )
+//         ->where([
+//             ['tvente_produit.refCategorie', '=', $refCategorie],
+//             ['tvente_stock_service.refService', '=', $idService]
+//         ])
+//         ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+//         "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+//         "tvente_stock_service.devise","tvente_stock_service.taux")
+//         ->orderBy("tvente_produit.designation", "asc")
+//         ->get();
+
+//     // Construction de l'output
+
+
+//     $data111 = DB::table('tvente_stock_service')
+//     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//     ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
+//         $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
+//         ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
+//              ->where('dtEntree.refDestination', '=', $idService)
+//              ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
+//     })       
+//     // Utilisez distinct() avant select()
+//     ->distinct()
+//     ->select(
+//         "tvente_stock_service.id",
+//         'tvente_stock_service.refService',
+//         'tvente_stock_service.refProduit',
+//         "tvente_produit.designation as designation",
+//         "refCategorie",
+//         "tvente_stock_service.pu",
+//         "tvente_categorie_produit.designation as Categorie",
+//         "tvente_stock_service.qte",
+//         "tvente_stock_service.uniteBase",
+//         "tvente_stock_service.cmup",
+//         DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree')        
+//     )
+//     ->where([
+//         ['tvente_produit.refCategorie', '=', $refCategorie],
+//         ['tvente_stock_service.refService', '=', $idService]
+//     ])
+//     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+//     ->orderBy("tvente_produit.designation", "asc")
+//     ->get();
+
+
+
+
+
+//         // Récupérer les données de stock, mouvements et ventes en une seule requête
+//         $data222 = DB::table('tvente_stock_service')
+//         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
 //         ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
 //             $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
@@ -8689,28 +8210,8 @@ function showCategorieFicheStockServiceByCategorie($date1,$date2,$idCategorie,$i
 //                  ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
 //         })
 
-//         ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-//             $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-//             ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-//                  ->where('mvtEnteteAppro.refService', '=', $idService)
-//                  ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-//         })
-
-//         ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-//             $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-//             ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-//                  ->where('mvtEnteteVente.refService', '=', $idService)               
-//                  ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-//         })
-//         ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-//             $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-//             ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-//             ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-//                 ->where('mvtEnteteUse.refService', '=', $idService)
-//                  ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-//         })
+//         // Utilisez distinct() avant select()
+//         ->distinct()
 //         ->select(
 //             "tvente_stock_service.id",
 //             'tvente_stock_service.refService',
@@ -8722,66 +8223,70 @@ function showCategorieFicheStockServiceByCategorie($date1,$date2,$idCategorie,$i
 //             "tvente_stock_service.qte",
 //             "tvente_stock_service.uniteBase",
 //             "tvente_stock_service.cmup",
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
+//             "tvente_stock_service.devise",
+//             "tvente_stock_service.taux",
+
+//             DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) as stockEntree')
+//         )
+//         ->where([
+//             ['tvente_produit.refCategorie', '=', $refCategorie],
+//             ['tvente_stock_service.refService', '=', $idService]
+//         ])
+//         ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+//         "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+//         "tvente_stock_service.devise","tvente_stock_service.taux")
+//         ->orderBy("tvente_produit.designation", "asc")
+//         ->get();
+
+//     // Construction de l'output
+
+
+
+//         // Récupérer les données de stock, mouvements et ventes en une seule requête
+//         $data1 = DB::table('tvente_stock_service')
+//         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//         ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
+//             $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
+//             ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
+//             ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
+//                  ->where('dtEnteteAppro.refService', '=', $idService)
+//                  ->where('dtEnteteAppro.dateEntree', '<', $date1);
+//         })
+//         ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
+//              $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
+//             // $join->on('dtVente.idStockService', '=', 'tvente_stock_service.id')
+//             ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
+//             //->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
+//                  ->where('dtEnteteVente.refService', '=', $idService)
+//                  ->where('dtEnteteVente.dateVente', '<', $date1);
+//         })
+//         ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
+//             $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
+//             ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
+//             ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
+//                  ->where('dtEnteteUse.refService', '=', $idService)
+//                  ->where('dtEnteteUse.dateUse', '<', $date1);
+//         })        
+//         // Utilisez distinct() avant select()
+//         ->distinct()
+//         ->select(
+//             "tvente_stock_service.id",
+//             'tvente_stock_service.refService',
+//             'tvente_stock_service.refProduit',
+//             "tvente_produit.designation as designation",
+//             "refCategorie",
+//             "tvente_stock_service.pu",
+//             "tvente_categorie_produit.designation as Categorie",
+//             "tvente_stock_service.qte",
+//             "tvente_stock_service.uniteBase",
+//             "tvente_stock_service.cmup",
+
 //             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
 //             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
-
-//             DB::raw('(IFNULL(ROUND(SUM(DISTINCT dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-//             - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI'),
-
-//             DB::raw('(IFNULL(ROUND(SUM(DISTINCT mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),
-
-//             DB::raw('((IFNULL(ROUND(SUM(DISTINCT dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-//             - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-//             + (IFNULL(ROUND(SUM(DISTINCT mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) as totalG'),
-            
-            
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-//             DB::raw('(IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-//             + IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-//             + IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-//             DB::raw('(((IFNULL(ROUND(SUM(DISTINCT dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-//             - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-//             + (IFNULL(ROUND(SUM(DISTINCT mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-//             - (IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) as totalSF'),
-
-//             DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-//             DB::raw('((((IFNULL(ROUND(SUM(DISTINCT dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-//             - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-//             + (IFNULL(ROUND(SUM(DISTINCT mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-            
-//             - (IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-//             IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-//             (tvente_stock_service.cmup)) as totalPT'),
+//             DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse')
 //         )
 //         ->where([
 //             ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -8792,79 +8297,356 @@ function showCategorieFicheStockServiceByCategorie($date1,$date2,$idCategorie,$i
 //         ->get();
 
 //     // Construction de l'output
+
+//     // Récupérer les données de stock, mouvements et ventes en une seule requête
+//     $data2 = DB::table('tvente_stock_service')
+//         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//        ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
+//             $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
+//             ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
+//             // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
+//                  ->where('mvtEnteteAppro.refService', '=', $idService)
+//                  ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
+//         })
+
+//         ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
+//             $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
+//             // $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
+//             ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
+//                  ->where('mvtEnteteVente.refService', '=', $idService)               
+//                  ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
+//         })
+//         ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
+//             $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
+//             ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
+//             // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
+//                 ->where('mvtEnteteUse.refService', '=', $idService)
+//                  ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
+//         })
+//         // Utilisez distinct() avant select()
+//         ->distinct()
+//         ->select(
+//             "tvente_stock_service.id",
+//             'tvente_stock_service.refService',
+//             'tvente_stock_service.refProduit',
+//             "tvente_produit.designation as designation",
+//             "refCategorie",
+//             "tvente_stock_service.pu",
+//             "tvente_categorie_produit.designation as Categorie",
+//             "tvente_stock_service.qte",
+//             "tvente_stock_service.uniteBase",
+//             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",  
+            
+//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0) as stockAppro'),
+//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
+//             DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUse'),
+
+//             DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
+
+//         )
+//         ->where([
+//             ['tvente_produit.refCategorie', '=', $refCategorie],
+//             ['tvente_stock_service.refService', '=', $idService]
+//         ])
+//         ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+//         "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+//         "tvente_stock_service.devise","tvente_stock_service.taux")
+//         ->orderBy("tvente_produit.designation", "asc")
+//         ->get();
+
+//     // Construction de l'output
     
 //     $output = '';
-//     foreach ($data1 as $row1) 
-//     {
-//         $output .='
+
+//     // Vérifiez que les deux tableaux ont la même longueur
+//     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+//     && ( count($data1) === count($data111)) && (count($data1) === count($data22)) 
+//     && (count($data1) === count($data222))) {
+//         for ($i = 0; $i < count($data1); $i++) {
+//             $row1 = $data1[$i];
+//             $row2 = $data2[$i];
+//             $row11 = $data11[$i];
+//             $row22 = $data22[$i];
+//             $row111 = $data111[$i];
+//             $row222 = $data222[$i];
+
+//             $totalSortie = floatval($row11->totalSortie);
+//             $totalEntree = floatval($row111->totalEntree);
+//             $totalVente = floatval($row1->totalVente);
+//             $totalAppro = floatval($row1->totalAppro);
+//             $totalUse = floatval($row1->totalUse);
+
+//             $stockSortie = floatval($row22->stockSortie);            
+//             $stockEntree = floatval($row222->stockEntree);
+//             $stockVente = floatval($row2->stockVente);
+//             $stockAppro = floatval($row2->stockAppro);
+//             $stockUse = floatval($row2->stockUse);
+
+//             $totalSI = ((floatval($totalEntree) + floatval($totalAppro)) - (floatval($totalSortie) + floatval($totalVente) + floatval($totalUse)));
+//             $totalGEntree = floatval($stockEntree) + floatval($stockAppro);
+//             $totalG = floatval($totalSI) + floatval($stockEntree) + floatval($stockAppro);
+//             $TGSortie = floatval($stockSortie) + floatval($stockVente) + floatval($stockUse);
+//             $totalSF = floatval($totalG) - floatval($stockSortie) - floatval($stockVente) - floatval($stockUse);
+//             $totalPT = floatval($totalSF) * floatval($row2->puVente);
+
+
+//             $output .= '
 //                 <tr style="vertical-align:top;">
-//                 <td style="width:0px;height:24px;"></td>
-//                 <td></td>
-//                 <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
-//                 <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalSI.' '.$row1->uniteBase.'</td>
-//                 <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalGEntree.' '.$row1->uniteBase.' </td>
-//                 <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalG.' '.$row1->uniteBase.'</td>
-//                 <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->TGSortie.' '.$row1->uniteBase.'</td>
-//                 <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalSF.' '.$row1->uniteBase.'</td>                
-//                 <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->puVente,2).'$</td>
-//                 <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalPT,2).'$</td>
-//             </tr>
-//         ';        
+//                     <td style="width:0px;height:24px;"></td>
+//                     <td></td>
+//                     <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+//                     <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSI.' '.$row1->uniteBase.'</td>
+//                     <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalGEntree.' '.$row1->uniteBase.' </td>
+//                     <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
+//                     <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$TGSortie.' '.$row1->uniteBase.'</td>
+//                     <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
+//                     <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->puVente, 2).'$</td>
+//                     <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
+//                 </tr>
+//             ';   
+
 //     }
+//     } else {
+//         // Gérer le cas où les tableaux n'ont pas la même longueur
+//         echo 'Les tableaux ont pas la même longueur.';
+//     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     // // Récupérer les données de stock, mouvements et ventes en une seule requête
+//     // $data1 = DB::table('tvente_stock_service')
+//     //     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//     //     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//     //     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//     //     ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
+//     //         $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
+//     //         ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
+//     //              ->where('dtEnteteTransSortie.refService', '=', $idService)
+//     //              ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+//     //     })
+//     //     ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
+//     //         $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
+//     //              ->where('dtEntree.refDestination', '=', $idService)
+//     //              ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
+//     //     })
+//     //     ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
+//     //         $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
+//     //         ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
+//     //              ->where('dtEnteteAppro.refService', '=', $idService)
+//     //              ->where('dtEnteteAppro.dateEntree', '<', $date1);
+//     //     })
+//     //     ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
+//     //         $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
+//     //         ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
+//     //              ->where('dtEnteteVente.refService', '=', $idService)
+//     //              ->where('dtEnteteVente.dateVente', '<', $date1);
+//     //     })
+//     //     ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
+//     //         $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
+//     //         ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
+//     //              ->where('dtEnteteUse.refService', '=', $idService)
+//     //              ->where('dtEnteteUse.dateUse', '<', $date1);
+//     //     })        
+//     //     // Utilisez distinct() avant select()
+//     //     ->distinct()
+//     //     ->select(
+//     //         "tvente_stock_service.id",
+//     //         'tvente_stock_service.refService',
+//     //         'tvente_stock_service.refProduit',
+//     //         "tvente_produit.designation as designation",
+//     //         "refCategorie",
+//     //         // "tvente_stock_service.pu",
+//     //         "tvente_categorie_produit.designation as Categorie",
+//     //         // "tvente_stock_service.qte",
+//     //         "tvente_stock_service.uniteBase",
+//     //         // "tvente_stock_service.cmup",'unitePivot','qtePivot',
+//     //         DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
+//     //         DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
+//     //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
+//     //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
+//     //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
+
+//     //         DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
+//     //         IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
+//     //         - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
+//     //         IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
+//     //         IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI')
+//     //     )
+//     //     ->where([
+//     //         ['tvente_produit.refCategorie', '=', $refCategorie],
+//     //         ['tvente_stock_service.refService', '=', $idService]
+//     //     ])
+//     //     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+//     //     "designation", "refCategorie", "Categorie","tvente_stock_service.uniteBase")
+//     //     ->orderBy("tvente_produit.designation", "asc")
+//     //     ->get();
+
+//     // // Construction de l'output
+
+//     // // Récupérer les données de stock, mouvements et ventes en une seule requête
+//     // $data2 = DB::table('tvente_stock_service')
+//     //     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+//     //     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+//     //     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+//     //     ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+//     //         $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
+//     //         ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
+//     //              ->where('mvtEnteteTransSortie.refService', '=', $idService)
+//     //              ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
+//     //     })
+
+//     //     ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+//     //         $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
+//     //              ->where('mvtEntree.refDestination', '=', $idService)
+//     //              ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
+//     //     })
+
+//     //     ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
+//     //         $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
+//     //         ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
+//     //         // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
+//     //              ->where('mvtEnteteAppro.refService', '=', $idService)
+//     //              ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
+//     //     })
+
+//     //     ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
+//     //         $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
+//     //         ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
+//     //              ->where('mvtEnteteVente.refService', '=', $idService)               
+//     //              ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
+//     //     })
+//     //     ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
+//     //         $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
+//     //         ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
+//     //         // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
+//     //             ->where('mvtEnteteUse.refService', '=', $idService)
+//     //              ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
+//     //     })
+//     //     // Utilisez distinct() avant select()
+//     //     ->distinct()
+//     //     ->select(
+//     //         "tvente_stock_service.id",
+//     //         'tvente_stock_service.refService',
+//     //         'tvente_stock_service.refProduit',
+//     //         "tvente_produit.designation as designation",
+//     //         "refCategorie",
+//     //         // "tvente_stock_service.pu",
+//     //         "tvente_categorie_produit.designation as Categorie",
+//     //         // "tvente_stock_service.qte",
+//     //         "tvente_stock_service.uniteBase",
+//     //         // "tvente_stock_service.cmup",
+//     //         // 'unitePivot','qtePivot',
+
+//     //         DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
+//     //         IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),        
+            
+//     //         DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
+//     //         DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
+//     //         DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
+
+//     //         DB::raw('(IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
+//     //         + IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
+//     //         + IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
+
+//     //         DB::raw('IFNULL(AVG(tvente_stock_service.cmup), 0) as puVente'),
+
+//     //     )
+//     //     ->where([
+//     //         ['tvente_produit.refCategorie', '=', $refCategorie],
+//     //         ['tvente_stock_service.refService', '=', $idService]
+//     //     ])
+//     //     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit",
+//     //      "designation", "refCategorie","Categorie","tvente_stock_service.uniteBase")
+//     //     ->orderBy("tvente_produit.designation", "asc")
+//     //     ->get();
+
+//     // // Construction de l'output
+    
+//     // $output = '';
+
+//     // // Vérifiez que les deux tableaux ont la même longueur
+//     // if (count($data1) === count($data2)) {
+//     //     for ($i = 0; $i < count($data1); $i++) {
+//     //         $row1 = $data1[$i];
+//     //         $row2 = $data2[$i];
+
+//     //         $totalG = floatval($row1->totalSI) + floatval($row2->totalGEntree);
+//     //         $totalSF = floatval($totalG) - floatval($row2->TGSortie);
+//     //         $totalPT = floatval($totalSF) * floatval($row2->puVente);
+
+//     //         $output .= '
+//     //             <tr style="vertical-align:top;">
+//     //                 <td style="width:0px;height:24px;"></td>
+//     //                 <td></td>
+//     //                 <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+//     //                 <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalSI.' '.$row1->uniteBase.'</td>
+//     //                 <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->totalGEntree.' '.$row1->uniteBase.' </td>
+//     //                 <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
+//     //                 <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->TGSortie.' '.$row1->uniteBase.'</td>
+//     //                 <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
+//     //                 <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->puVente, 2).'$</td>
+//     //                 <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
+//     //             </tr>
+//     //         ';
+//     //     }
+//     // } else {
+//     //     // Gérer le cas où les tableaux n'ont pas la même longueur
+//     //     echo 'Les tableaux ont pas la même longueur.';
+//     // }
 
 //     return $output;
 // }
 
 function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idService)
 {
-
+    // Récupérer les données de stock, mouvements et ventes en une seule requête 
     $data11 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
-        ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            //  ->where('dtEnteteTransSortie.refService', '=', $idService)
-             ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+    ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
     })
-    // Utilisez distinct() avant select()
-    ->distinct()
-    ->select(
-        "tvente_stock_service.id",
-        'tvente_stock_service.refService',
-        'tvente_stock_service.refProduit',
-        "tvente_produit.designation as designation",
-        "refCategorie",
-        "tvente_stock_service.pu",
-        "tvente_categorie_produit.designation as Categorie",
-        "tvente_stock_service.qte",
-        "tvente_stock_service.uniteBase",
-        "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie')
-    )
-    ->where([
-        ['tvente_produit.refCategorie', '=', $refCategorie],
-        ['tvente_stock_service.refService', '=', $idService]
-    ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-    ->orderBy("tvente_produit.designation", "asc")
-    ->get();
-
-
-    // Récupérer les données de stock, mouvements et ventes en une seule requête 
-    $data22 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-                //  ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-        })
 
         // Utilisez distinct() avant select()
         ->distinct()
@@ -8879,7 +8661,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
         )
         ->where([
@@ -8892,20 +8674,18 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
-    // Construction de l'output
+//======================================================================
 
-
-    $data111 = DB::table('tvente_stock_service')
+    $data22 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-        $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-             ->where('dtEntree.refDestination', '=', $idService)
-             ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    })       
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
     // Utilisez distinct() avant select()
     ->distinct()
     ->select(
@@ -8919,7 +8699,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree')        
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -8929,165 +8709,86 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
+    // ============ LEs Mouvements =========================================================================
 
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data222 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",
-
-            DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) as stockEntree')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
         $data1 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
         })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        })        
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data2 = DB::table('tvente_stock_service')
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-       ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
         })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",  
-            
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0) as stockAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUse'),
-
-            DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
 
     // Construction de l'output
     
@@ -9095,34 +8796,26 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
 
     // Vérifiez que les deux tableaux ont la même longueur
     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
-    && ( count($data1) === count($data111)) && (count($data1) === count($data22)) 
-    && (count($data1) === count($data222))) {
+    && (count($data1) === count($data22)))
+    {
         for ($i = 0; $i < count($data1); $i++) {
-            $row1 = $data1[$i];
-            $row2 = $data2[$i];
             $row11 = $data11[$i];
             $row22 = $data22[$i];
-            $row111 = $data111[$i];
-            $row222 = $data222[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
 
-            $totalSortie = floatval($row11->totalSortie);
-            $totalEntree = floatval($row111->totalEntree);
-            $totalVente = floatval($row1->totalVente);
-            $totalAppro = floatval($row1->totalAppro);
-            $totalUse = floatval($row1->totalUse);
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
 
-            $stockSortie = floatval($row22->stockSortie);            
-            $stockEntree = floatval($row222->stockEntree);
-            $stockVente = floatval($row2->stockVente);
-            $stockAppro = floatval($row2->stockAppro);
-            $stockUse = floatval($row2->stockUse);
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
 
-            $totalSI = ((floatval($totalEntree) + floatval($totalAppro)) - (floatval($totalSortie) + floatval($totalVente) + floatval($totalUse)));
-            $totalGEntree = floatval($stockEntree) + floatval($stockAppro);
-            $totalG = floatval($totalSI) + floatval($stockEntree) + floatval($stockAppro);
-            $TGSortie = floatval($stockSortie) + floatval($stockVente) + floatval($stockUse);
-            $totalSF = floatval($totalG) - floatval($stockSortie) - floatval($stockVente) - floatval($stockUse);
-            $totalPT = floatval($totalSF) * floatval($row2->puVente);
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
 
 
             $output .= '
@@ -9135,7 +8828,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                     <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
                     <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$TGSortie.' '.$row1->uniteBase.'</td>
                     <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
-                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->puVente, 2).'$</td>
+                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->cmup, 2).'$</td>
                     <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
                 </tr>
             ';   
@@ -9145,223 +8838,6 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         // Gérer le cas où les tableaux n'ont pas la même longueur
         echo 'Les tableaux ont pas la même longueur.';
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // // Récupérer les données de stock, mouvements et ventes en une seule requête
-    // $data1 = DB::table('tvente_stock_service')
-    //     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-    //     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-    //     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-    //     ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-    //         $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
-    //         ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-    //              ->where('dtEnteteTransSortie.refService', '=', $idService)
-    //              ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
-    //     })
-    //     ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-    //         $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-    //              ->where('dtEntree.refDestination', '=', $idService)
-    //              ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    //     })
-    //     ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-    //         $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-    //         ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-    //              ->where('dtEnteteAppro.refService', '=', $idService)
-    //              ->where('dtEnteteAppro.dateEntree', '<', $date1);
-    //     })
-    //     ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-    //         $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-    //         ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-    //              ->where('dtEnteteVente.refService', '=', $idService)
-    //              ->where('dtEnteteVente.dateVente', '<', $date1);
-    //     })
-    //     ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-    //         $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-    //         ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-    //              ->where('dtEnteteUse.refService', '=', $idService)
-    //              ->where('dtEnteteUse.dateUse', '<', $date1);
-    //     })        
-    //     // Utilisez distinct() avant select()
-    //     ->distinct()
-    //     ->select(
-    //         "tvente_stock_service.id",
-    //         'tvente_stock_service.refService',
-    //         'tvente_stock_service.refProduit',
-    //         "tvente_produit.designation as designation",
-    //         "refCategorie",
-    //         // "tvente_stock_service.pu",
-    //         "tvente_categorie_produit.designation as Categorie",
-    //         // "tvente_stock_service.qte",
-    //         "tvente_stock_service.uniteBase",
-    //         // "tvente_stock_service.cmup",'unitePivot','qtePivot',
-    //         DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-    //         DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
-    //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-    //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-    //         DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
-
-    //         DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-    //         IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-    //         - (IFNULL(ROUND(SUM(DISTINCT dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-    //         IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-    //         IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI')
-    //     )
-    //     ->where([
-    //         ['tvente_produit.refCategorie', '=', $refCategorie],
-    //         ['tvente_stock_service.refService', '=', $idService]
-    //     ])
-    //     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-    //     "designation", "refCategorie", "Categorie","tvente_stock_service.uniteBase")
-    //     ->orderBy("tvente_produit.designation", "asc")
-    //     ->get();
-
-    // // Construction de l'output
-
-    // // Récupérer les données de stock, mouvements et ventes en une seule requête
-    // $data2 = DB::table('tvente_stock_service')
-    //     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-    //     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-    //     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-    //     ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-    //         $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
-    //         ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-    //              ->where('mvtEnteteTransSortie.refService', '=', $idService)
-    //              ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-    //     })
-
-    //     ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-    //         $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-    //              ->where('mvtEntree.refDestination', '=', $idService)
-    //              ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-    //     })
-
-    //     ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-    //         $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-    //         ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-    //         // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-    //              ->where('mvtEnteteAppro.refService', '=', $idService)
-    //              ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-    //     })
-
-    //     ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-    //         $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
-    //         ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
-    //              ->where('mvtEnteteVente.refService', '=', $idService)               
-    //              ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-    //     })
-    //     ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-    //         $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
-    //         ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-    //         // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-    //             ->where('mvtEnteteUse.refService', '=', $idService)
-    //              ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-    //     })
-    //     // Utilisez distinct() avant select()
-    //     ->distinct()
-    //     ->select(
-    //         "tvente_stock_service.id",
-    //         'tvente_stock_service.refService',
-    //         'tvente_stock_service.refProduit',
-    //         "tvente_produit.designation as designation",
-    //         "refCategorie",
-    //         // "tvente_stock_service.pu",
-    //         "tvente_categorie_produit.designation as Categorie",
-    //         // "tvente_stock_service.qte",
-    //         "tvente_stock_service.uniteBase",
-    //         // "tvente_stock_service.cmup",
-    //         // 'unitePivot','qtePivot',
-
-    //         DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-    //         IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),        
-            
-    //         DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-    //         DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-    //         DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-    //         DB::raw('(IFNULL(ROUND(SUM(DISTINCT mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-    //         + IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-    //         + IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-    //         DB::raw('IFNULL(AVG(tvente_stock_service.cmup), 0) as puVente'),
-
-    //     )
-    //     ->where([
-    //         ['tvente_produit.refCategorie', '=', $refCategorie],
-    //         ['tvente_stock_service.refService', '=', $idService]
-    //     ])
-    //     ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit",
-    //      "designation", "refCategorie","Categorie","tvente_stock_service.uniteBase")
-    //     ->orderBy("tvente_produit.designation", "asc")
-    //     ->get();
-
-    // // Construction de l'output
-    
-    // $output = '';
-
-    // // Vérifiez que les deux tableaux ont la même longueur
-    // if (count($data1) === count($data2)) {
-    //     for ($i = 0; $i < count($data1); $i++) {
-    //         $row1 = $data1[$i];
-    //         $row2 = $data2[$i];
-
-    //         $totalG = floatval($row1->totalSI) + floatval($row2->totalGEntree);
-    //         $totalSF = floatval($totalG) - floatval($row2->TGSortie);
-    //         $totalPT = floatval($totalSF) * floatval($row2->puVente);
-
-    //         $output .= '
-    //             <tr style="vertical-align:top;">
-    //                 <td style="width:0px;height:24px;"></td>
-    //                 <td></td>
-    //                 <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
-    //                 <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->totalSI.' '.$row1->uniteBase.'</td>
-    //                 <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->totalGEntree.' '.$row1->uniteBase.' </td>
-    //                 <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
-    //                 <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->TGSortie.' '.$row1->uniteBase.'</td>
-    //                 <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
-    //                 <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->puVente, 2).'$</td>
-    //                 <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
-    //             </tr>
-    //         ';
-    //     }
-    // } else {
-    //     // Gérer le cas où les tableaux n'ont pas la même longueur
-    //     echo 'Les tableaux ont pas la même longueur.';
-    // }
 
     return $output;
 }
@@ -10186,53 +9662,17 @@ function showCategorieFicheStockCoutService($date1,$date2,$idService)
 function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idService)
 {
 
+    // Récupérer les données de stock, mouvements et ventes en une seule requête 
     $data11 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
-        ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            //  ->where('dtEnteteTransSortie.refService', '=', $idService)
-             ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+    ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
     })
-    // Utilisez distinct() avant select()
-    ->distinct()
-    ->select(
-        "tvente_stock_service.id",
-        'tvente_stock_service.refService',
-        'tvente_stock_service.refProduit',
-        "tvente_produit.designation as designation",
-        "refCategorie",
-        "tvente_stock_service.pu",
-        "tvente_categorie_produit.designation as Categorie",
-        "tvente_stock_service.qte",
-        "tvente_stock_service.uniteBase",
-        "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.puTransfert * dtSortie.qteTransfert), 0), 0) as totalSortie')
-    )
-    ->where([
-        ['tvente_produit.refCategorie', '=', $refCategorie],
-        ['tvente_stock_service.refService', '=', $idService]
-    ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-    ->orderBy("tvente_produit.designation", "asc")
-    ->get();
-
-
-    // Récupérer les données de stock, mouvements et ventes en une seule requête 
-    $data22 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-                //  ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-        })
 
         // Utilisez distinct() avant select()
         ->distinct()
@@ -10247,7 +9687,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(mvtSortie.puTransfert * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.puMvt * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
         )
         ->where([
@@ -10260,20 +9700,18 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
-    // Construction de l'output
+//======================================================================
 
-
-    $data111 = DB::table('tvente_stock_service')
+    $data22 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-        $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-             ->where('dtEntree.refDestination', '=', $idService)
-             ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    })       
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
     // Utilisez distinct() avant select()
     ->distinct()
     ->select(
@@ -10287,7 +9725,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtEntree.puTransfert * dtEntree.qteTransfert), 0), 0) as totalEntree')        
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.puMvt * dtSortie.qteMvt), 0), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -10297,165 +9735,86 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
+    // ============ LEs Mouvements =========================================================================
 
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data222 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",
-
-            DB::raw('IFNULL(ROUND(SUM(mvtEntree.puTransfert * mvtEntree.qteTransfert), 0), 0) as stockEntree')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
         $data1 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
         })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        })        
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.puEntree * dtAppro.qteEntree), 0), 0) as totalAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.puVente * dtVente.qteVente), 0), 0) as totalVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.puVente * dtUtilisation.qteVente), 0), 0) as totalUse')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data2 = DB::table('tvente_stock_service')
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.puMvt * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-       ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
         })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",  
-            
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtAppro.puEntree * mvtAppro.qteEntree), 0), 0) as stockAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.puVente * mvtVente.qteVente), 0), 0) as stockVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.puVente * mvtUtilisation.qteVente), 0), 0) as stockUse'),
-
-            DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.puMvt * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
 
     // Construction de l'output
     
@@ -10463,34 +9822,26 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
 
     // Vérifiez que les deux tableaux ont la même longueur
     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
-    && ( count($data1) === count($data111)) && (count($data1) === count($data22)) 
-    && (count($data1) === count($data222))) {
+    && (count($data1) === count($data22)))
+    {
         for ($i = 0; $i < count($data1); $i++) {
-            $row1 = $data1[$i];
-            $row2 = $data2[$i];
             $row11 = $data11[$i];
             $row22 = $data22[$i];
-            $row111 = $data111[$i];
-            $row222 = $data222[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
 
-            $totalSortie = floatval($row11->totalSortie);
-            $totalEntree = floatval($row111->totalEntree);
-            $totalVente = floatval($row1->totalVente);
-            $totalAppro = floatval($row1->totalAppro);
-            $totalUse = floatval($row1->totalUse);
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
 
-            $stockSortie = floatval($row22->stockSortie);            
-            $stockEntree = floatval($row222->stockEntree);
-            $stockVente = floatval($row2->stockVente);
-            $stockAppro = floatval($row2->stockAppro);
-            $stockUse = floatval($row2->stockUse);
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
 
-            $totalSI = ((floatval($totalEntree) + floatval($totalAppro)) - (floatval($totalSortie) + floatval($totalVente) + floatval($totalUse)));
-            $totalGEntree = floatval($stockEntree) + floatval($stockAppro);
-            $totalG = floatval($totalSI) + floatval($stockEntree) + floatval($stockAppro);
-            $TGSortie = floatval($stockSortie) + floatval($stockVente) + floatval($stockUse);
-            $totalSF = floatval($totalG) - floatval($stockSortie) - floatval($stockVente) - floatval($stockUse);
-            $totalPT = floatval($totalSF) * floatval($row2->puVente);
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
 
 
             $output .= '
@@ -11875,88 +11226,61 @@ function showCategorieFicheStockCategorieUnite($date1,$date2,$idCategorie)
 }
 function showDetailFicheStockUnite($date1,$date2,$refCategorie)
 {
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data1 = DB::table('tvente_stock_service')
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data11 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->leftJoin('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->leftJoin('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-            $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransSortieServ', 'dtEnteteTransSortieServ.id', '=', 'dtEnteteTransSortie.refService')
-                 ->where('dtEnteteTransSortie.refService', '=', $idService)
-                 ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+            $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('dtEntree.type_mouvement', '=', 'Entree')
+                 ->where('dtEntree.dateMvt', '<', $date1);
         })
-        ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-            $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransEntreeServ', 'dtEnteteTransEntreeServ.id', '=', 'dtEntree.refDestination') 
-                 ->where('dtSortie.refDestination', '=', $idService)
-                 ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        $data22 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+            $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('dtSortie.type_mouvement', '=', 'Sortie')
+                 ->where('dtSortie.dateMvt', '<', $date1);
         })
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        })        
-
-        //mvtEnteteTransEntree  mvtEnteteTransSortie
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransSortieServ', 'mvtEnteteTransSortieServ.id', '=', 'mvtEnteteTransSortie.refService')
-                 ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransEntreeServ', 'mvtEnteteTransEntreeServ.id', '=', 'mvtEntree.refDestination') 
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-            ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
+        // Utilisez distinct() avant select()
+        ->distinct()
         ->select(
             "tvente_stock_service.id",
             'tvente_stock_service.refService',
@@ -11969,101 +11293,155 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.unitePivot",
             "tvente_stock_service.cmup",
-            //
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0)/qtePivot),0) as totalEntree'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0)/qtePivot),0) as totalSortie'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)/qtePivot),0) as totalAppro'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0)/qtePivot),0) as totalVente'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)/qtePivot),0) as totalUse'),
-
-            DB::raw('IFNULL(((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0))/qtePivot),0) as totalSI'),
-
-            DB::raw('IFNULL(((IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))/qtePivot),0) as totalGEntree'),
-
-            DB::raw('IFNULL((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)))/qtePivot),0) as totalG'),
-            
-            
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0)/qtePivot),0) as stockSortie'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0)/qtePivot),0) as stockVente'),
-            DB::raw('IFNULL((IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)/qtePivot),0) as stockUtilisation'),
-
-            DB::raw('IFNULL(((IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))/qtePivot),0) as TGSortie'),
-
-            DB::raw('IFNULL(((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)))/qtePivot),0) as totalSF'),
-
-            DB::raw('IFNULL((IFNULL(tvente_stock_service.cmup, 0)/qtePivot),0) as puVente'),
-
-            DB::raw('IFNULL((((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-            
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-            (tvente_stock_service.cmup))/qtePivot),0) as totalPT'),
+            "tvente_stock_service.qtePivot",
+            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
         )
         ->where([
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", 
-        "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup","tvente_stock_service.unitePivot")
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
+    
+        // ============ LEs Mouvements =========================================================================
+    
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+            $data1 = DB::table('tvente_stock_service')
+            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+        
+            ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+                $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                     ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                     ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);
+            })
+        
+                // Utilisez distinct() avant select()
+                ->distinct()
+                ->select(
+                    "tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation as designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation as Categorie",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase",
+                    "tvente_stock_service.unitePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.qtePivot",
+                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+        
+                )
+                ->where([
+                    ['tvente_produit.refCategorie', '=', $refCategorie],
+                    ['tvente_stock_service.refService', '=', $idService]
+                ])
+                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->orderBy("tvente_produit.designation", "asc")
+                ->get();
+        
+        //======================================================================
+        
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+            $data2 = DB::table('tvente_stock_service')
+            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+        
+            ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+                $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                     ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                     ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);
+            })
+        
+                // Utilisez distinct() avant select()
+                ->distinct()
+                ->select(
+                    "tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation as designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation as Categorie",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase",
+                    "tvente_stock_service.unitePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.qtePivot",
+                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+        
+                )
+                ->where([
+                    ['tvente_produit.refCategorie', '=', $refCategorie],
+                    ['tvente_stock_service.refService', '=', $idService]
+                ])
+                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->orderBy("tvente_produit.designation", "asc")
+                ->get();
+        
+    
+        // Construction de l'output
+        
+        $output = '';
+    
+        // Vérifiez que les deux tableaux ont la même longueur
+        if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+        && (count($data1) === count($data22)))
+        {
+            for ($i = 0; $i < count($data1); $i++) {
+                $row11 = $data11[$i];
+                $row22 = $data22[$i];
+                $row1 = $data1[$i];
+                $row2 = $data2[$i];            
+    
+                $totalSortie = floatval($row22->totalSortie);
+                $totalEntree = floatval($row11->totalEntree);
+    
+                $stockSortie = floatval($row2->stockSortie);            
+                $stockEntree = floatval($row1->stockEntree);
+    
+                $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+                $totalGEntree = floatval($stockEntree);
+                $totalG = floatval($totalSI) + floatval($stockEntree);
+                $TGSortie = floatval($stockSortie);
+                $totalSF = floatval($totalG) - floatval($stockSortie);
+                $totalPT = floatval($totalSF) * floatval($row2->cmup);
+    
+    
+                $output .= '
+                    <tr style="vertical-align:top;">
+                        <td style="width:0px;height:24px;"></td>
+                        <td></td>
+                        <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+                        <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSI,2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalGEntree,2).' '.$row1->unitePivot.' </td>
+                        <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalG,2).' '.$row1->unitePivot.'</td>
+                        <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($TGSortie,2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSF,2).' '.$row1->unitePivot.'</td>                
+                        <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->cmup,2).'$</td>
+                        <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT,2).'$</td>
+                    </tr>
+                ';   
+    
+        }
+        } else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
+        }
 
-    // Construction de l'output
 
-    $output = '';
-    foreach ($data1 as $row1) 
-    {
-
-        $output .='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
-                <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalSI,2).' '.$row1->unitePivot.'</td>
-                <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalGEntree,2).' '.$row1->unitePivot.' </td>
-                <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalG,2).' '.$row1->unitePivot.'</td>
-                <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->TGSortie,2).' '.$row1->unitePivot.'</td>
-                <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalSF,2).' '.$row1->unitePivot.'</td>                
-                <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->puVente,2).'$</td>
-                <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->totalPT,2).'$</td>
-            </tr>
-        ';       
-    }
-
-
-    return $output;
+   return $output;
 
 }
 
@@ -12487,11 +11865,52 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
     ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
     ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
-        ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            //  ->where('dtEnteteTransSortie.refService', '=', $idService)
-             ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+    ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.qtePivot",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_produit.refCategorie', '=', $refCategorie],
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+//======================================================================
+
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
     })
     // Utilisez distinct() avant select()
     ->distinct()
@@ -12505,8 +11924,10 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
         "tvente_categorie_produit.designation as Categorie",
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
+        "tvente_stock_service.unitePivot",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie')
+        "tvente_stock_service.qtePivot",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -12516,242 +11937,92 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
+    // ============ LEs Mouvements =========================================================================
 
-    // Récupérer les données de stock, mouvements et ventes en une seule requête 
-    $data22 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-                //  ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-        })
-
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-
-    $data111 = DB::table('tvente_stock_service')
-    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-    ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-        $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-             ->where('dtEntree.refDestination', '=', $idService)
-             ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    })       
-    // Utilisez distinct() avant select()
-    ->distinct()
-    ->select(
-        "tvente_stock_service.id",
-        'tvente_stock_service.refService',
-        'tvente_stock_service.refProduit',
-        "tvente_produit.designation as designation",
-        "refCategorie",
-        "tvente_stock_service.pu",
-        "tvente_categorie_produit.designation as Categorie",
-        "tvente_stock_service.qte",
-        "tvente_stock_service.uniteBase",
-        "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree')        
-    )
-    ->where([
-        ['tvente_produit.refCategorie', '=', $refCategorie],
-        ['tvente_stock_service.refService', '=', $idService]
-    ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-    ->orderBy("tvente_produit.designation", "asc")
-    ->get();
-
-
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data222 = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",
-
-            DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) as stockEntree')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
         $data1 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);
         })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        })        
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-    // Construction de l'output
-
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data2 = DB::table('tvente_stock_service')
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-       ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);
         })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",'unitePivot','qtePivot',  
-            
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0) as stockAppro'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-            DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUse'),
-
-            DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux",'unitePivot','qtePivot')
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
 
     // Construction de l'output
     
@@ -12759,34 +12030,26 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
 
     // Vérifiez que les deux tableaux ont la même longueur
     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
-    && ( count($data1) === count($data111)) && (count($data1) === count($data22)) 
-    && (count($data1) === count($data222))) {
+    && (count($data1) === count($data22)))
+    {
         for ($i = 0; $i < count($data1); $i++) {
-            $row1 = $data1[$i];
-            $row2 = $data2[$i];
             $row11 = $data11[$i];
             $row22 = $data22[$i];
-            $row111 = $data111[$i];
-            $row222 = $data222[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
 
-            $totalSortie = floatval($row11->totalSortie);
-            $totalEntree = floatval($row111->totalEntree);
-            $totalVente = floatval($row1->totalVente);
-            $totalAppro = floatval($row1->totalAppro);
-            $totalUse = floatval($row1->totalUse);
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
 
-            $stockSortie = floatval($row22->stockSortie);            
-            $stockEntree = floatval($row222->stockEntree);
-            $stockVente = floatval($row2->stockVente);
-            $stockAppro = floatval($row2->stockAppro);
-            $stockUse = floatval($row2->stockUse);
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
 
-            $totalSI = ((floatval($totalEntree) + floatval($totalAppro)) - (floatval($totalSortie) + floatval($totalVente) + floatval($totalUse)));
-            $totalGEntree = floatval($stockEntree) + floatval($stockAppro);
-            $totalG = floatval($totalSI) + floatval($stockEntree) + floatval($stockAppro);
-            $TGSortie = floatval($stockSortie) + floatval($stockVente) + floatval($stockUse);
-            $totalSF = floatval($totalG) - floatval($stockSortie) - floatval($stockVente) - floatval($stockUse);
-            $totalPT = floatval($totalSF) * floatval($row2->puVente);
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
 
 
             $output .= '
@@ -12799,7 +12062,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                     <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalG)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>
                     <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($TGSortie)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>
                     <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalSF)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>                
-                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->puVente, 2).'$</td>
+                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->cmup, 2).'$</td>
                     <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
                 </tr>
             ';   
@@ -12808,7 +12071,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
     } else {
         // Gérer le cas où les tableaux n'ont pas la même longueur
         echo 'Les tableaux ont pas la même longueur.';
-    }  
+    }
 
     return $output;
 
@@ -23530,8 +22793,6 @@ function printRapportSoldeFacture_Fournisseur($date1, $date2)
 
 }
 
-
-
 function showDetailSoldeFournisseur($date1, $date2)
 {
     // Récupérer les données de stock, mouvements et ventes en une seule requête
@@ -23609,15 +22870,960 @@ function showDetailSoldeFournisseur($date1, $date2)
     return $output;
 }
 
+//==================== RAPPORT TRANSFERT PAR SERVICE SOURCE =======================================
+
+public function fetch_rapport_detailtransfert_date_service_source(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('date1') && $request->get('date2')&& $request->get('idService')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printRapportDetailTransfert_Service_Source($date1, $date2,$idService);       
+        $html .='<script>window.print()</script>';
+
+        echo($html);          
+
+    } else {
+        // code...
+    }  
+    
+}
+function printRapportDetailTransfert_Service_Source($date1, $date2,$idService)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme;         
+         }
+ 
+         $TotalTransfert=0;
+         // 
+         $data2 =  DB::table('tvente_detail_transfert')
+         ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
+         ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
+         ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
+         ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
+         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+
+         ->select(DB::raw('ROUND(SUM(qteTransfert * puTransfert),3) as TotalTransfert'))
+         ->where([
+            ['date_transfert','>=', $date1],
+            ['date_transfert','<=', $date2],
+            ['servicesOrigine.id','=', $idService],
+        ])    
+         ->get(); 
+         $output='';
+         foreach ($data2 as $row) 
+         {                                
+            $TotalTransfert=$row->TotalTransfert;                    
+         }
 
 
 
 
+         $services='';         
+
+         $data3=DB::table('tvente_services')       
+         ->select('id','nom_service','status','active')
+         ->where([
+            ['tvente_services.id','=', $idService]
+        ])      
+        ->first(); 
+        if ($data3) 
+        {
+            $services=$data3->nom_service;              
+        }
+
+
+        $output='';  
+
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTransfert</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:844px;height:375px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:62px;"></td>
+                    <td style="height:0px;width:77px;"></td>
+                    <td style="height:0px;width:4px;"></td>
+                    <td style="height:0px;width:128px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                    <td style="height:0px;width:89px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:76px;"></td>
+                    <td style="height:0px;width:72px;"></td>
+                    <td style="height:0px;width:24px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:36px;"></td>
+                    <td style="height:0px;width:45px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:12px;"></td>
+                    <td style="height:0px;width:114px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="8" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$nomEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="5" style="width:126px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:126px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:126px;height:110px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$busnessName.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$idNatEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;00056789/M</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$adresseEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Site-web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:23px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:16px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="12" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;TRANSFERT&nbsp;PAR&nbsp;SERVICE&nbsp;SOURCE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Service&nbsp;Source&nbsp;:&nbsp;'.$services.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:36px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:61px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:80px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;Transfert</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:128px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Service&nbsp;Source</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:129px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Sercive&nbsp;Destination</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:179px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Produit</nobr></td>
+                    <td class="csEE1F9023" style="width:35px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Qt&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:63px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
+                    <td class="csEE1F9023" style="width:113px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PT</nobr></td>
+                </tr>
+                ';
+
+                                        $output .= $this->showDetailTransfert_Service_Source($date1,$date2,$idService); 
+
+                                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" colspan="4" style="width:98px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalTransfert.'$</nobr></td>
+                </tr>
+            </table>
+            </body>
+            </html>      
+        ';  
+       
+        return $output; 
+
+}
+function showDetailTransfert_Service_Source($date1,$date2,$idService)
+{
+        $data = DB::table('tvente_detail_transfert')  
+        ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
+        ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
+        ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+
+        ->select('tvente_detail_transfert.id','refEnteteTransfert','refProduit','refDestination','puTransfert',
+        'qteTransfert','uniteTransfert','tvente_detail_transfert.puBase','tvente_detail_transfert.qteBase',
+        'tvente_detail_transfert.uniteBase','tvente_detail_transfert.author','tvente_detail_transfert.refUser',
+        'tvente_detail_transfert.created_at','refService','date_transfert',"servicesOrigine.nom_service as ServiceOrigine",
+        "servicesDestination.nom_service as ServiceDestination"
+
+        ,"tvente_produit.designation as designation",'refCategorie','refUniteBase','pu','qte',
+        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',"tvente_categorie_produit.designation as Categorie"        
+        )
+        ->selectRaw('(qteTransfert*puTransfert) as PTTransfert')
+        ->selectRaw('(qteBase*puBase) as PTBase')
+        ->selectRaw('CONCAT("S",YEAR(date_transfert),"",MONTH(date_transfert),"00",refEnteteTransfert) as codeFacture')
+        ->where([
+            ['date_transfert','>=', $date1],
+            ['date_transfert','<=', $date2],
+            ['servicesOrigine.id','=', $idService]
+        ])
+        ->orderBy("tvente_detail_transfert.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+
+            $output .='
+                	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:36px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>1</nobr></td>
+                    <td class="cs6AEC9C2" style="width:61px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->date_transfert.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:80px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
+                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
+                    <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
+                </tr>
+            ';         
+   
+    }
+
+    return $output;
+
+}
+
+
+//==================== RAPPORT DETAIL TRANSFERT SELON LES SERVICES =======================================
+
+public function fetch_rapport_detailtransfert_date_service_destination(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('date1') && $request->get('date2')&& $request->get('idService')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printRapportDetailTransfert_Service_Destination($date1, $date2,$idService);       
+        $html .='<script>window.print()</script>';
+
+        echo($html);          
+
+    } else {
+        // code...
+    }  
+    
+}
+function printRapportDetailTransfert_Service_Destination($date1, $date2,$idService)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme;         
+         }
+ 
+         $TotalTransfert=0;
+         // 
+         $data2 =  DB::table('tvente_detail_transfert')
+         ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
+         ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
+         ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
+         ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
+         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+
+         ->select(DB::raw('ROUND(SUM(qteTransfert * puTransfert),3) as TotalTransfert'))
+         ->where([
+            ['date_transfert','>=', $date1],
+            ['date_transfert','<=', $date2],
+            ['servicesDestination.id','=', $idService],
+        ])    
+         ->get(); 
+         $output='';
+         foreach ($data2 as $row) 
+         {                                
+            $TotalTransfert=$row->TotalTransfert;                    
+         }
 
 
 
 
+         $services='';         
 
+         $data3=DB::table('tvente_services')       
+         ->select('id','nom_service','status','active')
+         ->where([
+            ['tvente_services.id','=', $idService]
+        ])      
+        ->first(); 
+        if ($data3) 
+        {
+            $services=$data3->nom_service;              
+        }
+
+
+        $output='';  
+
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTransfert</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8A513397 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs6105B8F3 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:844px;height:375px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:62px;"></td>
+                    <td style="height:0px;width:77px;"></td>
+                    <td style="height:0px;width:4px;"></td>
+                    <td style="height:0px;width:128px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                    <td style="height:0px;width:89px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:76px;"></td>
+                    <td style="height:0px;width:72px;"></td>
+                    <td style="height:0px;width:24px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:36px;"></td>
+                    <td style="height:0px;width:45px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:12px;"></td>
+                    <td style="height:0px;width:114px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="8" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$nomEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="5" style="width:126px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:126px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:126px;height:110px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$busnessName.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$idNatEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;00056789/M</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>'.$adresseEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs6105B8F3" colspan="10" style="width:586px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Site-web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td class="cs8A513397" colspan="10" style="width:586px;height:23px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:16px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="12" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;TRANSFERT&nbsp;PAR&nbsp;SERVICE&nbsp;RECEPTEUR</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Service&nbsp;Source&nbsp;:&nbsp;'.$services.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:36px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:61px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:80px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;Transfert</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:128px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Service&nbsp;Source</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:129px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Sercive&nbsp;Destination</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:179px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Produit</nobr></td>
+                    <td class="csEE1F9023" style="width:35px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Qt&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:63px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
+                    <td class="csEE1F9023" style="width:113px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>PT</nobr></td>
+                </tr>
+                ';
+
+                                        $output .= $this->showDetailTransfert_Service_Destination($date1,$date2,$idService); 
+
+                                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" colspan="4" style="width:98px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalTransfert.'$</nobr></td>
+                </tr>
+            </table>
+            </body>
+            </html>      
+        ';  
+       
+        return $output; 
+
+}
+function showDetailTransfert_Service_Destination($date1,$date2,$idService)
+{
+        $data = DB::table('tvente_detail_transfert')  
+        ->join('tvente_entete_transfert','tvente_entete_transfert.id','=','tvente_detail_transfert.refEnteteTransfert')     
+        ->join('tvente_services as servicesOrigine','servicesOrigine.id','=','tvente_entete_transfert.refService')
+        ->join('tvente_services as servicesDestination','servicesDestination.id','=','tvente_detail_transfert.refDestination')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_transfert.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+
+        ->select('tvente_detail_transfert.id','refEnteteTransfert','refProduit','refDestination','puTransfert',
+        'qteTransfert','uniteTransfert','tvente_detail_transfert.puBase','tvente_detail_transfert.qteBase',
+        'tvente_detail_transfert.uniteBase','tvente_detail_transfert.author','tvente_detail_transfert.refUser',
+        'tvente_detail_transfert.created_at','refService','date_transfert',"servicesOrigine.nom_service as ServiceOrigine",
+        "servicesDestination.nom_service as ServiceDestination"
+
+        ,"tvente_produit.designation as designation",'refCategorie','refUniteBase','pu','qte',
+        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',"tvente_categorie_produit.designation as Categorie"        
+        )
+        ->selectRaw('(qteTransfert*puTransfert) as PTTransfert')
+        ->selectRaw('(qteBase*puBase) as PTBase')
+        ->selectRaw('CONCAT("S",YEAR(date_transfert),"",MONTH(date_transfert),"00",refEnteteTransfert) as codeFacture')
+        ->where([
+            ['date_transfert','>=', $date1],
+            ['date_transfert','<=', $date2],
+            ['servicesDestination.id','=', $idService]
+        ])
+        ->orderBy("tvente_detail_transfert.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+
+            $output .='
+                	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:36px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>1</nobr></td>
+                    <td class="cs6AEC9C2" style="width:61px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->date_transfert.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:80px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
+                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
+                    <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
+                </tr>
+            ';         
+   
+    }
+
+    return $output;
+
+}
 //===================================================================================================================
 //======================== FICHE STOCK AVEC EXCEL ====================================================================
 
@@ -23631,88 +23837,55 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
 
         $data_return = []; // Initialisation du tableau pour stocker les résultats
 
-            // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data1 = DB::table('tvente_stock_service')
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data11 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+    $data22 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-    ->leftJoin('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-    ->leftJoin('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-    ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-        $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-        ->join('tvente_services as dtEnteteTransSortieServ', 'dtEnteteTransSortieServ.id', '=', 'dtEnteteTransSortie.refService')
-             ->where('dtEnteteTransSortie.refService', '=', $idService)
-             ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
     })
-    ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-        $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-        ->join('tvente_services as dtEnteteTransEntreeServ', 'dtEnteteTransEntreeServ.id', '=', 'dtEntree.refDestination') 
-             ->where('dtSortie.refDestination', '=', $idService)
-             ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-        $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-        ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-             ->where('dtEnteteAppro.refService', '=', $idService)
-             ->where('dtEnteteAppro.dateEntree', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-        $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-        ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-             ->where('dtEnteteVente.refService', '=', $idService)
-             ->where('dtEnteteVente.dateVente', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-        $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-        ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-             ->where('dtEnteteUse.refService', '=', $idService)
-             ->where('dtEnteteUse.dateUse', '<', $date1);
-    })        
-
-    //mvtEnteteTransEntree  mvtEnteteTransSortie
-
-    ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-        ->join('tvente_services as mvtEnteteTransSortieServ', 'mvtEnteteTransSortieServ.id', '=', 'mvtEnteteTransSortie.refService')
-             ->where('mvtEnteteTransSortie.refService', '=', $idService)
-             ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-        ->join('tvente_services as mvtEnteteTransEntreeServ', 'mvtEnteteTransEntreeServ.id', '=', 'mvtEntree.refDestination') 
-             ->where('mvtEntree.refDestination', '=', $idService)
-             ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-        ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-             ->where('mvtEnteteAppro.refService', '=', $idService)
-             ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-        ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-             ->where('mvtEnteteVente.refService', '=', $idService)               
-             ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-    })
-    ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-        ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-            ->where('mvtEnteteUse.refService', '=', $idService)
-             ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-    })
+    // Utilisez distinct() avant select()
+    ->distinct()
     ->select(
         "tvente_stock_service.id",
         'tvente_stock_service.refService',
@@ -23724,98 +23897,144 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
-        DB::raw('IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-        DB::raw('IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-        DB::raw('IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
-
-        DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI'),
-
-        DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),
-
-        DB::raw('((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) as totalG'),
-        
-        
-        DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-        DB::raw('IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-        DB::raw('IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-        DB::raw('(IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-        + IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-        + IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-        DB::raw('(((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-        - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) as totalSF'),
-
-        DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-        DB::raw('((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-        
-        - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-        (tvente_stock_service.cmup)) as totalPT'),
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
     )
     ->where([
         ['tvente_stock_service.refService', '=', $idService]
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-    "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup","nom_service")
+    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
-        // Construction de l'output
-        $output = '';
-        foreach ($data1 as $row1) 
-        {
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
             $data_return[] = [
                 'id' => $row1->id,
                 'Service' => $row1->nom_service,
                 'designation' => $row1->designation,
                 'Categorie' => $row1->Categorie,
-                'SI' => $row1->totalSI,
-                'Entree' =>$row1->totalGEntree,
-                'Total' => $row1->totalG,
-                'Sortie' => $row1->TGSortie,
-                'SF' => $row1->totalSF,
-                'PU' => round($row1->puVente,2),
-                'PT' => round($row1->totalPT,2),
+                'SI' => $totalSI,
+                'Entree' =>$totalGEntree,
+                'Total' => $totalG,
+                'Sortie' => $TGSortie,
+                'SF' => $totalSF,
+                'PU' => round($row1->cmup,2),
+                'PT' => round($totalPT,2),
                 'Unité' => $row1->uniteBase
             ];
-      
+
         }
-       // Retournez ou affichez le tableau complet
-        return response()->json($data_return); // Par exemple, vous pouvez retourner les données sous forme de JSON
+    } 
+    else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
     }
+
+    return response()->json($data_return);
+
+    }
+
+
 
     return response()->json(['error' => 'Invalid parameters'], 400);
 }
@@ -23831,195 +24050,207 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
         $idService = $request->get('idService');
 
         $data_return = []; // Initialisation du tableau pour stocker les résultat
+
+        $data11 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
     
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data1 = DB::table('tvente_stock_service')
-    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-    ->leftJoin('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-    ->leftJoin('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-    ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-        $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-        ->join('tvente_services as dtEnteteTransSortieServ', 'dtEnteteTransSortieServ.id', '=', 'dtEnteteTransSortie.refService')
-             ->where('dtEnteteTransSortie.refService', '=', $idService)
-             ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-        $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-        ->join('tvente_services as dtEnteteTransEntreeServ', 'dtEnteteTransEntreeServ.id', '=', 'dtEntree.refDestination') 
-             ->where('dtSortie.refDestination', '=', $idService)
-             ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-        $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-        ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-             ->where('dtEnteteAppro.refService', '=', $idService)
-             ->where('dtEnteteAppro.dateEntree', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-        $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-        ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-             ->where('dtEnteteVente.refService', '=', $idService)
-             ->where('dtEnteteVente.dateVente', '<', $date1);
-    })
-    ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-        $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-        ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-             ->where('dtEnteteUse.refService', '=', $idService)
-             ->where('dtEnteteUse.dateUse', '<', $date1);
-    })        
-
-    //mvtEnteteTransEntree  mvtEnteteTransSortie
-
-    ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-        ->join('tvente_services as mvtEnteteTransSortieServ', 'mvtEnteteTransSortieServ.id', '=', 'mvtEnteteTransSortie.refService')
-             ->where('mvtEnteteTransSortie.refService', '=', $idService)
-             ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-        ->join('tvente_services as mvtEnteteTransEntreeServ', 'mvtEnteteTransEntreeServ.id', '=', 'mvtEntree.refDestination') 
-             ->where('mvtEntree.refDestination', '=', $idService)
-             ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-        ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-             ->where('mvtEnteteAppro.refService', '=', $idService)
-             ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-    })
-
-    ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-        ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-             ->where('mvtEnteteVente.refService', '=', $idService)               
-             ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-    })
-    ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-        $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-        ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-        ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-            ->where('mvtEnteteUse.refService', '=', $idService)
-             ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-    })
-    ->select(
-        "tvente_stock_service.id",
-        'tvente_stock_service.refService',
-        'tvente_stock_service.refProduit',
-        "tvente_produit.designation as designation",
-        "refCategorie",
-        "tvente_stock_service.pu",
-        "tvente_categorie_produit.designation as Categorie",
-        "tvente_stock_service.qte",
-        "tvente_stock_service.uniteBase",
-        "tvente_stock_service.cmup",
-        "tvente_stock_service.unitePivot",
-        "tvente_stock_service.qtePivot",
-        DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
-        DB::raw('IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-        DB::raw('IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-        DB::raw('IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
-
-        DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI'),
-
-        DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),
-
-        DB::raw('((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) as totalG'),
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+            $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('dtEntree.type_mouvement', '=', 'Entree')
+                 ->where('dtEntree.dateMvt', '<', $date1);
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+        $data22 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+            $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('dtSortie.type_mouvement', '=', 'Sortie')
+                 ->where('dtSortie.dateMvt', '<', $date1);
+        })
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup",
+            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        )
+        ->where([
+            ['tvente_produit.refCategorie', '=', $refCategorie],
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+    
+        // ============ LEs Mouvements =========================================================================
+    
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+            $data1 = DB::table('tvente_stock_service')
+            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
         
+            ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+                $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                     ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                     ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+            })
         
-        DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-        DB::raw('IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-        DB::raw('IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-        DB::raw('(IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-        + IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-        + IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-        DB::raw('(((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-        - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) as totalSF'),
-
-        DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-        DB::raw('((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-        - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-        + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
+                // Utilisez distinct() avant select()
+                ->distinct()
+                ->select(
+                    "tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation as designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation as Categorie",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase","nom_service",
+                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
         
-        - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-        IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-        (tvente_stock_service.cmup)) as totalPT'),
-    )
-    ->where([
-        ['tvente_produit.refCategorie', '=', $refCategorie],
-        ['tvente_stock_service.refService', '=', $idService] 
-    ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-    "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup","nom_service",'unitePivot','qtePivot')
-    ->orderBy("tvente_produit.designation", "asc")
-    ->get();
-
-        // Construction de l'output
-        foreach ($data1 as $row1) 
+                )
+                ->where([
+                    ['tvente_produit.refCategorie', '=', $refCategorie],
+                    ['tvente_stock_service.refService', '=', $idService]
+                ])
+                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->orderBy("tvente_produit.designation", "asc")
+                ->get();
+        
+        //======================================================================
+        
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+            $data2 = DB::table('tvente_stock_service')
+            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+        
+            ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+                $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                     ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                     ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+            })
+        
+                // Utilisez distinct() avant select()
+                ->distinct()
+                ->select(
+                    "tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation as designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation as Categorie",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase","nom_service",
+                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+        
+                )
+                ->where([
+                    ['tvente_produit.refCategorie', '=', $refCategorie],
+                    ['tvente_stock_service.refService', '=', $idService]
+                ])
+                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->orderBy("tvente_produit.designation", "asc")
+                ->get();
+        
+    
+        // Vérifiez que les deux tableaux ont la même longueur
+        if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+        && (count($data1) === count($data22)))
         {
-            $data_return[] = [
-                'id' => $row1->id,
-                'Service' => $row1->nom_service,
-                'designation' => $row1->designation,
-                'Categorie' => $row1->Categorie,
-                'SI' => $row1->totalSI,
-                'Entree' =>$row1->totalGEntree,
-                'Total' => $row1->totalG,
-                'Sortie' => $row1->TGSortie,
-                'SF' => $row1->totalSF,
-                'PU' => round($row1->puVente,2),
-                'PT' => round($row1->totalPT,2),
-                'Unité' => $row1->uniteBase
-            ];
-      
+            for ($i = 0; $i < count($data1); $i++) {
+                $row11 = $data11[$i];
+                $row22 = $data22[$i];
+                $row1 = $data1[$i];
+                $row2 = $data2[$i];            
+    
+                $totalSortie = floatval($row22->totalSortie);
+                $totalEntree = floatval($row11->totalEntree);
+    
+                $stockSortie = floatval($row2->stockSortie);            
+                $stockEntree = floatval($row1->stockEntree);
+    
+                $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+                $totalGEntree = floatval($stockEntree);
+                $totalG = floatval($totalSI) + floatval($stockEntree);
+                $TGSortie = floatval($stockSortie);
+                $totalSF = floatval($totalG) - floatval($stockSortie);
+                $totalPT = floatval($totalSF) * floatval($row2->cmup);
+    
+                $data_return[] = [
+                    'id' => $row1->id,
+                    'Service' => $row1->nom_service,
+                    'designation' => $row1->designation,
+                    'Categorie' => $row1->Categorie,
+                    'SI' => $totalSI,
+                    'Entree' =>$totalGEntree,
+                    'Total' => $totalG,
+                    'Sortie' => $TGSortie,
+                    'SF' => $totalSF,
+                    'PU' => round($row1->cmup,2),
+                    'PT' => round($totalPT,2),
+                    'Unité' => $row1->uniteBase
+                ];
+    
+            }
+        } 
+        else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
         }
-        // Retournez ou affichez le tableau complet
-        return response()->json($data_return); // Par exemple, vous pouvez retourner les données sous forme de JSON
-    }
-
+    
+        return response()->json($data_return);
+    
+        }
+ 
     return response()->json(['error' => 'Invalid parameters'], 400);
 }
 
@@ -24037,88 +24268,22 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
         $refCategorie = $request->get('idCategorie');
         $idService = $request->get('idService');
 
-        $data_return = [];
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
 
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data1 = DB::table('tvente_stock_service')
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data11 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->leftJoin('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->leftJoin('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-        ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-            $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransSortieServ', 'dtEnteteTransSortieServ.id', '=', 'dtEnteteTransSortie.refService')
-                 ->where('dtEnteteTransSortie.refService', '=', $idService)
-                 ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-            $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransEntreeServ', 'dtEnteteTransEntreeServ.id', '=', 'dtEntree.refDestination') 
-                 ->where('dtSortie.refDestination', '=', $idService)
-                 ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        }) 
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransSortieServ', 'mvtEnteteTransSortieServ.id', '=', 'mvtEnteteTransSortie.refService')
-                 ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
         })
 
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransEntreeServ', 'mvtEnteteTransEntreeServ.id', '=', 'mvtEntree.refDestination') 
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-            ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
+        // Utilisez distinct() avant select()
+        ->distinct()
         ->select(
             "tvente_stock_service.id",
             'tvente_stock_service.refService',
@@ -24128,102 +24293,179 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             "tvente_stock_service.pu",
             "tvente_categorie_produit.designation as Categorie",
             "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-            "tvente_stock_service.qtePivot",
-            "tvente_stock_service.unitePivot",
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
-            DB::raw('IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-            DB::raw('IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-            DB::raw('IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
+            "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
-            DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI'),
-
-            DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),
-
-            DB::raw('((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) as totalG'),
-            
-            
-            DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-            DB::raw('IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-            DB::raw('IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-            DB::raw('(IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-            DB::raw('(((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) as totalSF'),
-
-            DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-            DB::raw('((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-            
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-            (tvente_stock_service.cmup)) as totalPT'),
         )
         ->where([
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
         ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation","refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.unitePivot","tvente_stock_service.qtePivot","tvente_stock_service.unitePivot")
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
-            // Construction de l'output
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-            $output = '';
-            foreach ($data1 as $row1) 
-            {
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
+    // Utilisez distinct() avant select()
+    ->distinct()
+    ->select(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation as designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation as Categorie",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+    )
+    ->where([
+        ['tvente_produit.refCategorie', '=', $refCategorie],
+        ['tvente_stock_service.refService', '=', $idService]
+    ])
+    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->orderBy("tvente_produit.designation", "asc")
+    ->get();
 
-                $data_return[] = [
-                    'id' => $row1->id,
-                    'Service' => $row1->nom_service,
-                    'designation' => $row1->designation,
-                    'Categorie' => $row1->Categorie,
-                    'SI' => round((floatval($row1->totalSI)/floatval($row1->qtePivot)),2),
-                    'Entree' => round((floatval($row1->totalGEntree)/floatval($row1->qtePivot)),2),
-                    'Total' => round((floatval($row1->totalG)/floatval($row1->qtePivot)),2),
-                    'Sortie' => round((floatval($row1->TGSortie)/floatval($row1->qtePivot)),2),
-                    'SF' => round((floatval($row1->totalSF)/floatval($row1->qtePivot)),2),
-                    'PU' => round($row1->puVente,2),
-                    'PT' => round($row1->totalPT,2),
-                    'Unité' => $unitePivot
-                ];       
-            } 
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
+            $data_return[] = [
+                'id' => $row1->id,
+                'Service' => $row1->nom_service,
+                'designation' => $row1->designation,
+                'Categorie' => $row1->Categorie,
+                'SI' => round((floatval($totalSI)/floatval($row1->qtePivot)),2),
+                'Entree' => round((floatval($totalGEntree)/floatval($row1->qtePivot)),2),
+                'Total' => round((floatval($totalG)/floatval($row1->qtePivot)),2),
+                'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
+                'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
+                'PU' => round($row1->cmup,2),
+                'PT' => round($totalPT,2),
+                'Unité' => $row1->unitePivot
+            ];
+
+            }
+        } 
+        else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
+        }
 
         return response()->json($data_return);
         
@@ -24238,95 +24480,26 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
 {
 
     if ($request->get('date1') && $request->get('date2') && $request->get('idService')) {
-        // code...
         $date1 = $request->get('date1');
         $date2 = $request->get('date2');
         $idService = $request->get('idService');
 
-        $data_return = [];
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
 
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data1 = DB::table('tvente_stock_service')
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data11 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->leftJoin('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->leftJoin('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-        ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-            $join->on('dtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransSortieServ', 'dtEnteteTransSortieServ.id', '=', 'dtEnteteTransSortie.refService')
-                 ->where('dtEnteteTransSortie.refService', '=', $idService)
-                 ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-            $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-            ->join('tvente_services as dtEnteteTransEntreeServ', 'dtEnteteTransEntreeServ.id', '=', 'dtEntree.refDestination') 
-                 ->where('dtSortie.refDestination', '=', $idService)
-                 ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-            $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-            ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                 ->where('dtEnteteAppro.refService', '=', $idService)
-                 ->where('dtEnteteAppro.dateEntree', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-            $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-            ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                 ->where('dtEnteteVente.refService', '=', $idService)
-                 ->where('dtEnteteVente.dateVente', '<', $date1);
-        })
-        ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-            $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-            ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                 ->where('dtEnteteUse.refService', '=', $idService)
-                 ->where('dtEnteteUse.dateUse', '<', $date1);
-        })        
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
 
-        //mvtEnteteTransEntree  mvtEnteteTransSortie
-
-        ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtSortie.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransSortieServ', 'mvtEnteteTransSortieServ.id', '=', 'mvtEnteteTransSortie.refService')
-                 ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-            ->join('tvente_services as mvtEnteteTransEntreeServ', 'mvtEnteteTransEntreeServ.id', '=', 'mvtEntree.refDestination') 
-                 ->where('mvtEntree.refDestination', '=', $idService)
-                 ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-            ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                 ->where('mvtEnteteAppro.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date2]);
-        })
-
-        ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtVente.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')
-            ->join('tvente_services as mvtEnteteVenteServ', 'mvtEnteteVenteServ.id', '=', 'mvtEnteteVente.refService')  
-                 ->where('mvtEnteteVente.refService', '=', $idService)               
-                 ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date2]);
-        })
-        ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $date2, $idService) {
-            $join->on('mvtUtilisation.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-            ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                ->where('mvtEnteteUse.refService', '=', $idService)
-                 ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date2]);
-        })
+        // Utilisez distinct() avant select()
+        ->distinct()
         ->select(
             "tvente_stock_service.id",
             'tvente_stock_service.refService',
@@ -24336,107 +24509,185 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             "tvente_stock_service.pu",
             "tvente_categorie_produit.designation as Categorie",
             "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-            "tvente_stock_service.qtePivot",
-            "tvente_stock_service.unitePivot",
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree'),
-            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie'),
-            DB::raw('IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-            DB::raw('IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-            DB::raw('IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse'),
+            "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
-            DB::raw('(IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) as totalSI'),
-
-            DB::raw('(IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0)) as totalGEntree'),
-
-            DB::raw('((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) as totalG'),
-            
-            
-            DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-            DB::raw('IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-            DB::raw('IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUtilisation'),
-
-            DB::raw('(IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) 
-            + IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0)) as TGSortie'),
-
-            DB::raw('(((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) as totalSF'),
-
-            DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-            DB::raw('((((IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtAppro.qteBase * dtAppro.qteEntree), 0), 0)) 
-            - (IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(dtVente.qteBase * dtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0)) 
-
-            + (IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0))) 
-            
-            - (IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtVente.qteBase * mvtVente.qteVente), 0), 0) + 
-            IFNULL(ROUND(SUM(mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0))) * 
-            (tvente_stock_service.cmup)) as totalPT'),
         )
         ->where([
             ['tvente_stock_service.refService', '=', $idService]
         ])
         ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation","refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.unitePivot","tvente_stock_service.qtePivot","tvente_stock_service.unitePivot")
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
-            // Construction de l'output
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-            $output = '';
-            foreach ($data1 as $row1) 
-            {
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
+    // Utilisez distinct() avant select()
+    ->distinct()
+    ->select(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation as designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation as Categorie",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+    )
+    ->where([
+        ['tvente_stock_service.refService', '=', $idService]
+    ])
+    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->orderBy("tvente_produit.designation", "asc")
+    ->get();
 
-                $data_return[] = [
-                    'id' => $row1->id,
-                    'Service' => $row1->nom_service,
-                    'designation' => $row1->designation,
-                    'Categorie' => $row1->Categorie,
-                    'SI' => round((floatval($row1->totalSI)/floatval($row1->qtePivot)),2),
-                    'Entree' => round((floatval($row1->totalGEntree)/floatval($row1->qtePivot)),2),
-                    'Total' => round((floatval($row1->totalG)/floatval($row1->qtePivot)),2),
-                    'Sortie' => round((floatval($row1->TGSortie)/floatval($row1->qtePivot)),2),
-                    'SF' => round((floatval($row1->totalSF)/floatval($row1->qtePivot)),2),
-                    'PU' => round($row1->puVente,2),
-                    'PT' => round($row1->totalPT,2),
-                    'Unité' => $unitePivot
-                ];       
-            } 
-            
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
+            $data_return[] = [
+                'id' => $row1->id,
+                'Service' => $row1->nom_service,
+                'designation' => $row1->designation,
+                'Categorie' => $row1->Categorie,
+                'SI' => round((floatval($totalSI)/floatval($row1->qtePivot)),2),
+                'Entree' => round((floatval($totalGEntree)/floatval($row1->qtePivot)),2),
+                'Total' => round((floatval($totalG)/floatval($row1->qtePivot)),2),
+                'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
+                'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
+                'PU' => round($row1->cmup,2),
+                'PT' => round($totalPT,2),
+                'Unité' => $row1->unitePivot
+            ];
+
+            }
+        } 
+        else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
+        }
+
         return response()->json($data_return);
-        
+
     }
-    else{
-    }    
+    else
+    {
+        return response()->json(['error' => 'Invalid parameters'], 400);
+    }
+    
+
 }
 
 

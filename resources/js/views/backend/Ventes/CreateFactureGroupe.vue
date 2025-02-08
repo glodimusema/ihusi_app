@@ -218,7 +218,7 @@
                                 </v-list-item-title>
                                 </v-list-item>
 
-                                <v-list-item link @click="showFacture(item.id,item.noms,'Ventes')">
+                                <v-list-item link @click="printBill(item.id)">
                                 <v-list-item-icon>
                                     <v-icon color="blue">print</v-icon>
                                 </v-list-item-icon>
@@ -380,6 +380,9 @@ export default {
        refreshData()
         {
             this.fetchListClient();
+        },
+        printBill(id_facture) {            
+            window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_by_numero?id_facture=` + id_facture + "&author=" + this.userData.name);
         },
         async updateChambre(index)
             {

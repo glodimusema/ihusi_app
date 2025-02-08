@@ -317,6 +317,14 @@
                               </v-list-item-title>
                             </v-list-item>
 
+                            <v-list-item link @click="printBill2(item.id)">
+                              <v-list-item-icon>
+                                <v-icon color="primary">print</v-icon>
+                              </v-list-item-icon>
+                              <v-list-item-title style="margin-left: -20px">Facture pour Chambre + Consommation
+                              </v-list-item-title>
+                            </v-list-item>
+
                             <v-list-item link @click="showFacture(item.id,item.noms,'Ventes')">
                               <v-list-item-icon>
                                 <v-icon color="blue">print</v-icon>
@@ -546,6 +554,9 @@
     
         printBill(id) {
           window.open(`${this.apiBaseURL}/pdf_facture_hotel?id=` + id);
+        },    
+        printBill2(id_facture) {
+          window.open(`${this.apiBaseURL}/fetch_facture_hebergement_consommation?id_facture=` + id_facture + "&author=" + this.userData.name);
         },
     
         printFiche(id) {

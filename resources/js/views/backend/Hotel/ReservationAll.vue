@@ -355,6 +355,14 @@
                               </v-list-item-title>
                             </v-list-item>
 
+                            <v-list-item link @click="printBill2(item.id)">
+                              <v-list-item-icon>
+                                <v-icon color="primary">print</v-icon>
+                              </v-list-item-icon>
+                              <v-list-item-title style="margin-left: -20px">Facture pour Chambre + Consommation
+                              </v-list-item-title>
+                            </v-list-item>
+
                             <v-list-item link @click="printFiche(item.id)">
                               <v-list-item-icon>
                                 <v-icon color="primary">print</v-icon>
@@ -519,6 +527,9 @@
             }
     
           }
+        },    
+        printBill2(id_facture) {
+          window.open(`${this.apiBaseURL}/fetch_facture_hebergement_consommation?id_facture=` + id_facture + "&author=" + this.userData.name);
         },
         fetchListClient() {
             this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_client_2`).then(

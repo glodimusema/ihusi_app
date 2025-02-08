@@ -286,8 +286,19 @@
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailTransfertByDate_Service" block color="  blue" dark>
-                                            <v-icon>print</v-icon> LES TRANSFERTS/SERVICE
+                                        <v-btn @click="showDetailTransfertByDate_Service_Source" block color="  blue" dark>
+                                            <v-icon>print</v-icon> LES TRANSFERTS/SERVICE SOURCE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>                                
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showDetailTransfertByDate_Service_Destination" block color="  blue" dark>
+                                            <v-icon>print</v-icon> LES TRANSFERTS/SERVICE RECEPTEUR
                                         </v-btn>
                                     </span>
                                 </template>
@@ -1416,6 +1427,40 @@ export default {
                 if(this.svData.idService!="")
                 {
                     window.open(`${this.apiBaseURL}/fetch_rapport_detail_cuisine_date_service?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showDetailTransfertByDate_Service_Source() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="")
+                {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_detailtransfert_date_service_source?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showDetailTransfertByDate_Service_Destination() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="")
+                {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_detailtransfert_date_service_destination?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
                 }else
                 {
                     this.showError("Veillez selectionner le service svp");
