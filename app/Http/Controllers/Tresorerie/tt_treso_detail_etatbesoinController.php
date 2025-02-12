@@ -149,7 +149,16 @@ class tt_treso_detail_etatbesoinController extends Controller
     public function store(Request $request)
     {
 
-        //refEntete,refRubrique,Qte,PU,service_beneficiaire
+        $taux=0;
+        $data5 =  DB::table("tvente_taux")
+        ->select("tvente_taux.id", "tvente_taux.taux", 
+        "tvente_taux.created_at", "tvente_taux.author")
+         ->first();
+         if ($data5) 
+         {                                
+            $taux=$data5->taux;                           
+         }
+         $devise = "USD";
         if ($request->id !='') 
         {
             //author
@@ -157,10 +166,13 @@ class tt_treso_detail_etatbesoinController extends Controller
             $data = tt_treso_detail_etatbesoin::where("id", $request->id)->update([
                 'refEntete' =>  $request->refEntete,
                 'refRubrique' =>  $request->refRubrique,
+                'service_beneficiaire' =>  $request->service_beneficiaire,
                 'Qte' =>  $request->Qte,
                 'PU' =>  $request->PU,
-                'service_beneficiaire' =>  $request->service_beneficiaire,
-                'author' =>  $request->author
+                'taux' =>  $taux,
+                'devise' =>  $devise,
+                'author' =>  $request->author,
+                'refUser' =>  $request->refUser
 
             ]);
             return $this->msgJson('Modification avec succès!!!');
@@ -168,14 +180,18 @@ class tt_treso_detail_etatbesoinController extends Controller
         }
         else
         {
+            //refEntete,refRubrique,service_beneficiaire,Qte,PU,taux,devise,author,refUser
             // insertion 
             $data = tt_treso_detail_etatbesoin::create([
                 'refEntete' =>  $request->refEntete,
                 'refRubrique' =>  $request->refRubrique,
+                'service_beneficiaire' =>  $request->service_beneficiaire,
                 'Qte' =>  $request->Qte,
                 'PU' =>  $request->PU,
-                'service_beneficiaire' =>  $request->service_beneficiaire,
-                'author' =>  $request->author
+                'taux' =>  $taux,
+                'devise' =>  $devise,
+                'author' =>  $request->author,
+                'refUser' =>  $request->refUser
             ]);
 
             return $this->msgJson('Insertion avec succès!!!');

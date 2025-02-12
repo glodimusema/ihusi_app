@@ -25,13 +25,13 @@ class CreateTdepenseTable extends Migration
             $table->string('modepaie',20);
             $table->string('numeroBordereau',50);
             $table->double('taux_dujour');
-            $table->string('AcquitterPar',100);
-            $table->string('StatutAcquitterPar',5);
-            $table->datetime('DateAcquitterPar');
-            $table->string('ApproCoordi',100);
-            $table->string('StatutApproCoordi',5);
-            $table->datetime('DateApproCoordi');
-            $table->string('numeroBE',50);
+            $table->string('AcquitterPar',100)->nullable();
+            $table->string('StatutAcquitterPar',5)->nullable();
+            $table->datetime('DateAcquitterPar')->nullable();
+            $table->string('ApproCoordi',100)->nullable();
+            $table->string('StatutApproCoordi',5)->nullable();
+            $table->datetime('DateApproCoordi')->nullable();
+            $table->string('numeroBE',50)->nullable();
             $table->string('author',50); 
             $table->timestamps();
             

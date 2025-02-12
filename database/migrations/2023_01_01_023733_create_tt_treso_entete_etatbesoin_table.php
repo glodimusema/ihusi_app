@@ -18,12 +18,12 @@ class CreateTtTresoEnteteEtatbesoinTable extends Migration
             $table->foreignId('refProvenance')->constrained('tt_treso_provenance')->restrictOnUpdate()->restrictOnDelete();
             $table->string('motifDepense',100);
             $table->datetime('DateElaboration');
-            $table->string('AcquitterPar',100);
-            $table->string('StatutAcquitterPar',100);
-            $table->datetime('DateAcquitterPar');
-            $table->string('ApproCoordi',100);
-            $table->string('StatutApproCoordi',100);
-            $table->datetime('DateApproCoordi');
+            $table->string('AcquitterPar',100)->nullable();
+            $table->string('StatutAcquitterPar',100)->nullable();
+            $table->datetime('DateAcquitterPar')->nullable();
+            $table->string('ApproCoordi',100)->nullable();
+            $table->string('StatutApproCoordi',100)->nullable();
+            $table->datetime('DateApproCoordi')->nullable();
             $table->string('author',100);  
             $table->foreignId('refUser')->constrained('users')->restrictOnUpdate()->restrictOnDelete();   
             $table->timestamps();

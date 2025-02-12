@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Finances;
 //tfin_cloture_caisse
 use App\Http\Controllers\Controller;
+use App\Traits\{GlobalMethod,Slug};
 use Illuminate\Http\Request;
 use App\Models\Finances\tDepense;
 use App\Models\Finances\tfin_entete_operationcompte;
 use App\Models\Finances\tfin_detail_operationcompte;
 use App\Models\Finances\{tfin_cloture_comptabilite};
 use App\Models\Finances\{tfin_cloture_caisse};
+
 use DB;
 
 class tDepenseController extends Controller
@@ -266,7 +268,7 @@ class tDepenseController extends Controller
 
     function insert_depense(Request $request)
     {
-
+        // $resteLettre = $this->chiffreEnLettre($request->montant);
         $datetest='';
         $data3 = DB::table('tfin_cloture_comptabilite')
        ->select('dateCloture')
@@ -307,7 +309,7 @@ class tDepenseController extends Controller
                  'numeroBordereau'    =>  $request->numeroBordereau,
                  'taux_dujour'    =>  $taux,
                  'numeroBE'    =>  $request->numeroBE,
-                 'author'       =>  $request->author
+                 'author' =>  $request->author
              ]);
              return response()->json([
                  'data'  =>  "Insertion avec succès!!!",
@@ -319,7 +321,7 @@ class tDepenseController extends Controller
 
     function update_depense(Request $request, $id)
     {
-
+        // $resteLettre = $this->chiffreEnLettre($request->montant);
         $datetest='';
         $data3 = DB::table('tfin_cloture_comptabilite')
        ->select('dateCloture')

@@ -162,6 +162,20 @@ class thotel_chambreController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    public function chambre_by_categorie($refClasse)
+    {
+        //
+        $data = DB::table("thotel_chambre")
+        ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+        ->select("thotel_chambre.id", "thotel_chambre.nom_chambre","numero_chambre","refClasse", 
+        "thotel_classe_chambre.designation as ClasseChambre","thotel_classe_chambre.prix_chambre",
+        "thotel_classe_chambre.devise","thotel_classe_chambre.taux", 
+        "thotel_chambre.created_at", "thotel_chambre.author","thotel_chambre.refUser")
+        ->where('thotel_chambre.refClasse', $refClasse)
+        ->get();
+        return response()->json(['data' => $data]);
+    }
+
    
 
     /**

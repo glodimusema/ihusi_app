@@ -1281,6 +1281,8 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::get("fetch_hotel_chambre", 'thotel_chambreController@index');
     Route::get("fetch_single_hotel_chambre/{id}", 'thotel_chambreController@edit');
     Route::get("delete_hotel_chambre/{id}", 'thotel_chambreController@destroy');
+    Route::get("chambre_by_categorie/{refClasse}", 'thotel_chambreController@chambre_by_categorie');
+    //chambre_by_categorie 
     Route::post("insert_hotel_chambre", 'thotel_chambreController@store');
     Route::get("fetch_thotel_chambre_2", 'thotel_chambreController@fetch_thotel_chambre_2');
     Route::get("fetch_thotel_chambre_libre", 'thotel_chambreController@fetch_thotel_chambre_libre');
@@ -1319,7 +1321,7 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::post("update_hotel_paiement_salle/{id}", 'thotel_paiement_salleController@update_data');
     Route::get("delete_hotel_paiement_salle/{id}", 'thotel_paiement_salleController@delete_data');
 
-    //fetch_reservation_search
+    //thotel_reservation_appartementController
     Route::get("fetch_hotel_reservation_chambre", 'thotel_reservation_chambreController@all');
     Route::get("fetch_hotel_reservation_search", 'thotel_reservation_chambreController@fetch_reservation_search');
     Route::get("fetch_hotel_reservation_chambre/{refEntete}", 'thotel_reservation_chambreController@fetch_data_entete');
@@ -1327,6 +1329,15 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::post("insert_hotel_reservation_chambre", 'thotel_reservation_chambreController@insert_data');
     Route::post("update_hotel_reservation_chambre/{id}", 'thotel_reservation_chambreController@update_data');
     Route::get("delete_hotel_reservation_chambre/{id}", 'thotel_reservation_chambreController@delete_data');
+
+
+    Route::get("fetch_hotel_reservation_appartement", 'thotel_reservation_appartementController@all');
+    Route::get("fetch_hotel_reservation_search_appartement", 'thotel_reservation_appartementController@fetch_reservation_search');
+    Route::get("fetch_hotel_reservation_appartement/{refEntete}", 'thotel_reservation_appartementController@fetch_data_entete');
+    Route::get("fetch_single_hotel_reservation_appartement/{id}", 'thotel_reservation_appartementController@fetch_single_data');    
+    Route::post("insert_hotel_reservation_appartement", 'thotel_reservation_appartementController@insert_data');
+    Route::post("update_hotel_reservation_appartement/{id}", 'thotel_reservation_appartementController@update_data');
+    Route::get("delete_hotel_reservation_appartement/{id}", 'thotel_reservation_appartementController@delete_data');
 
     Route::get("fetch_hotel_reservation_salle", 'thotel_reservation_salleController@all');
     Route::get("fetch_hotel_reservation_salle/{refEntete}", 'thotel_reservation_salleController@fetch_data_entete');
@@ -1340,6 +1351,12 @@ Route::group(['namespace'   =>  "Hotel"], function(){
     Route::get("pdf_fiche_hotel", 'PdfReservationController@pdf_fiche_hotel');
     Route::get("pdf_facture_hotel", 'PdfReservationController@pdf_facture_hotel'); 
     Route::get("pdf_facture_salle", 'PdfReservationController@pdf_facture_salle');  
+
+    Route::get("pdf_facture_appartement", 'PdfReservationController@pdf_facture_appartement'); 
+    Route::get("fetch_rapport_appartement_date", 'PdfReservationController@fetch_rapport_appartement_date'); 
+    Route::get("fetch_rapport_appartement_client_date", 'PdfReservationController@fetch_rapport_appartement_client_date'); 
+    Route::get("fetch_rapport_appartement_by_location_date", 'PdfReservationController@fetch_rapport_appartement_by_location_date'); 
+
     //  
     Route::get("fetch_facture_hebergement_consommation", 'PdfReservationController@fetch_facture_hebergement_consommation');
     Route::get("fetch_rapport_facture_hebergement_date_organisation", 'PdfReservationController@fetch_rapport_facture_hebergement_date_organisation');

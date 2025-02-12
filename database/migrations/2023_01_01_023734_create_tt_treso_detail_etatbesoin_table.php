@@ -20,6 +20,7 @@ class CreateTtTresoDetailEtatbesoinTable extends Migration
             $table->id();
             $table->foreignId('refEntete')->constrained('ttreso_entete_angagement')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('refRubrique')->constrained('tt_treso_rubrique')->restrictOnUpdate()->restrictOnDelete();
+            $table->string('service_beneficiaire',100);
             $table->double('Qte');
             $table->double('PU');
             $table->double('taux');

@@ -17,7 +17,7 @@ class CreatePaysTable extends Migration
             $table->id();
             $table->string('nomPays', 250);
             $table->timestamps();
-        });
+        });       
     }
 
     /**

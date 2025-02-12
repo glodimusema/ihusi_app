@@ -86,7 +86,6 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
@@ -98,6 +97,49 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip> 
                             <br>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintRapportLocation" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES LOCATIONS
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintRapportLocationByClient" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES LOCATIONS/CLIENT.
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                            <v-flex xs12 sm12 md12 lg12>
+                                    <div class="mr-1">
+                                        <v-autocomplete label="Selectionnez Chambre" prepend-inner-icon="map"
+                                        :rules="[(v) => !!v || 'Ce champ est requis']" :items="chambreList"
+                                        item-text="nom_chambre" item-value="id" dense outlined v-model="svData.refChambre" clearable
+                                        chips>
+                                        </v-autocomplete>
+                                    </div>
+                            </v-flex>
+                            <br>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintRapportLocationByChambre" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES LOCATIONS/CHAMBRE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
 
                             
                             </v-col>
@@ -160,6 +202,7 @@ export default {
                 id: "",
                 idEntreprise: "",
                 id_tarif: "",
+                refChambre : 0,
                 id_agent:[],
                 remise: 0,
                 ceo: "",
@@ -174,11 +217,10 @@ export default {
             stataData: {
                 entrepriseList: [],
                 agentList: [],
-                
-
             },
             fetchData: null,
             ClientList: [],
+            chambreList: [],
             ModeList: [],
             titreModal: "",
             typetarifList: [],    
@@ -234,6 +276,15 @@ export default {
 
           }
         );
+      },      
+      fetchListChambre() {
+        this.editOrFetch(`${this.apiBaseURL}/fetch_thotel_chambre_2`).then(
+          ({ data }) => {
+            var donnees = data.data;
+            this.chambreList = donnees;
+
+          }
+        );
       },
         PrintRapportHotel() {
 
@@ -284,8 +335,6 @@ export default {
            //fetch_rapport_paie_date
         },
         PrintRapportSalle() {
-
-            // if (this.userData.id_role == 1 || this.userData.id_role == 2) {
                 var date1 = this.dates[0];
                 var date2 = this.dates[1];
                 if (date1 <= date2) {                             
@@ -293,13 +342,35 @@ export default {
                 } else {
                     this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
                 }
-            // } else {
-            //     this.showError("Cette action est reservée uniquement aux administrateurs du système!!!");
-            // }
-
-           
-           
-           //fetch_rapport_paie_date
+        },
+        PrintRapportLocation() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {                             
+                    window.open(`${this.apiBaseURL}/fetch_rapport_appartement_date?date1=` + date1 + "&date2=" + date2);
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+        },
+        PrintRapportLocationByClient() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_appartement_client_date?date1=` + date1 + "&date2=" + date2+ "&refClient=" + this.svData.id_prisecharge);
+                   
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+        },
+        PrintRapportLocationByChambre() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_appartement_by_location_date?date1=` + date1 + "&date2=" + date2+ "&refChambre=" + this.svData.refChambre);
+                   
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
         },
 
        
@@ -325,7 +396,8 @@ export default {
 
     },
     created() { 
-        this.fetchListClient()
+        this.fetchListClient();
+        this.fetchListChambre();
     },
 };
 </script>

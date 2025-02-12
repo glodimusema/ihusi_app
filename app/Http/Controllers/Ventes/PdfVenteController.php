@@ -11253,7 +11253,9 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                 "tvente_stock_service.unitePivot",
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.qtePivot",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
     
             )
@@ -11261,9 +11263,21 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -11300,7 +11314,19 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+        ->groupBy(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.qtePivot")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
     
@@ -11341,9 +11367,21 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                     ['tvente_produit.refCategorie', '=', $refCategorie],
                     ['tvente_stock_service.refService', '=', $idService]
                 ])
-                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->groupBy("tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase",
+                    "tvente_stock_service.unitePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.qtePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux")
                 ->orderBy("tvente_produit.designation", "asc")
                 ->get();
         
@@ -11376,7 +11414,9 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                     "tvente_stock_service.unitePivot",
                     "tvente_stock_service.cmup",
                     "tvente_stock_service.qtePivot",
-                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux",            
                     DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
         
                 )
@@ -11384,9 +11424,23 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                     ['tvente_produit.refCategorie', '=', $refCategorie],
                     ['tvente_stock_service.refService', '=', $idService]
                 ])
-                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->groupBy(
+                    "tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase",
+                    "tvente_stock_service.unitePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.qtePivot",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux"
+                    )
                 ->orderBy("tvente_produit.designation", "asc")
                 ->get();
         
@@ -11894,9 +11948,19 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->groupBy("tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.qtePivot",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
@@ -11933,7 +11997,18 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
         ['tvente_produit.refCategorie', '=', $refCategorie],
         ['tvente_stock_service.refService', '=', $idService]
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->groupBy("tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.unitePivot",
+        "tvente_stock_service.cmup",
+        "tvente_stock_service.qtePivot")
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
@@ -11974,9 +12049,21 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -12017,9 +12104,21 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.qtePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -23861,16 +23960,27 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             "tvente_categorie_produit.designation as Categorie",
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux",            
             DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
         )
         ->where([
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->groupBy("tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
@@ -23902,7 +24012,17 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
     ->where([
         ['tvente_stock_service.refService', '=', $idService]
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->groupBy("tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup"
+        )
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
@@ -23932,16 +24052,30 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase","nom_service",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
     
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux"
+                )
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -23971,16 +24105,30 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase","nom_service",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
     
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux"
+                )
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -24074,7 +24222,9 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
     
             )
@@ -24082,9 +24232,18 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -24117,7 +24276,18 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+        ->groupBy(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup"
+            )
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
     
@@ -24147,7 +24317,9 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     "tvente_categorie_produit.designation as Categorie",
                     "tvente_stock_service.qte",
                     "tvente_stock_service.uniteBase","nom_service",
-                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux",            
                     DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
         
                 )
@@ -24155,9 +24327,19 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     ['tvente_produit.refCategorie', '=', $refCategorie],
                     ['tvente_stock_service.refService', '=', $idService]
                 ])
-                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->groupBy("tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase",
+                    "nom_service",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux")
                 ->orderBy("tvente_produit.designation", "asc")
                 ->get();
         
@@ -24187,7 +24369,9 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     "tvente_categorie_produit.designation as Categorie",
                     "tvente_stock_service.qte",
                     "tvente_stock_service.uniteBase","nom_service",
-                    "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux",            
                     DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
         
                 )
@@ -24195,9 +24379,18 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     ['tvente_produit.refCategorie', '=', $refCategorie],
                     ['tvente_stock_service.refService', '=', $idService]
                 ])
-                ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-                "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-                "tvente_stock_service.devise","tvente_stock_service.taux")
+                ->groupBy("tvente_stock_service.id",
+                    'tvente_stock_service.refService',
+                    'tvente_stock_service.refProduit',
+                    "tvente_produit.designation",
+                    "refCategorie",
+                    "tvente_stock_service.pu",
+                    "tvente_categorie_produit.designation",
+                    "tvente_stock_service.qte",
+                    "tvente_stock_service.uniteBase","nom_service",
+                    "tvente_stock_service.cmup",
+                    "tvente_stock_service.devise",
+                    "tvente_stock_service.taux")
                 ->orderBy("tvente_produit.designation", "asc")
                 ->get();
         
@@ -24293,8 +24486,11 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             "tvente_stock_service.pu",
             "tvente_categorie_produit.designation as Categorie",
             "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            "tvente_stock_service.uniteBase",
+            "nom_service","qtePivot","unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux",            
             DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
         )
@@ -24302,9 +24498,19 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             ['tvente_produit.refCategorie', '=', $refCategorie],
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->groupBy("tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "nom_service","qtePivot","unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
@@ -24337,7 +24543,18 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
         ['tvente_produit.refCategorie', '=', $refCategorie],
         ['tvente_stock_service.refService', '=', $idService]
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->groupBy(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup"
+        )
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
@@ -24366,8 +24583,13 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 "tvente_stock_service.pu",
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "qtePivot",
+                "unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
     
             )
@@ -24375,9 +24597,21 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "qtePivot",
+                "unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -24406,8 +24640,13 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 "tvente_stock_service.pu",
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "qtePivot",
+                "unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
     
             )
@@ -24415,9 +24654,21 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "qtePivot",
+                "unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -24510,16 +24761,28 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             "tvente_categorie_produit.designation as Categorie",
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux",            
             DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
 
         )
         ->where([
             ['tvente_stock_service.refService', '=', $idService]
         ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->groupBy("tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "nom_service","qtePivot","unitePivot",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux")
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
@@ -24551,7 +24814,16 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
     ->where([
         ['tvente_stock_service.refService', '=', $idService]
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->groupBy("tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup")
     ->orderBy("tvente_produit.designation", "asc")
     ->get();
 
@@ -24580,17 +24852,30 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 "tvente_stock_service.pu",
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.uniteBase",
+                "nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
     
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     
@@ -24619,17 +24904,30 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 "tvente_stock_service.pu",
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase","nom_service","qtePivot","unitePivot",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                "tvente_stock_service.uniteBase",
+                "nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
                 DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
     
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->groupBy("tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service","qtePivot","unitePivot",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
     

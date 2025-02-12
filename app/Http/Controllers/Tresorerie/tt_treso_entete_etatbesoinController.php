@@ -86,13 +86,14 @@ class tt_treso_entete_etatbesoinController extends Controller
 
         if ($request->id !='') 
         {
-            //author
+            //author refUser
             # code...
             $data = tt_treso_entete_etatbesoin::where("id", $request->id)->update([
                 'refProvenance' =>  $request->refProvenance,
                 'motifDepense' =>  $request->motifDepense,
                 'DateElaboration' =>  $request->DateElaboration,
-                'author' =>  $request->author
+                'author' =>  $request->author,
+                'refUser' =>  $request->refUser
             ]);
             return $this->msgJson('Modification avec succès!!!');
 
@@ -104,7 +105,8 @@ class tt_treso_entete_etatbesoinController extends Controller
                 'refProvenance' =>  $request->refProvenance,
                 'motifDepense' =>  $request->motifDepense,
                 'DateElaboration' =>  $request->DateElaboration,
-                'author' =>  $request->author
+                'author' =>  $request->author,
+                'refUser' =>  $request->refUser
             ]);
 
             return $this->msgJson('Insertion avec succès!!!');

@@ -147,7 +147,9 @@ export default {
         id: '',
         refcateRubrik: 0,
         desiRubriq: "",
-        codeRubriq: ""
+        codeRubriq: "",
+        author: '',
+        refUser : 0
       },
       fetchData: [],
       categorieList: [],
@@ -174,6 +176,8 @@ export default {
 
     validate() {
       if (this.$refs.form.validate()) {
+        this.svData.author = this.userData.name;
+        this.svData.refUser = this.userData.id
         this.isLoading(true);
         if (this.edit) {
           this.insertOrUpdate(
@@ -212,21 +216,6 @@ export default {
         }
 
       }
-    },
-      fetchAccess() {
-      this.editOrFetch(`${this.apiBaseURL}/fetch_crud_access_roles_one/${this.userData.id_role}`).then(
-        ({ data }) => {
-          var donnees = data.data;
-          donnees.map((item) => {  
-          this.inserer = item.insert;
-          this.modifier = item.update;
-          this.supprimer = item.delete;
-          this.chargement = item.load;
-        });
-
-          console.log(donnees);
-        }
-      );
     },
 
     editData(id) {

@@ -195,7 +195,8 @@ export default {
         Qte: 0,
         PU: 0,
         service_beneficiaire:"",
-        author: "Admin",
+        author: "",
+        refUser : 0
       },
       fetchData: [],
       RubriqueList: [],
@@ -210,8 +211,7 @@ export default {
 
     }
   },
-  created() {
-     
+  created() {     
     this.fetchDataList();
     this.fetchListSelection();
     this.fetchListServices();
@@ -229,6 +229,7 @@ export default {
         if (this.edit) {
           this.svData.refEntete = this.refEntete;
           this.svData.author = this.userData.name;
+          this.svData.refUser = this.userData.id;
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_DetatBesoin`,
             JSON.stringify(this.svData)
@@ -249,6 +250,7 @@ export default {
         else {
           this.svData.refEntete = this.refEntete;
           this.svData.author = this.userData.name;
+          this.svData.refUser = this.userData.id;
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_DetatBesoin`,
             JSON.stringify(this.svData)
@@ -268,21 +270,6 @@ export default {
 
       }
     },
-      fetchAccess() {
-      this.editOrFetch(`${this.apiBaseURL}/fetch_crud_access_roles_one/${this.userData.id_role}`).then(
-        ({ data }) => {
-          var donnees = data.data;
-          donnees.map((item) => {  
-          this.inserer = item.insert;
-          this.modifier = item.update;
-          this.supprimer = item.delete;
-          this.chargement = item.load;
-        });
-
-          console.log(donnees);
-        }
-      );
-    },
 
     //'id','refEntete','refRubrique','Qte','PU','author'
 
@@ -297,7 +284,8 @@ export default {
             this.svData.Qte = item.Qte;
             this.svData.PU = item.PU;
             this.svData.service_beneficiaire = item.service_beneficiaire;
-            this.svData.author = item.author;            
+            this.svData.author = item.author;  
+            this.svData.refUser = item.refUser;            
           });
           this.edit = true;
           this.dialog = true;

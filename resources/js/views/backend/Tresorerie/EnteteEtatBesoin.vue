@@ -4,7 +4,7 @@
     <v-flex md12>
 
       <DetailEtatdeBesoin ref="DetailEtatdeBesoin" />
-      <EnteteBonEngagement_Model ref="EnteteBonEngagement_Model" />
+      <!-- <EnteteBonEngagement_Model ref="EnteteBonEngagement_Model" /> -->
 
       <v-dialog v-model="dialog" max-width="400px" persistent>
         <v-card :loading="loading">
@@ -145,13 +145,13 @@
                               </v-list-item-title>
                             </v-list-item>
 
-                            <v-list-item v-if="item.StatutAcquitterPar == 'OUI' && item.StatutApproCoordi == 'OUI'" link @click="showEnteteBonEngagement(item.codeEB, item.nomProvenance)">
+                            <!-- <v-list-item v-if="item.StatutAcquitterPar == 'OUI' && item.StatutApproCoordi == 'OUI'" link @click="showEnteteBonEngagement(item.codeEB, item.nomProvenance)">
                               <v-list-item-icon>
                                 <v-icon color="  blue">mdi-briefcase-check</v-icon>
                               </v-list-item-icon>
                               <v-list-item-title style="margin-left: -20px">Passer au Bon d'Engagement
                               </v-list-item-title>
-                            </v-list-item>
+                            </v-list-item> -->
 
                             <v-list-item link @click="aquitter_EB(item.id)">
                               <v-list-item-icon>
@@ -214,12 +214,12 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import DetailEtatdeBesoin from './DetailEtatdeBesoin.vue';
-import EnteteBonEngagement_Model from './EnteteBonEngagement_Model.vue';
+// import EnteteBonEngagement_Model from './EnteteBonEngagement_Model.vue';
 
 export default {
   components: {
     DetailEtatdeBesoin,
-    EnteteBonEngagement_Model
+    // EnteteBonEngagement_Model
   },
   data() {
     return {
@@ -265,6 +265,7 @@ export default {
         this.isLoading(true);
         if (this.edit) {
           this.svData.author = this.userData.name;
+          this.svData.refUser = this.userData.id;
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_etatBesoin`,
             JSON.stringify(this.svData)
@@ -283,7 +284,8 @@ export default {
 
         }
         else {
-          this.svData.author = this.userData.name;
+          this.svData.author = this.userData.name;          
+          this.svData.refUser = this.userData.id;
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_etatBesoin`,
             JSON.stringify(this.svData)
@@ -443,25 +445,25 @@ export default {
       );
     },
 
-    showEnteteBonEngagement(refEtatbesoin, provenance) {
+    // showEnteteBonEngagement(refEtatbesoin, provenance) {
 
-      if (refEtatbesoin != '') {
+    //   if (refEtatbesoin != '') {
 
-        this.$refs.EnteteBonEngagement_Model.$data.etatModal = true;
-        this.$refs.EnteteBonEngagement_Model.$data.refEtatbesoin = refEtatbesoin;
-        this.$refs.EnteteBonEngagement_Model.$data.svData.refEtatbesoin = refEtatbesoin;
-        this.$refs.EnteteBonEngagement_Model.fetchListSelection();
-        this.$refs.EnteteBonEngagement_Model.fetchDataList();
-        this.fetchDataList();
+    //     this.$refs.EnteteBonEngagement_Model.$data.etatModal = true;
+    //     this.$refs.EnteteBonEngagement_Model.$data.refEtatbesoin = refEtatbesoin;
+    //     this.$refs.EnteteBonEngagement_Model.$data.svData.refEtatbesoin = refEtatbesoin;
+    //     this.$refs.EnteteBonEngagement_Model.fetchListSelection();
+    //     this.$refs.EnteteBonEngagement_Model.fetchDataList();
+    //     this.fetchDataList();
 
-        this.$refs.EnteteBonEngagement_Model.$data.titleComponent =
-          "Bon d'Engagement pour " + provenance;
+    //     this.$refs.EnteteBonEngagement_Model.$data.titleComponent =
+    //       "Bon d'Engagement pour " + provenance;
 
-      } else {
-        this.showError("Personne n'a fait cette action");
-      }
+    //   } else {
+    //     this.showError("Personne n'a fait cette action");
+    //   }
 
-    },
+    // },
     desactiverData(valeurs,user_created,date_entree,noms) {
 //
       var tables='tt_treso_entete_etatbesoin';

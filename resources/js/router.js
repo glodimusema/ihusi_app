@@ -97,9 +97,10 @@ import Cloture_Caisse_Salle from './views/backend/Finances/Cloture_Caisse_Salle.
 import Cloture_Caisse_Chambre from './views/backend/Finances/Cloture_Caisse_Chambre.vue'
 import Cloture_Caisse_Billard from './views/backend/Finances/Cloture_Caisse_Billard.vue'
 import ClotureComptabilite from './views/backend/Finances/ClotureComptabilite.vue'
-//ClotureComptabilite
+//DepenseAll
 
 import depense from './views/backend/Finances/Depenses.vue'
+import DepenseAll from './views/backend/Finances/DepenseAll.vue'
 import recette from './views/backend/Finances/Ressources.vue'
 import Comptes from './views/backend/Finances/Comptes.vue'
 import EnteteOperationComptable from './views/backend/Finances/EnteteOperationComptable.vue'
@@ -209,6 +210,9 @@ import ApprovCommandes from './views/backend/Ventes/ApprovCommandes.vue'
 import CreateAjustement from './views/backend/Ventes/CreateAjustement.vue'
 import TranfertUsage from './views/backend/Ventes/TranfertUsage.vue'
 
+import RapportEntree from './views/backend/Ventes/RapportEntree.vue'
+import RapportSortie from './views/backend/Ventes/RapportSortie.vue'
+
 import VenteEnteteFactureGroupe from './views/backend/Ventes/VenteEnteteFactureGroupe.vue'
 import CreateFactureGroupe from './views/backend/Ventes/CreateFactureGroupe.vue'
 
@@ -249,8 +253,10 @@ import Chambre from './views/backend/Hotel/Chambre.vue'
 import ClasseChambre from './views/backend/Hotel/ClasseChambre.vue'
 import ClientHotel from './views/backend/Hotel/ClientHotel.vue'
 import ReservationAll from './views/backend/Hotel/ReservationAll.vue'
+import LocationAppartementAll from './views/backend/Hotel/LocationAppartementAll.vue'
 import Salle from './views/backend/Hotel/Salle.vue'
 
+//LocationAppartementAll
 
 import SalonProduit from './views/backend/Salon/SalonProduit.vue'
 import RapportsJour_VenteSalon from './views/backend/Rapports/Finances/RapportsJour_VenteSalon.vue'
@@ -1415,10 +1421,20 @@ const Router = new VueRouter({
         name: 'ClientHotel',
         component: ClientHotel,
     },
-    {
+    { 
         path: '/admin/ReservationAll',
         name: 'ReservationAll',
         component: ReservationAll,
+    },
+    { 
+        path: '/admin/LocationAppartementAll',
+        name: 'LocationAppartementAll',
+        component: LocationAppartementAll,
+    },
+    { //
+        path: '/admin/DepenseAll',
+        name: 'DepenseAll',
+        component: DepenseAll,
     },
     {
         path: '/admin/ClientVente',
@@ -1440,10 +1456,21 @@ const Router = new VueRouter({
         name: 'VenteEnteteFactureGroupe',
         component: VenteEnteteFactureGroupe,
     },
-    { 
+    {       
         path: '/admin/CreateFactureGroupe',
         name: 'CreateFactureGroupe',
         component: CreateFactureGroupe,
+    },
+    { 
+      // 
+        path: '/admin/RapportEntree',
+        name: 'RapportEntree',
+        component: RapportEntree,
+    },
+    { 
+        path: '/admin/RapportSortie',
+        name: 'RapportSortie',
+        component: RapportSortie,
     },
     { 
         path: '/admin/CreateAjustement',

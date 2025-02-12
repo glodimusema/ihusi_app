@@ -804,7 +804,7 @@ export default {
               {
                 icon: "store",
                 text: "Rapports",
-                href: "/admin/RapportsJour_Vente",
+                href: "/admin/RapportEntree",
               },
                   
               ],
@@ -827,7 +827,7 @@ export default {
                 text: "Liste Appro.",
                 href: "/admin/VenteEnteteEntree",
               },
-              { //ApprovCommandes
+              { //RapportEntree     RapportSortie
                 text: "Création Transfert",
                 href: "/admin/TransfertStock",
               },
@@ -856,7 +856,7 @@ export default {
               { //TestExcel
                 icon: "store",
                 text: "Rapports",
-                href: "/admin/RapportsJour_Vente",
+                href: "/admin/RapportEntree",
               },
               { //TestExcel
                 icon: "store",
@@ -899,7 +899,7 @@ export default {
                 {
                   icon: "store",
                   text: "Rapports",
-                  href: "/admin/RapportsJour_Vente",
+                  href: "/admin/RapportSortie",
                 },
               ],
             },
@@ -944,7 +944,7 @@ export default {
                 },                {
                   icon: "store",
                   text: "Rapports",
-                  href: "/admin/RapportsJour_Vente",
+                  href: "/admin/RapportSortie",
                 },
               ],
             },
@@ -965,7 +965,7 @@ export default {
                 {
                   icon: "store",
                   text: "Rapports",
-                  href: "/admin/RapportsJour_Vente",
+                  href: "/admin/RapportSortie",
                 },
               ],
             },
@@ -1048,8 +1048,7 @@ export default {
             {
               text: "Hebergement",
               icon: "mdi-home",
-              items: [
-                
+              items: [                
                 { 
                   text: "Réservation Chambre",
                   href: "/admin/ReservationAll",
@@ -1057,6 +1056,10 @@ export default {
                 { 
                   text: "Clients",
                   href: "/admin/ClientHotel",
+                },
+                { //
+                  text: "Location Appartement",
+                  href: "/admin/LocationAppartementAll",
                 },
                 { 
                   text: "Salles",
@@ -1095,9 +1098,13 @@ export default {
                   text: "Etat de Besoin",
                   href: "/admin/EnteteEtatBesoin",
                 },
-                {
-                  text: "Bon d'Engagement",
-                  href: "/admin/EnteteBonEngagement",
+                // { //DepenseAll
+                //   text: "Bon d'Engagement",
+                //   href: "/admin/EnteteBonEngagement",
+                // },
+                { //DepenseAll
+                  text: "Depenses",
+                  href: "/admin/DepenseAll",
                 },
                 {
                   text: "Cloture de la Caisse",

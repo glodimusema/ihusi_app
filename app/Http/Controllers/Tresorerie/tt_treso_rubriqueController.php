@@ -82,7 +82,9 @@ class tt_treso_rubriqueController extends Controller
             $data = tt_treso_rubrique::where("id", $request->id)->update([
                 'desiRubriq' =>  $request->desiRubriq,
                 'codeRubriq' =>  $request->codeRubriq,
-                'refcateRubrik'=> $request->refcateRubrik
+                'refcateRubrik'=> $request->refcateRubrik,
+                'author'=> $request->author,
+                'refUser'=> $request->refUser
             ]);
             return $this->msgJson('Modification avec succès!!!');
 
@@ -93,7 +95,9 @@ class tt_treso_rubriqueController extends Controller
             $data = tt_treso_rubrique::create([
                 'desiRubriq' =>  $request->desiRubriq,
                 'codeRubriq' =>  $request->codeRubriq,
-                'refcateRubrik'=> $request->refcateRubrik
+                'refcateRubrik'=> $request->refcateRubrik,
+                'author'=> $request->author,
+                'refUser'=> $request->refUser
             ]);
 
             return $this->msgJson('Insertion avec succès!!!');
