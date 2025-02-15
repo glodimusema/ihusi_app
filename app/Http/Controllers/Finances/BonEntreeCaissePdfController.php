@@ -643,12 +643,6 @@ class BonEntreeCaissePdfController extends Controller
 
     }
 
-
-
-
-
-
-
 //==================== RAPPORT JOURNALIER SELON LE COMPTE =================================
 
 
@@ -753,9 +747,7 @@ function printDataListCompte($date1, $date2, $refCompte)
             $Compte=$row->Compte;                 
         }
 
-//
 
-    //
 
         $output='
 
@@ -1180,9 +1172,7 @@ function printDataList($date1, $date2)
             $Compte=$row->Compte;                 
         }
 
-//
 
-    //
 
         $output='
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -1501,8 +1491,6 @@ function showDetailPaie($date1, $date2)
 
 }
 
-
-
 public function fetch_rapport_entree_compte_date(Request $request)
 {
     //
@@ -1548,6 +1536,467 @@ public function fetch_rapport_entree_compte_date(Request $request)
 }
 
 
+
+
+
+
+//=================== RAPPORT DE SORTIE PAR BANQUE ==========================================
+
+public function fetch_rapport_entree_banque_date(Request $request)
+{
+    if ($request->get('date1') && $request->get('date2') && $request->get('refBanque'))  {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $refBanque = $request->get('refBanque');
+
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printDataListBanque($date1, $date2,$refBanque);       
+        $html .='<script>window.print()</script>';
+        echo($html);            
+
+    }
+    else {
+        // code...
+    }
+    
+}
+function printDataListBanque($date1, $date2, $refBanque)
+{
+
+                //Info Entreprise
+                $nomEse='';
+                $adresseEse='';
+                $Tel1Ese='';
+                $Tel2Ese='';
+                $siteEse='';
+                $emailEse='';
+                $idNatEse='';
+                $numImpotEse='';
+                $rccEse='';
+                $siege='';
+                $busnessName='';
+                $pic='';
+                $pic2 = $this->displayImg("fichier", 'logo.png');
+                $logo='';
+        
+                $data1 = DB::table('entreprises')
+                ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+                ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+        
+                ->join('pays','pays.id','=','entreprises.idPays')
+                ->join('provinces','provinces.id','=','entreprises.idProvince')
+                ->join('users','users.id','=','entreprises.ceo')        
+                ->select('entreprises.id as id','entreprises.id as idEntreprise',
+                'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+                'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+                'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+                'entreprises.idforme','entreprises.etat',
+                'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+                'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+                'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+                'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+                    //forme
+                    'forme_juridiques.nomForme','secteurs.nomSecteur',
+                    //users
+                    'users.name','users.email','users.avatar','users.telephone','users.adresse',
+                    //
+                    'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+                ->get();
+                $output='';
+                foreach ($data1 as $row) 
+                {                                
+                    $nomEse=$row->nomEntreprise;
+                    $adresseEse=$row->adresseEntreprise;
+                    $Tel1Ese=$row->telephoneEntreprise;
+                    $Tel2Ese=$row->telephone;
+                    $siteEse=$row->siteweb;
+                    $emailEse=$row->emailEntreprise;
+                    $idNatEse=$row->rccm;
+                    $numImpotEse=$row->rccm;
+                    $busnessName=$row->nomSecteur;
+                    $rccmEse=$row->rccm;
+                    $pic = $this->displayImg("fichier", 'logo.png');
+                    $siege=$row->nomForme;         
+                }
+
+
+                $totalPaie=0; 
+                $refMvt=1;
+                
+                $data2 = DB::table('tdepense')        
+                ->select(DB::raw('SUM(montant) as TotalPaie'))        
+                ->where([
+                    ['dateOperation','>=', $date1],
+                    ['dateOperation','<=', $date2],
+                    ['tdepense.refBanque','=', $refBanque],
+                    ['tdepense.refMvt','=', $refMvt]
+                ])       
+                ->get();
+                $output='';
+                foreach ($data2 as $row) 
+                {                                
+                    $totalPaie=$row->TotalPaie;                
+                }
+
+
+                $datedebut=$date1;
+                $datefin=$date2;
+                $Compte='';
+
+                $data3=DB::table('tdepense')
+                ->join('tcompte','tcompte.id','=','tdepense.refCompte')        
+                ->join('ttypemouvement','ttypemouvement.id','=','tdepense.refMvt') 
+                ->join('tconf_banque' , 'tconf_banque.id','=','tdepense.refBanque')
+                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tconf_banque.refSscompte')
+                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')  
+            
+                ->select("tdepense.id","montant","montantLettre","motif","dateOperation",
+                "tdepense.refMvt","tdepense.refCompte","tdepense.author",'modepaie','refBanque','numeroBordereau',
+                'taux_dujour',"AcquitterPar","StatutAcquitterPar","DateAcquitterPar","ApproCoordi","StatutApproCoordi"
+                ,"DateApproCoordi","tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
+                "tconf_banque.refSscompte",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte',
+                'numero_souscompte','tfin_souscompte.refCompte as refCompteBanque','nom_compte','numero_compte','refClasse',
+                'refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte",
+                "tcompte.designation as Compte","ttypemouvement.designation as TypeMouvement",
+                "tdepense.created_at","tdepense.updated_at","numeroBE")
+                ->selectRaw('CONCAT("BS",YEAR(dateOperation),"",MONTH(dateOperation),"00",tdepense.id) as codeOperation')       
+                ->where([
+                    ['dateOperation','>=', $date1],
+                    ['dateOperation','<=', $date2],
+                    ['tdepense.refBanque','=', $refBanque],
+                    ['tdepense.refMvt','=', $refMvt]
+                ])      
+                ->get();      
+                $output='';
+                foreach ($data3 as $row) 
+                {
+                    $Compte=$row->nom_banque;                 
+                }
+
+
+
+        $output='
+
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>RAPPORT DES RECETTES</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs8AAF79E9 {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+                    .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csE6D2AE99 {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; }
+                    .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs3B0DD49A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+                    .cs803D2C52 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:normal; font-style:normal; }
+                    .cs612ED82F {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .csFFC1C457 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .csCE72709D {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .csFBB219FE {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:912px;height:387px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:2px;"></td>
+                    <td style="height:0px;width:124px;"></td>
+                    <td style="height:0px;width:83px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:74px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:157px;"></td>
+                    <td style="height:0px;width:164px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:36px;"></td>
+                    <td style="height:0px;width:136px;"></td>
+                    <td style="height:0px;width:3px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:9px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td class="csFBB219FE" colspan="9" style="width:718px;height:23px;line-height:21px;text-align:left;vertical-align:middle;">'.$nomEse.'</td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="7" style="width:172px;height:144px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:172px;height:144px;">
+                        <img alt="" src="'.$pic.'" style="width:172px;height:144px;" /></div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="9" style="width:718px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$busnessName.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="9" style="width:718px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$numImpotEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="9" style="width:718px;height:22px;line-height:13px;text-align:left;vertical-align:middle;">'.$adresseEse.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="9" style="width:718px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Email&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="9" style="width:718px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Site&nbsp;web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:11px;"></td>
+                    <td></td>
+                    <td class="cs612ED82F" colspan="9" rowspan="2" style="width:718px;height:23px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>T&#233;l&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'&nbsp;&nbsp;24h/24</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:16px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:32px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csB6F858D0" colspan="12" style="width:896px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;DEPENSES</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs56F73198" colspan="6" style="width:329px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
+                    <td class="cs56F73198" colspan="6" style="width:562px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$Compte.'</nobr></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:7px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs8AAF79E9" colspan="2" style="width:125px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;BS</nobr></td>
+                    <td class="cs8AAF79E9" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MONTANT&nbsp;($)</nobr></td>
+                    <td class="cs8AAF79E9" style="width:73px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
+                    <td class="cs8AAF79E9" colspan="3" style="width:262px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MOTIF</nobr></td>
+                    <td class="cs8AAF79E9" colspan="3" style="width:206px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIBELLE</nobr></td>
+                    <td class="csE6D2AE99" style="width:136px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
+                    <td></td>
+                </tr>
+                ';
+                    
+                                $output .= $this->showDetailPaieBanque($date1, $date2,$refBanque);
+                    
+                                $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs9FE9304F" colspan="2" style="width:125px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL($)&nbsp;:</nobr></td>
+                    <td class="csEAC52FCD" colspan="10" style="width:773px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'$</nobr></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:9px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs12FE94AA" colspan="3" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>        
+        ';  
+       
+        return $output; 
+
+}
+function showDetailPaieBanque($date1, $date2,$refBanque)
+{
+    $refMvt=1;
+
+    $data=DB::table('tdepense')
+    ->join('tcompte','tcompte.id','=','tdepense.refCompte')        
+    ->join('ttypemouvement','ttypemouvement.id','=','tdepense.refMvt') 
+    ->join('tconf_banque' , 'tconf_banque.id','=','tdepense.refBanque')
+    ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tconf_banque.refSscompte')
+    ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+    ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+    ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+    ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+    ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')  
+
+    ->select("tdepense.id","montant","montantLettre","motif","dateOperation",
+    "tdepense.refMvt","tdepense.refCompte","tdepense.author",'modepaie','refBanque','numeroBordereau',
+    'taux_dujour',"AcquitterPar","StatutAcquitterPar","DateAcquitterPar","ApproCoordi","StatutApproCoordi"
+    ,"DateApproCoordi","tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
+    "tconf_banque.refSscompte",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte',
+    'numero_souscompte','tfin_souscompte.refCompte as refCompteBanque','nom_compte','numero_compte','refClasse',
+    'refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte",
+    "tcompte.designation as Compte","ttypemouvement.designation as TypeMouvement",
+    "tdepense.created_at","tdepense.updated_at","numeroBE")
+    ->selectRaw('CONCAT("BS",YEAR(dateOperation),"",MONTH(dateOperation),"00",tdepense.id) as codeOperation')
+    ->where([
+        ['dateOperation','>=', $date1],
+        ['dateOperation','<=', $date2],
+        ['tdepense.refBanque','=', $refBanque],
+        ['tdepense.refMvt','=', $refMvt]
+    ])    
+    ->orderBy("tdepense.id", "asc")
+    ->get();
+
+    $output='';
+
+    foreach ($data as $row) 
+    { 
+        $output .='
+            <tr style="vertical-align:top;">
+            <td style="width:0px;height:24px;"></td>
+            <td></td>
+            <td class="cs3B0DD49A" colspan="2" style="width:125px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->codeOperation.'</td>
+            <td class="csEE1F9023" colspan="2" style="width:92px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->montant.'$</td>
+            <td class="cs3B0DD49A" style="width:73px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
+            <td class="cs3B0DD49A" colspan="3" style="width:262px;height:22px;line-height:12px;text-align:left;vertical-align:middle;">'.$row->motif.'</td>
+            <td class="cs3B0DD49A" colspan="3" style="width:206px;height:22px;line-height:12px;text-align:left;vertical-align:middle;">'.$row->Compte.' - '.$row->nom_banque.' - '.$row->numeroBE.'</td>
+            <td class="cs803D2C52" style="width:136px;height:22px;line-height:12px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
+            <td></td>
+        </tr>
+            '; 
+    }
+
+    return $output;
+
+}
 
 
     

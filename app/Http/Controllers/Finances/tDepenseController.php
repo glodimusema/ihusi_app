@@ -430,12 +430,7 @@ class tDepenseController extends Controller
         ]);
     }
 
-
-
-
-
-
-    function cloturer_Caisse_vente(Request $request, $refCompte,$taux)
+    function cloturer_Caisse_vente(Request $request,$refCompte,$taux)
     {
         $datetest='';
         $data3 = DB::table('tfin_cloture_caisse')
@@ -458,40 +453,12 @@ class tDepenseController extends Controller
             
        }
        else
-       {
-                $sommation=0;
-
-                $data6 = DB::table('tvente_paiement')
-                ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_paiement.refEnteteVente')
-                ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
-                ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')
-        
-                ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement.refBanque')
-                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tconf_banque.refSscompte')
-                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
-                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
-                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
-                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
-                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
-                
-                ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
-                ->where([
-                    ['date_paie','=', $request->date_cloture]
-                ])                  
-                ->get();    
-    
-                
-                foreach ($data6 as $row) 
-                { 
-                  $sommation = $row->TotalPaie;
-                }
-    
+       {  
             $TotalPaie=0;
             $date_paie='';
             $refBanque=0;
             $modepaie='';
-
-            
+                        
             $data2 = DB::table('tvente_paiement')
             ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_paiement.refEnteteVente')
             ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
@@ -506,22 +473,24 @@ class tDepenseController extends Controller
             ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
             
             ->select('date_paie','refBanque','modepaie')
-            ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
+            ->selectRaw('IFNULL(ROUND(SUM(montant_paie),3),0) as TotalPaie')
             ->where([
                 ['date_paie','=', $request->date_cloture]
             ])
             ->groupby('date_paie','refBanque','modepaie')    
             ->get();
             
-            foreach ($data2 as $row) 
+            foreach ($data2 as $row2) 
             { 
-                                                    
-                $TotalPaie=$row->TotalPaie;
-                $date_paie=$row->date_paie;
-                $refBanque=$row->refBanque;  
-                $modepaie=$row->modepaie;
+
+                // $idCompte = DB::table("tcompte")
+                // ->where([['designation','=', 'VENTES RESTO&BAR']])->pluck('id')->first();                                      
+                $TotalPaie=$row2->TotalPaie;
+                $date_paie=$row2->date_paie;
+                $refBanque=$row2->refBanque;  
+                $modepaie=$row2->modepaie;
                         
-                $data4 = tDepense::create([
+                $data3 = tDepense::create([
                     'montant'       =>  $TotalPaie,
                     'montantLettre'    =>  'USD',
                     'motif'    =>  'VENTES RESTO&BAR',
@@ -537,6 +506,154 @@ class tDepenseController extends Controller
 
             }
 
+            // //====================================================================================
+            // //============= les paiements des commandes ==========================================
+
+
+            // $data4 = DB::table('tvente_paiement_commande')
+            // ->join('tvente_entete_requisition','tvente_entete_requisition.id','=','tvente_paiement_commande.refCommande')
+            // ->join('tvente_entete_paiecommande','tvente_entete_paiecommande.id','=','tvente_paiement_commande.refEntetepaie')
+            // ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+            // ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+            // ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+            // ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+            // ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+            // ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
+            // ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+            
+            // ->select('date_paie','refBanque','modepaie')
+            // ->selectRaw('IFNULL(ROUND(SUM(montant_paie),0),0) as TotalPaie')
+            // ->where([
+            //     ['date_paie','=', $request->date_cloture]
+            // ])
+            // ->groupby('date_paie','refBanque','modepaie')    
+            // ->get();
+            
+            // foreach ($data4 as $row4) 
+            // { 
+            //     $idCompte = DB::table("tcompte")
+            //     ->where([['designation','=', 'PAIEMENT DES FROUNISSEURS']])->pluck('id')->first();                                    
+            //     $TotalPaie=$row4->TotalPaie;
+            //     $date_paie=$row4->date_paie;
+            //     $refBanque=$row4->refBanque;  
+            //     $modepaie=$row4->modepaie;
+                        
+            //     $data5 = tDepense::create([
+            //         'montant'       =>  $TotalPaie,
+            //         'montantLettre'    =>  'USD',
+            //         'motif'    =>  'PAIEMENT DES FROUNISSEURS',
+            //         'dateOperation'    => $date_paie,
+            //         'refMvt'    =>  2,
+            //         'refCompte'    =>  $idCompte,
+            //         'modepaie'    =>  $modepaie,
+            //         'refBanque'    =>  $refBanque,
+            //         'numeroBordereau'    =>  '00000000',
+            //         'taux_dujour'    =>  $taux,
+            //         'author'       =>  $request->author
+            //     ]);
+
+            // }
+
+
+
+            // $data6 = DB::table('thotel_paiement_chambre')
+            // ->join('thotel_reservation_chambre','thotel_reservation_chambre.id','=','thotel_paiement_chambre.refReservation')
+            // ->join('thotel_chambre','thotel_chambre.id','=','thotel_reservation_chambre.refClient')
+            // ->join('thotel_classe_chambre','thotel_classe_chambre.id','=','thotel_chambre.refClasse') 
+            // ->join('tvente_client','tvente_client.id','=','thotel_reservation_chambre.refClient')
+            // ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')
+    
+            // ->join('tconf_banque' , 'tconf_banque.id','=','thotel_paiement_chambre.refBanque')
+            // ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tconf_banque.refSscompte')
+            // ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+            // ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+            // ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+            // ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+            // ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
+            
+            // ->select('date_paie','refBanque','modepaie')
+            // ->selectRaw('IFNULL(ROUND(SUM(montant_paie),0),0) as TotalPaie')
+            // ->where([
+            //     ['date_paie','=', $request->date_cloture]
+            // ])
+            // ->groupby('date_paie','refBanque','modepaie')    
+            // ->get();
+            
+            // foreach ($data6 as $row6) 
+            // { 
+            //     $idCompte = DB::table("tcompte")
+            //     ->where([['designation','=', 'PAIEMENT DES RESERVATIONS CHAMBRES']])->pluck('id')->first();                                    
+            //     $TotalPaie=$row6->TotalPaie;
+            //     $date_paie=$row6->date_paie;
+            //     $refBanque=$row6->refBanque;  
+            //     $modepaie=$row6->modepaie;
+                        
+            //     $data7 = tDepense::create([
+            //         'montant'       =>  $TotalPaie,
+            //         'montantLettre'    =>  'USD',
+            //         'motif'    =>  'PAIEMENT DES RESERVATIONS CHAMBRES',
+            //         'dateOperation'    => $date_paie,
+            //         'refMvt'    =>  1,
+            //         'refCompte'    =>  $idCompte,
+            //         'modepaie'    =>  $modepaie,
+            //         'refBanque'    =>  $refBanque,
+            //         'numeroBordereau'    =>  '00000000',
+            //         'taux_dujour'    =>  $taux,
+            //         'author'       =>  $request->author
+            //     ]);
+
+            // }
+
+
+
+
+
+            // $data8 = DB::table('thotel_paiement_salle')
+            // ->join('thotel_reservation_salle','thotel_reservation_salle.id','=','thotel_paiement_salle.refReservation')
+            // ->join('thotel_salle','thotel_salle.id','=','thotel_reservation_salle.refClient')
+            // ->join('tvente_client','tvente_client.id','=','thotel_reservation_salle.refClient')
+            // ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')
+    
+            // ->join('tconf_banque' , 'tconf_banque.id','=','thotel_paiement_salle.refBanque')
+            // ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tconf_banque.refSscompte')
+            // ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+            // ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+            // ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+            // ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+            // ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+            
+            // ->select('date_paie','refBanque','modepaie')
+            // ->selectRaw('IFNULL(ROUND(SUM(montant_paie),0),0) as TotalPaie')
+            // ->where([
+            //     ['date_paie','=', $request->date_cloture]
+            // ])
+            // ->groupby('date_paie','refBanque','modepaie')    
+            // ->get();
+            
+            // foreach ($data8 as $row8) 
+            // { 
+            //     $idCompte = DB::table("tcompte")
+            //     ->where([['designation','=', 'PAIEMENT DES RESERVATIONS SALLES']])->pluck('id')->first();                                    
+            //     $TotalPaie=$row8->TotalPaie;
+            //     $date_paie=$row8->date_paie;
+            //     $refBanque=$row8->refBanque;  
+            //     $modepaie=$row8->modepaie;
+                        
+            //     $data9 = tDepense::create([
+            //         'montant'       =>  $TotalPaie,
+            //         'montantLettre'    =>  'USD',
+            //         'motif'    =>  'PAIEMENT DES RESERVATIONS SALLES',
+            //         'dateOperation'    => $date_paie,
+            //         'refMvt'    =>  1,
+            //         'refCompte'    =>  $idCompte,
+            //         'modepaie'    =>  $modepaie,
+            //         'refBanque'    =>  $refBanque,
+            //         'numeroBordereau'    =>  '00000000',
+            //         'taux_dujour'    =>  $taux,
+            //         'author'       =>  $request->author
+            //     ]);
+
+            // }
 
             return response()->json([
                 'data'  =>  "La Caisse a été clauturer avec succès!!!",
@@ -546,8 +663,6 @@ class tDepenseController extends Controller
 
 
     }
-
-
 
     function cloturer_Caisse_hotel(Request $request, $refCompte,$taux)
     {
@@ -586,7 +701,7 @@ class tDepenseController extends Controller
                 ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
                 ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
                 
-                ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
+                ->selectRaw('IFNULL(ROUND(SUM(montant_paie),3),0) as TotalPaie')
                 ->where([
                     ['date_paie','=', $request->date_cloture]
                 ])                  
@@ -620,7 +735,7 @@ class tDepenseController extends Controller
             ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
             
             ->select('date_paie','refBanque','modepaie')
-            ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
+            ->selectRaw('IFNULL(ROUND(SUM(montant_paie),3),0) as TotalPaie')
             ->where([
                 ['date_paie','=', $request->date_cloture]
             ])
@@ -655,8 +770,6 @@ class tDepenseController extends Controller
       }
 
     }
-
-
 
     function cloturer_Caisse_salle(Request $request,$refCompte,$taux)
     {
@@ -694,7 +807,7 @@ class tDepenseController extends Controller
                 ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
                 ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
                 
-                ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
+                ->selectRaw('ROUND(SUM(montant_paie),3) as TotalPaie')
                 ->where([
                     ['date_paie','=', $request->date_cloture]
                 ])                  
@@ -797,7 +910,7 @@ class tDepenseController extends Controller
                 ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
                 ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition') 
                 
-                ->selectRaw('ROUND(SUM(montant_paie),0) as TotalPaie')
+                ->selectRaw('ROUND(SUM(montant_paie),3) as TotalPaie')
                 ->where([
                     ['date_paie','=', $request->date_cloture]
                 ])                  
@@ -865,6 +978,92 @@ class tDepenseController extends Controller
     }
 
 
+    function cloturer_Caisse_fournisseur(Request $request,$refCompte,$taux)
+    {
+        $datetest='';
+        $data3 = DB::table('tfin_cloture_caisse')
+       ->select('date_cloture')
+       ->where('date_cloture','=', $request->date_cloture)
+       ->take(1)
+       ->orderBy('id', 'desc')         
+       ->get();    
+       foreach ($data3 as $row) 
+       {                           
+          $datetest=$row->date_cloture;          
+       }
+
+       if($datetest == $request->date_cloture)
+       {
+            return response()->json([
+                'data'  =>  "La Caisse est déja cloturée pour cette date svp!!! Veuillez prendre la date du jour suivant!!!",
+            ]);
+
+            
+       }
+       else
+       {  
+            $TotalPaie=0;
+            $date_paie='';
+            $refBanque=0;
+            $modepaie='';
+                        
+            $data4 = DB::table('tvente_paiement_commande')
+            ->join('tvente_entete_requisition','tvente_entete_requisition.id','=','tvente_paiement_commande.refCommande')
+            ->join('tvente_entete_paiecommande','tvente_entete_paiecommande.id','=','tvente_paiement_commande.refEntetepaie')
+            ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+            ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+            ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+            ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+            ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+            ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
+            ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+            
+            ->select('date_paie','refBanque','modepaie')
+            ->selectRaw('IFNULL(ROUND(SUM(montant_paie),3),0) as TotalPaie')
+            ->where([
+                ['date_paie','=', $request->date_cloture]
+            ])
+            ->groupby('date_paie','refBanque','modepaie')    
+            ->get();
+            
+            foreach ($data4 as $row4) 
+            { 
+                // $idCompte = DB::table("tcompte")
+                // ->where([['designation','=', 'PAIEMENT DES FROUNISSEURS']])->pluck('id')->first();                                    
+                $TotalPaie=$row4->TotalPaie;
+                $date_paie=$row4->date_paie;
+                $refBanque=$row4->refBanque;  
+                $modepaie=$row4->modepaie;
+                        
+                $data5 = tDepense::create([
+                    'montant'       =>  $TotalPaie,
+                    'montantLettre'    =>  'USD',
+                    'motif'    =>  'PAIEMENT DES FROUNISSEURS',
+                    'dateOperation'    => $date_paie,
+                    'refMvt'    =>  2,
+                    'refCompte'    =>  $refCompte,
+                    'modepaie'    =>  $modepaie,
+                    'refBanque'    =>  $refBanque,
+                    'numeroBordereau'    =>  '00000000',
+                    'taux_dujour'    =>  $taux,
+                    'author'       =>  $request->author
+                ]);
+
+            }
+
+
+
+
+            return response()->json([
+                'data'  =>  "La Caisse a été clauturer avec succès!!!",
+            ]); 
+       }
+
+
+
+    }
+
+
     // mes scripts
 
     function cloturer_Caisse(Request $request)
@@ -900,8 +1099,9 @@ class tDepenseController extends Controller
 
                 $this->cloturer_Caisse_vente($request,1,$taux);
                 $this->cloturer_Caisse_hotel($request,2,$taux);        
-                $this->cloturer_Caisse_salle($request,3,$taux);
-                $this->cloturer_Caisse_billard($request,4,$taux);
+                // $this->cloturer_Caisse_salle($request,3,$taux);                
+                $this->cloturer_Caisse_fournisseur($request,4,$taux);
+                // $this->cloturer_Caisse_billard($request,5,$taux);
                 
         
                 $data5 = tfin_cloture_caisse::create([

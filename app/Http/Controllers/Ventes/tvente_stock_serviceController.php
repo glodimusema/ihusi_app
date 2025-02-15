@@ -228,16 +228,55 @@ class tvente_stock_serviceController extends Controller
     {
         $data_return = []; 
         $date1 = Carbon::now();
+
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
         $data11 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
 
-        ->leftJoin('tvente_detail_transfert as dtSortie', function ($join) use ($date1, $idService) {
-            $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')
-            ->join('tvente_entete_transfert as dtEnteteTransSortie', 'dtEnteteTransSortie.id', '=', 'dtSortie.refEnteteTransfert')
-                //  ->where('dtEnteteTransSortie.refService', '=', $idService)
-                ->where('dtEnteteTransSortie.date_transfert', '<', $date1);
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+            $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                ->where('dtEntree.type_mouvement', '=', 'Entree')
+                ->where('dtEntree.dateMvt', '<', $date1);
+        })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+    //======================================================================
+
+        $data22 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+        ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+            $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                ->where('dtSortie.type_mouvement', '=', 'Sortie')
+                ->where('dtSortie.dateMvt', '<', $date1);
         })
         // Utilisez distinct() avant select()
         ->distinct()
@@ -252,7 +291,7 @@ class tvente_stock_serviceController extends Controller
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup",
-            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteTransfert), 0), 0) as totalSortie')
+            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
         )
         ->where([
             ['tvente_stock_service.refService', '=', $idService]
@@ -261,20 +300,20 @@ class tvente_stock_serviceController extends Controller
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
+    // ============ LEs Mouvements =========================================================================
 
         // Récupérer les données de stock, mouvements et ventes en une seule requête 
-        $data22 = DB::table('tvente_stock_service')
-            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-            ->leftJoin('tvente_detail_transfert as mvtSortie', function ($join) use ($date1, $idService) {
-                $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')
-                ->join('tvente_entete_transfert as mvtEnteteTransSortie', 'mvtEnteteTransSortie.id', '=', 'mvtSortie.refEnteteTransfert')
-                    //  ->where('mvtEnteteTransSortie.refService', '=', $idService)
-                    ->whereBetween('mvtEnteteTransSortie.date_transfert', [$date1, $date1]);
-            })
-
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date1]);
+        })
+    
             // Utilisez distinct() avant select()
             ->distinct()
             ->select(
@@ -288,8 +327,8 @@ class tvente_stock_serviceController extends Controller
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteTransfert), 0), 0) as stockSortie'),
-
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+    
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
@@ -299,60 +338,21 @@ class tvente_stock_serviceController extends Controller
             "tvente_stock_service.devise","tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
-
-        // Construction de l'output
-
-
-        $data111 = DB::table('tvente_stock_service')
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
         ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_transfert as dtEntree', function ($join) use ($date1, $idService) {
-            $join->on('dtEntree.refProduit', '=', 'tvente_produit.id')
-            ->join('tvente_entete_transfert as dtEnteteTransEntree', 'dtEnteteTransEntree.id', '=', 'dtEntree.refEnteteTransfert')
-                ->where('dtEntree.refDestination', '=', $idService)
-                ->where('dtEnteteTransEntree.date_transfert', '<', $date1);
-        })       
-        // Utilisez distinct() avant select()
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.cmup",
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteTransfert), 0), 0) as totalEntree')        
-        )
-        ->where([
-            ['tvente_stock_service.refService', '=', $idService]
-        ])
-        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
-
-
-
-
-
-            // Récupérer les données de stock, mouvements et ventes en une seule requête
-            $data222 = DB::table('tvente_stock_service')
-            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-            ->leftJoin('tvente_detail_transfert as mvtEntree', function ($join) use ($date1, $idService) {
-                $join->on('mvtEntree.refProduit', '=', 'tvente_produit.id')
-                ->join('tvente_entete_transfert as mvtEnteteTransEntree', 'mvtEnteteTransEntree.id', '=', 'mvtEntree.refEnteteTransfert')
-                    ->where('mvtEntree.refDestination', '=', $idService)
-                    ->whereBetween('mvtEnteteTransEntree.date_transfert', [$date1, $date1]);
-            })
-
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date1]);;
+        })
+    
             // Utilisez distinct() avant select()
             ->distinct()
             ->select(
@@ -365,9 +365,9 @@ class tvente_stock_serviceController extends Controller
                 "tvente_categorie_produit.designation as Categorie",
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",
-
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteTransfert), 0), 0) as stockEntree')
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+    
             )
             ->where([
                 ['tvente_stock_service.refService', '=', $idService]
@@ -377,178 +377,52 @@ class tvente_stock_serviceController extends Controller
             "tvente_stock_service.devise","tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
             ->get();
+ 
+            // Vérifiez que les deux tableaux ont la même longueur
+            if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+            && (count($data1) === count($data22)))
+            {
+                for ($i = 0; $i < count($data1); $i++) {
+                    $row11 = $data11[$i];
+                    $row22 = $data22[$i];
+                    $row1 = $data1[$i];
+                    $row2 = $data2[$i];            
 
-        // Construction de l'output
+                    $totalSortie = floatval($row22->totalSortie);
+                    $totalEntree = floatval($row11->totalEntree);
 
+                    $stockSortie = floatval($row2->stockSortie);            
+                    $stockEntree = floatval($row1->stockEntree);
 
+                    $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+                    $totalGEntree = floatval($stockEntree);
+                    $totalG = floatval($totalSI) + floatval($stockEntree);
+                    $TGSortie = floatval($stockSortie);
+                    $totalSF = floatval($totalG) - floatval($stockSortie);
+                    $totalPT = floatval($totalSF) * floatval($row2->cmup);
 
-            // Récupérer les données de stock, mouvements et ventes en une seule requête
-            $data1 = DB::table('tvente_stock_service')
-            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+                    $data_return[] = [
+                        'id' => $row1->id,                    
+                        'designation' => $row1->designation,
+                        'refProduit' => $row2->refProduit,
+                        'Categorie' => $row1->Categorie,
+                        'SI' => $totalSI,
+                        'Entree' =>$totalGEntree,
+                        'Total' => $totalG,
+                        'Sortie' => $TGSortie,
+                        'SF' => $totalSF,
+                        'PU' => round($row2->cmup, 2),
+                        'PT' => round($totalPT, 2),
+                        'Unite' => $row1->uniteBase
+                    ];  
 
-            ->leftJoin('tvente_detail_entree as dtAppro', function ($join) use ($date1, $idService) {
-                $join->on('dtAppro.refProduit', '=', 'tvente_produit.id')
-                ->join('tvente_entete_entree as dtEnteteAppro', 'dtEnteteAppro.id', '=', 'dtAppro.refEnteteEntree')
-                ->join('tvente_services as dtEnteteApproServ', 'dtEnteteApproServ.id', '=', 'dtEnteteAppro.refService')
-                    ->where('dtEnteteAppro.refService', '=', $idService)
-                    ->where('dtEnteteAppro.dateEntree', '<', $date1);
-            })
-            ->leftJoin('tvente_detail_vente as dtVente', function ($join) use ($date1, $idService) {
-                $join->on('dtVente.refProduit', '=', 'tvente_produit.id')
-                ->join('tvente_entete_vente as dtEnteteVente', 'dtEnteteVente.id', '=', 'dtVente.refEnteteVente')
-                ->join('tvente_services as dtEnteteVenteServ', 'dtEnteteVenteServ.id', '=', 'dtEnteteVente.refService')
-                    ->where('dtEnteteVente.refService', '=', $idService)
-                    ->where('dtEnteteVente.dateVente', '<', $date1);
-            })
-            ->leftJoin('tvente_detail_utilisation as dtUtilisation', function ($join) use ($date1, $idService) {
-                $join->on('dtUtilisation.refProduit', '=', 'tvente_produit.id')
-                ->join('tvente_entete_utilisation as dtEnteteUse', 'dtEnteteUse.id', '=', 'dtUtilisation.refEnteteVente')
-                ->join('tvente_services as dtEnteteUseServ', 'dtEnteteUseServ.id', '=', 'dtEnteteUse.refService')
-                    ->where('dtEnteteUse.refService', '=', $idService)
-                    ->where('dtEnteteUse.dateUse', '<', $date1);
-            })        
-            // Utilisez distinct() avant select()
-            ->distinct()
-            ->select(
-                "tvente_stock_service.id",
-                'tvente_stock_service.refService',
-                'tvente_stock_service.refProduit',
-                "tvente_produit.designation as designation",
-                "refCategorie",
-                "tvente_stock_service.pu",
-                "tvente_categorie_produit.designation as Categorie",
-                "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase",
-                "tvente_stock_service.cmup",
+            }
+            } 
+            else {
+                // Gérer le cas où les tableaux n'ont pas la même longueur
+                echo 'Les tableaux ont pas la même longueur.';
+            }
 
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT dtAppro.qteBase * dtAppro.qteEntree), 0), 0) as totalAppro'),
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT dtVente.qteBase * dtVente.qteVente), 0), 0) as totalVente'),
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT dtUtilisation.qteBase * dtUtilisation.qteVente), 0), 0) as totalUse')
-            )
-            ->where([
-                ['tvente_stock_service.refService', '=', $idService]
-            ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
-            ->orderBy("tvente_produit.designation", "asc")
-            ->get();
-
-        // Construction de l'output
-
-        // Récupérer les données de stock, mouvements et ventes en une seule requête
-        $data2 = DB::table('tvente_stock_service')
-            ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-            ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-            ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-
-        ->leftJoin('tvente_detail_entree as mvtAppro', function ($join) use ($date1, $idService) {
-                $join->on('mvtAppro.refProduit', '=', 'tvente_produit.id')
-                ->join('tvente_entete_entree as mvtEnteteAppro', 'mvtEnteteAppro.id', '=', 'mvtAppro.refEnteteEntree')
-                // ->join('tvente_services as mvtEnteteApproServ', 'mvtEnteteApproServ.id', '=', 'mvtEnteteAppro.refService')
-                    ->where('mvtEnteteAppro.refService', '=', $idService)
-                    ->whereBetween('mvtEnteteAppro.dateEntree', [$date1, $date1]);
-            })
-
-            ->leftJoin('tvente_detail_vente as mvtVente', function ($join) use ($date1, $idService) {
-                $join->on('mvtVente.idStockService', '=', 'tvente_stock_service.id')
-                ->join('tvente_entete_vente as mvtEnteteVente', 'mvtEnteteVente.id', '=', 'mvtVente.refEnteteVente')  
-                    ->where('mvtEnteteVente.refService', '=', $idService)               
-                    ->whereBetween('mvtEnteteVente.dateVente', [$date1, $date1]);
-            })
-            ->leftJoin('tvente_detail_utilisation as mvtUtilisation', function ($join) use ($date1, $idService) {
-                $join->on('mvtUtilisation.idStockService', '=', 'tvente_stock_service.id')
-                ->join('tvente_entete_utilisation as mvtEnteteUse', 'mvtEnteteUse.id', '=', 'mvtUtilisation.refEnteteVente')
-                // ->join('tvente_services as mvtEnteteUseServ', 'mvtEnteteUseServ.id', '=', 'mvtEnteteUse.refService')
-                    ->where('mvtEnteteUse.refService', '=', $idService)
-                    ->whereBetween('mvtEnteteUse.dateUse', [$date1, $date1]);
-            })
-            // Utilisez distinct() avant select()
-            ->distinct()
-            ->select(
-                "tvente_stock_service.id",
-                'tvente_stock_service.refService',
-                'tvente_stock_service.refProduit',
-                "tvente_produit.designation as designation",
-                "refCategorie",
-                "tvente_stock_service.pu",
-                "tvente_categorie_produit.designation as Categorie",
-                "tvente_stock_service.qte",
-                "tvente_stock_service.uniteBase",
-                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",  
-                
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtAppro.qteBase * mvtAppro.qteEntree), 0), 0) as stockAppro'),
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtVente.qteBase * mvtVente.qteVente), 0), 0) as stockVente'),
-                DB::raw('IFNULL(ROUND(SUM(DISTINCT mvtUtilisation.qteBase * mvtUtilisation.qteVente), 0), 0) as stockUse'),
-
-                DB::raw('IFNULL(tvente_stock_service.cmup, 0) as puVente'),
-
-            )
-            ->where([
-                ['tvente_stock_service.refService', '=', $idService]
-            ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
-            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
-            "tvente_stock_service.devise","tvente_stock_service.taux")
-            ->orderBy("tvente_produit.designation", "asc")
-            ->get();
-
-        // Construction de l'output
-        
-        $output = '';
-
-        // Vérifiez que les deux tableaux ont la même longueur
-        if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
-        && ( count($data1) === count($data111)) && (count($data1) === count($data22)) 
-        && (count($data1) === count($data222))) {
-            for ($i = 0; $i < count($data1); $i++) {
-                $row1 = $data1[$i];
-                $row2 = $data2[$i];
-                $row11 = $data11[$i];
-                $row22 = $data22[$i];
-                $row111 = $data111[$i];
-                $row222 = $data222[$i];
-
-                $totalSortie = floatval($row11->totalSortie);
-                $totalEntree = floatval($row111->totalEntree);
-                $totalVente = floatval($row1->totalVente);
-                $totalAppro = floatval($row1->totalAppro);
-                $totalUse = floatval($row1->totalUse);
-
-                $stockSortie = floatval($row22->stockSortie);            
-                $stockEntree = floatval($row222->stockEntree);
-                $stockVente = floatval($row2->stockVente);
-                $stockAppro = floatval($row2->stockAppro);
-                $stockUse = floatval($row2->stockUse);
-
-                $totalSI = ((floatval($totalEntree) + floatval($totalAppro)) - (floatval($totalSortie) + floatval($totalVente) + floatval($totalUse)));
-                $totalGEntree = floatval($stockEntree) + floatval($stockAppro);
-                $totalG = floatval($totalSI) + floatval($stockEntree) + floatval($stockAppro);
-                $TGSortie = floatval($stockSortie) + floatval($stockVente) + floatval($stockUse);
-                $totalSF = floatval($totalG) - floatval($stockSortie) - floatval($stockVente) - floatval($stockUse);
-                $totalPT = floatval($totalSF) * floatval($row2->puVente);
-
-
-                $data_return[] = [
-                    'id' => $row1->id,                    
-                    'designation' => $row1->designation,
-                    'refProduit' => $row2->refProduit,
-                    'Categorie' => $row1->Categorie,
-                    'SI' => $totalSI,
-                    'Entree' =>$totalGEntree,
-                    'Total' => $totalG,
-                    'Sortie' => $TGSortie,
-                    'SF' => $totalSF,
-                    'PU' => round($row2->puVente, 2),
-                    'PT' => round($totalPT, 2),
-                    'Unite' => $row1->uniteBase
-                ]; 
-
-        }
-        } else {
-            // Gérer le cas où les tableaux n'ont pas la même longueur
-            echo 'Les tableaux ont pas la même longueur.';
-        } 
         return response()->json($data_return);
     }
 

@@ -2200,10 +2200,13 @@ Route::get("Profiletagent/{id}", [tagentController::class, 'ProfiletClient']);
 
 Route::get("pdf_bonsortie_data", [BonSortieCaissePdfController::class, 'pdf_bon_data']);
 Route::get("pdf_bonentree_data", [BonEntreeCaissePdfController::class, 'pdf_bon_data']); 
-Route::get("fetch_rapport_sortie_compte_date", [BonSortieCaissePdfController::class, 'fetch_rapport_sortie_compte_date']);
-Route::get("fetch_rapport_entree_compte_date", [BonEntreeCaissePdfController::class, 'fetch_rapport_entree_compte_date']);
+Route::get("fetch_rapport_sortie_banque_date", [BonSortieCaissePdfController::class, 'fetch_rapport_sortie_banque_date']);
+Route::get("fetch_rapport_sortie_compte_date_rubrique", [BonSortieCaissePdfController::class, 'fetch_rapport_sortie_compte_date']);
+Route::get("fetch_rapport_entree_compte_date_rubrique", [BonEntreeCaissePdfController::class, 'fetch_rapport_entree_compte_date']);
+Route::get("fetch_rapport_entree_banque_date", [BonEntreeCaissePdfController::class, 'fetch_rapport_entree_banque_date']);
 
-
+//fetch_rapport_entree_banque_date
+//fetch_rapport_sortie_banque_date
 
 
 //========================================================================================================

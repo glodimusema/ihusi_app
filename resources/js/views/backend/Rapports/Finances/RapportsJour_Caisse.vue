@@ -46,21 +46,6 @@
                                 prepend-icon="mdi-calendar"
                                 readonly
                             ></v-text-field>
-                            
-                            <br>                        
-
-                           
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="PrintshowDepenseByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORT DES DEPENSES
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip> 
                             <br>
 
                             <v-tooltip bottom color="black">
@@ -73,6 +58,20 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
+                            
+                            <br>  
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintshowDepenseByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES DEPENSES
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip> 
+                            
                             <br>
 
                                 <v-tooltip bottom color="black">
@@ -160,17 +159,29 @@
                                 </v-autocomplete>
                             </div>
                             </v-flex>
-                            
-                            <v-tooltip bottom color="black">
+
+                                <v-tooltip bottom color="black">
                                     <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
-                                            <v-btn @click="PrintshowDepenseByDate" block color="  blue" dark>
-                                                <v-icon>print</v-icon> RAPPORT DES DEPENSES
+                                            <v-btn @click="PrintshowDepenseBanqueByDate" block color="  blue" dark>
+                                                <v-icon>print</v-icon> RAPPORT DES DEPENSES/BANQUE
                                             </v-btn>
                                         </span>
                                     </template>
                                     <span>Imprimer le rapport</span>
-                                </v-tooltip>                               
+                                </v-tooltip>
+                            <br>
+                            
+                            <v-tooltip bottom color="black">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on">
+                                            <v-btn @click="PrintshowRessourceBanqueByDate" block color="  blue" dark>
+                                                <v-icon>print</v-icon> RAPPORT DES RECETTES/BANQUE
+                                            </v-btn>
+                                        </span>
+                                    </template>
+                                    <span>Imprimer le rapport</span>
+                                </v-tooltip>                                                        
 
                                 <br>
 
@@ -196,18 +207,7 @@
                                     </template>
                                     <span>Imprimer le rapport</span>
                                 </v-tooltip>
-                                <br>
-
-                                <v-tooltip bottom color="black">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <span v-bind="attrs" v-on="on">
-                                            <v-btn @click="PrintshowDepenseByDate" block color="  blue" dark>
-                                                <v-icon>print</v-icon> RAPPORT DES DEPENSES
-                                            </v-btn>
-                                        </span>
-                                    </template>
-                                    <span>Imprimer le rapport</span>
-                                </v-tooltip>
+                                
                             <br>
                             
                             </v-col>
@@ -388,7 +388,7 @@ export default {
                 var date1 = this.dates[0];
                 var date2 = this.dates[1];
                 if (date1 <= date2) {                             
-                    window.open(`${this.apiBaseURL}/fetch_rapport_entree_compte_date_rubrique?date1=` + date1 + "&date2=" + date2+"&refRubEntree="+this.svData.refRubEntree);
+                    window.open(`${this.apiBaseURL}/fetch_rapport_sortie_compte_date_rubrique?date1=` + date1 + "&date2=" + date2+"&refCompte="+this.svData.refRubEntree);
                 } else {
                     this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
                 } 
@@ -397,7 +397,27 @@ export default {
                 var date1 = this.dates[0];
                 var date2 = this.dates[1];
                 if (date1 <= date2) {
-                    window.open(`${this.apiBaseURL}/fetch_rapport_sortie_compte_date_rubrique?date1=` + date1 + "&date2=" + date2+"&refRubSortie="+this.svData.refRubSortie);
+                    window.open(`${this.apiBaseURL}/fetch_rapport_sortie_compte_date_rubrique?date1=` + date1 + "&date2=" + date2+"&refCompte="+this.svData.refRubSortie);
+                    //window.open(`${this.apiBaseURL}/fetch_rapport_depense_date?date1=` + date1+"&date2="+date2);
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+        },
+        PrintshowDepenseBanqueByDate() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_sortie_banque_date?date1=` + date1 + "&date2=" + date2+"&refBanque="+this.svData.refCompte);
+                    //window.open(`${this.apiBaseURL}/fetch_rapport_depense_date?date1=` + date1+"&date2="+date2);
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+        },
+        PrintshowRessourceBanqueByDate() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_entree_banque_date?date1=` + date1 + "&date2=" + date2+"&refBanque="+this.svData.refCompte);
                     //window.open(`${this.apiBaseURL}/fetch_rapport_depense_date?date1=` + date1+"&date2="+date2);
                 } else {
                     this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
