@@ -521,11 +521,37 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
+                            <!-- exportToExcelDetailCommande exportToExcelEnteteCommande -->
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showEnteteFactureCommandeByDate" block color="  blue" dark>
                                             <v-icon>print</v-icon> FACTURE DES FOURNISSEURS
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+
+                            <br>
+                            <!-- exportToExcelDetailCommande exportToExcelEnteteCommande -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelEnteteCommande" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FACTURES DES FOURNISSEURS/EXCEL
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <!-- exportToExcelDetailCommande exportToExcelEnteteCommande -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelDetailCommande" block color="  blue" dark>
+                                            <v-icon>print</v-icon> DETAILS DES FACTURES DES FSS./EXCEL
                                         </v-btn>
                                     </span>
                                 </template>
@@ -1554,6 +1580,131 @@ export default {
                     {
                         this.showError("Veillez selectionner le servic et Categorie svp");
                     }               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
+            }
+        },
+
+        async exportToExcelFicheStockServiceCategorie() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                    if(this.svData.idService!=""  && this.svData.idCategorie!="")
+                    {
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_bycategorie_excel?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&idCategorie="+this.svData.idCategorie);
+                        let users = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', users); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(users)) {
+                            // C'est déjà un tableau
+                        } else if (users.data && Array.isArray(users.data)) {
+                            users = users.data; // Accéder au tableau
+                        } else if (users.products && Array.isArray(users.products)) {
+                            users = users.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(users);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+                        XLSX.writeFile(workbook, 'fichestockServiceCategorie.xlsx');
+                    }
+                    else
+                    {
+                        this.showError("Veillez selectionner le servic et Categorie svp");
+                    }               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
+            }
+        },
+        async exportToExcelDetailCommande() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_detail_commande_fournisseur_excel?date1=` + date1+"&date2="+date2);
+                        let detail_commande = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', detail_commande); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(detail_commande)) {
+                            // C'est déjà un tableau
+                        } else if (detail_commande.data && Array.isArray(detail_commande.data)) {
+                            detail_commande = detail_commande.data; // Accéder au tableau
+                        } else if (detail_commande.products && Array.isArray(detail_commande.products)) {
+                            detail_commande = detail_commande.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(detail_commande);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'detail_commande');
+
+                        XLSX.writeFile(workbook, 'RapportDetaisFactureFournisseur.xlsx');                               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
+            }
+        },
+        async exportToExcelEnteteCommande() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_entete_commande_fournisseur_excel?date1=` + date1+"&date2="+date2);
+                        let entete_commande = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', entete_commande); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(entete_commande)) {
+                            // C'est déjà un tableau
+                        } else if (entete_commande.data && Array.isArray(entete_commande.data)) {
+                            entete_commande = entete_commande.data; // Accéder au tableau
+                        } else if (entete_commande.products && Array.isArray(entete_commande.products)) {
+                            entete_commande = entete_commande.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(entete_commande);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'entete_commande');
+
+                        XLSX.writeFile(workbook, 'RapportEnteteFactureFournisseur.xlsx');                               
 
                 } 
                 else {

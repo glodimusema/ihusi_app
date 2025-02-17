@@ -819,9 +819,13 @@ export default {
                 text: "Création Appro.",
                 href: "/admin/Approvisionnements",
               },
-              {
+              { //RetourStock
                 text: "Appro. par Commande",
                 href: "/admin/ApprovCommandes",
+              },
+              { //RetourStock
+                text: "Retour Stock",
+                href: "/admin/RetourStock",
               },
               {
                 text: "Liste Appro.",

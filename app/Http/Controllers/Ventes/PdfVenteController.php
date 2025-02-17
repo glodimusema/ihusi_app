@@ -1771,8 +1771,6 @@ function showDetailVente_EtatfactureService($date1,$date2,$etat_facture,$idServi
 
 }
 
-
-
 public function fetch_rapport_detailvente_date_etat_facture(Request $request)
 {
     //refDepartement
@@ -21105,8 +21103,6 @@ function showMouvementCompteProduitEntree($date1,$date2,$refService)
 
 }
 
-
-
 //=============Paiement des Fournisseurs===========================================================================================
 
 
@@ -24434,7 +24430,154 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
 
 
 
-//=======================================
+//==========================================================================================================
+//==================== GESTION DES FOURNISSEURS ===========================================================
+
+
+
+
+function pdf_detail_commande_fournisseur_excel(Request $request)
+{
+   if ($request->get('date1') && $request->get('date2')) {
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data = DB::table('tvente_detail_requisition')
+        ->join('tfin_ssouscompte as compteachat','compteachat.id','=','tvente_detail_requisition.compte_achat')
+        ->join('tfin_ssouscompte as compteproduit','compteproduit.id','=','tvente_detail_requisition.compte_produit')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_requisition.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+        ->join('tvente_grande_categorie_produit','tvente_grande_categorie_produit.id','=','tvente_categorie_produit.id_groupe_categorie')
+        ->join('tvente_entete_requisition','tvente_entete_requisition.id','=','tvente_detail_requisition.refEnteteCmd')
+        ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+        ->select('tvente_detail_requisition.id','refEnteteCmd','refProduit','tvente_detail_requisition.compte_achat',
+        'tvente_detail_requisition.compte_produit','puCmd','qteCmd','uniteCmd','tvente_detail_requisition.puBase',
+        'tvente_detail_requisition.qteBase','tvente_detail_requisition.uniteBase','tvente_detail_requisition.devise',
+        'tvente_detail_requisition.taux','montanttva','montantreduction','tvente_detail_requisition.active',
+        'tvente_detail_requisition.author','tvente_detail_requisition.refUser','tvente_detail_requisition.created_at'
+        ,"tvente_produit.designation as designation",'refCategorie','pu','qte',
+        'cmup','Oldcode','Newcode','tvaapplique','estvendable',"tvente_categorie_produit.designation as Categorie"
+        ,'compteachat.refSousCompte as refSousCompteAchat','compteachat.nom_ssouscompte as nom_ssouscompteAchat',
+        'compteachat.numero_ssouscompte as numero_ssouscompteAchat','designation_groupe'
+        ,'compteproduit.refSousCompte as refSousCompteProduit','compteproduit.nom_ssouscompte as nom_ssouscompteProduit',
+        'compteproduit.numero_ssouscompte as numero_ssouscompteProduit','noms','contact','mail','adresse','dateCmd')
+        ->selectRaw('(qteCmd*puCmd) as PTCmd')
+        ->selectRaw('(qteBase*puBase) as PTBase')
+        ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTCmdFC')
+        ->selectRaw('((qteBase*puBase)/tvente_detail_requisition.taux) as PTBaseFC')
+        ->selectRaw('CONCAT("BE",YEAR(dateCmd),"",MONTH(dateCmd),"00",refEnteteCmd) as codeFacture')
+        ->where([
+            ['dateCmd','>=', $date1],
+            ['dateCmd','<=', $date2]
+        ])
+        ->orderBy("tvente_detail_requisition.created_at", "asc")
+        ->get();   
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ($data)
+    {
+        for ($i = 0; $i < count($data); $i++) {
+            $row1 = $data[$i];
+
+            $data_return[] = [
+                'N°COM.' => $row1->refEnteteCmd,
+                'FOUNISSEUR' => $row1->noms,
+                'DATE COM.' => $row1->dateCmd,
+                'PRODUIT' => $row1->designation,                
+                'QTE' => $row1->qteCmd,
+                'PU($)' =>$row1->puCmd,
+                'PT($)' => $row1->PTCmd,
+                'CATEGORIE' => $row1->Categorie,
+                'G.CATEGORIE' => $row1->designation_groupe                
+            ];
+
+        }
+    } 
+    else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+     return response()->json($data_return);
+
+    }
+
+    return response()->json(['error' => 'Invalid parameters'], 400);
+}
+
+
+function pdf_entete_commande_fournisseur_excel(Request $request)
+{
+   if ($request->get('date1') && $request->get('date2')) {
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data = DB::table('tvente_entete_requisition')
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+        ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+        ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+        ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+        ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+        ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+        ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+        ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+        ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+        ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+        ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
+        'refService','dateCmd','libelle','cloture',
+        'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
+        'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
+        "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
+        "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
+        'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
+        ,"tvente_module.nom_module","tvente_services.nom_service")
+        ->selectRaw('CONCAT("F",YEAR(dateCmd),"",MONTH(dateCmd),"00",tvente_entete_requisition.id) as codeFacture')
+        ->selectRaw(' IFNULL(montant,0) as totalFacture')
+        ->selectRaw(' IFNULL(paie,0) as totalPaie')
+        ->selectRaw('(IFNULL((IFNULL(montant,0) - IFNULL(paie,0)),0)) as RestePaie')
+        ->selectRaw('TIMESTAMPDIFF(DAY, dateCmd, CURDATE()) as nombreJr')
+        ->where([
+            ['dateCmd','>=', $date1],
+            ['dateCmd','<=', $date2]
+        ])
+        ->orderBy("tvente_entete_requisition.created_at", "asc")
+        ->get();   
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ($data)
+    {
+        for ($i = 0; $i < count($data); $i++) {
+            $row1 = $data[$i];
+
+            $data_return[] = [
+                'N°FACT.' => $row1->id,
+                'FOUNISSEUR' => $row1->noms,
+                'DATE FACTURE.' => $row1->dateCmd,
+                'MONTANT DU($)' => $row1->totalFacture,                
+                'MONTANT PAIE($)' => $row1->totalPaie,
+                'RESTE($)' => $row1->RestePaie,
+                'OBSERV.(J)' => $row1->nombreJr             
+            ];
+
+        }
+    } 
+    else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+     return response()->json($data_return);
+
+    }
+
+    return response()->json(['error' => 'Invalid parameters'], 400);
+}
 
 
 

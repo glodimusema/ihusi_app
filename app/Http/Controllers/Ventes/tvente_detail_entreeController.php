@@ -631,6 +631,7 @@ class tvente_detail_entreeController extends Controller
         {
            $puBase=  floatval($montants);
         }
+        
         $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
  
         

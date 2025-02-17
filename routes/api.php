@@ -905,6 +905,13 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_rapport_detailtransfert_date_service_source", 'PdfVenteController@fetch_rapport_detailtransfert_date_service_source');
     Route::get("fetch_rapport_detailtransfert_date_service_destination", 'PdfVenteController@fetch_rapport_detailtransfert_date_service_destination');
 
+    Route::get("pdf_detail_commande_fournisseur_excel", 'PdfVenteController@pdf_detail_commande_fournisseur_excel');
+    Route::get("pdf_entete_commande_fournisseur_excel", 'PdfVenteController@pdf_entete_commande_fournisseur_excel');
+
+
+    
+
+
     Route::get("fetch_vente_entete_cuisine", 'tvente_entete_cuisineController@all');
     Route::get("fetch_data_encours_cuisine", 'tvente_entete_cuisineController@fetch_data_encours');
     Route::get("fetch_vente_entete_cuisine/{refEntete}", 'tvente_entete_cuisineController@fetch_data_entete');
