@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Ventes;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Ventes\tvente_entete_paievente;
+use App\Models\Ventes\tvente_paiement;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 use Carbon\Carbon;
@@ -180,6 +181,22 @@ class tvente_entete_paieventeController extends Controller
 
     function delete_data($id)
     {
+
+        $idFacture=0;
+        $montants=0;
+
+        $deleteds = DB::table('tvente_paiement')->Where('refEntetepaie',$id)->get(); 
+        foreach ($deleteds as $deleted) {
+            $idFacture = $deleted->refEnteteVente;
+            $montants = $deleted->montant_paie;
+
+            $data3 = DB::update(
+                'update tvente_entete_vente set paie = paie - (:paiement) where id = :refEnteteVente',
+                ['paiement' => $montants,'refEnteteVente' => $idFacture]
+            );
+        }        
+
+        $data = tvente_paiement::where('refEntetepaie',$id)->delete();
         $data = tvente_entete_paievente::where('id',$id)->delete();
               
         return response()->json([

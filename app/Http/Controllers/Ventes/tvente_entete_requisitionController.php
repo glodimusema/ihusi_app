@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Ventes\tvente_entete_requisition;
 use App\Models\Ventes\tvente_detail_requisition;
+use App\Models\Ventes\tvente_paiement_commande;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 
@@ -283,6 +284,7 @@ class tvente_entete_requisitionController extends Controller
 
     function delete_data($id)
     {
+        $data = tvente_paiement_commande::where('refCommande',$id)->delete(); 
         $data = tvente_detail_requisition::where('refEnteteCmd',$id)->delete(); 
         $data = tvente_entete_requisition::where('id',$id)->delete();
         return response()->json([

@@ -66,7 +66,32 @@
                                     </span>
                                 </template>
                                 <span>Imprimer le rapport</span>
-                            </v-tooltip> 
+                            </v-tooltip>
+                            <br>
+                            <!-- exportToExcelDetailCommande exportToExcelEnteteCommande -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelEnteteCommande" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FACTURES DES FOURNISSEURS/EXCEL
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <!-- exportToExcelDetailCommande exportToExcelEnteteCommande -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelDetailCommande" block color="  blue" dark>
+                                            <v-icon>print</v-icon> DETAILS DES FACTURES DES FSS./EXCEL
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            
                             <br>
 
                             <v-flex xs12 sm12 md12 lg12>
@@ -1240,6 +1265,84 @@ export default {
                
             } else {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        async exportToExcelDetailCommande() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_detail_commande_fournisseur_excel?date1=` + date1+"&date2="+date2);
+                        let detail_commande = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', detail_commande); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(detail_commande)) {
+                            // C'est déjà un tableau
+                        } else if (detail_commande.data && Array.isArray(detail_commande.data)) {
+                            detail_commande = detail_commande.data; // Accéder au tableau
+                        } else if (detail_commande.products && Array.isArray(detail_commande.products)) {
+                            detail_commande = detail_commande.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(detail_commande);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'detail_commande');
+
+                        XLSX.writeFile(workbook, 'RapportDetaisFactureFournisseur.xlsx');                               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
+            }
+        },
+        async exportToExcelEnteteCommande() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_entete_commande_fournisseur_excel?date1=` + date1+"&date2="+date2);
+                        let entete_commande = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', entete_commande); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(entete_commande)) {
+                            // C'est déjà un tableau
+                        } else if (entete_commande.data && Array.isArray(entete_commande.data)) {
+                            entete_commande = entete_commande.data; // Accéder au tableau
+                        } else if (entete_commande.products && Array.isArray(entete_commande.products)) {
+                            entete_commande = entete_commande.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(entete_commande);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'entete_commande');
+
+                        XLSX.writeFile(workbook, 'RapportEnteteFactureFournisseur.xlsx');                               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
             }
         },
 

@@ -503,10 +503,11 @@ class tvente_paiement_commandeController extends Controller
         $deleteds = DB::table('tvente_paiement_commande')->Where('id',$id)->get(); 
         foreach ($deleteds as $deleted) {
             $idFacture = $deleted->refCommande;
-            $montants = $deleted->montant_paie;
+            $montants = $deleted->montant_paie;        
         }
+        
         $data3 = DB::update(
-            'update tvente_entete_paiecommande set paie = paie - (:paiement) where id = :refCommande',
+            'update tvente_entete_requisition set paie = paie - (:paiement) where id = :refCommande',
             ['paiement' => $montants,'refCommande' => $idFacture]
         );
 

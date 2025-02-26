@@ -534,6 +534,42 @@
                   <td></td>
                   <td></td>
                 </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="csEF71EB8E" colspan="6"
+                    style="width:101px;height:22px;line-height:17px;text-align:left;vertical-align:middle;">
+                    <nobr>Payé&nbsp;(USD)</nobr>
+                  </td>
+                  <td class="csA2F7C04E" colspan="6"
+                    style="width:178px;height:22px;line-height:17px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ entete.PaieCmd }}$</nobr> 
+                  </td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                  <td style="width:0px;height:22px;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="csEF71EB8E" colspan="6"
+                    style="width:101px;height:22px;line-height:17px;text-align:left;vertical-align:middle;">
+                    <nobr>Reste&nbsp;(USD)</nobr>
+                  </td>
+                  <td class="csA2F7C04E" colspan="6"
+                    style="width:178px;height:22px;line-height:17px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ entete.RestePaieCmd }}$</nobr> 
+                  </td>
+                  <td></td>
+                  <td></td>
+                </tr>
                 <!-- TotalVenteUSD -->
                 <tr style="vertical-align:top;">
                   <td style="width:0px;height:11px;"></td>

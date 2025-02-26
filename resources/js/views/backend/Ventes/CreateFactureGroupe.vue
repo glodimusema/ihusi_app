@@ -224,24 +224,8 @@
                                 </v-list-item-icon>
                                 <v-list-item-title style="margin-left: -20px">Imprimer la Facture
                                 </v-list-item-title>
-                                </v-list-item> 
-                                
-                                <!-- <v-list-item link @click="editData(item.id)">
-                                <v-list-item-icon>
-                                    <v-icon color="blue">edit</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Modifier
-                                </v-list-item-title>
-                                </v-list-item>
+                                </v-list-item>                               
 
-                                <v-list-item   
-                                link @click="deleteData(item.id)">
-                                <v-list-item-icon>
-                                    <v-icon color="  red">delete</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Annuler la Facture
-                                </v-list-item-title>
-                                </v-list-item> -->
 
                             </v-list>
                             </v-menu>
@@ -263,7 +247,7 @@
                                 <v-tooltip top color="black">
                                       <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
-                                          <v-btn @click="showFacture(item.id,item.noms,'Ventes')" fab small><v-icon
+                                          <v-btn @click="printBill(item.id)" fab small><v-icon
                                               color="blue">print</v-icon></v-btn>
                                         </span>
                                       </template>
@@ -384,6 +368,9 @@ export default {
         printBill(id_facture) {            
             window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_by_numero?id_facture=` + id_facture + "&author=" + this.userData.name);
         },
+        // printBill(id_facture) {            
+        //     window.open(`${this.apiBaseURL}/fetch_rapport_facture_hebergement_by_numero?id_facture=` + id_facture + "&author=" + this.userData.name);
+        // },
         async updateChambre(index)
             {
                 try {

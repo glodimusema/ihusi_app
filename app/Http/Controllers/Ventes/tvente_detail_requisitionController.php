@@ -145,6 +145,8 @@ class tvente_detail_requisitionController extends Controller
         ->selectRaw('((qteCmd * puCmd) * tvente_detail_requisition.taux) as PTCmdFC')
         ->selectRaw('((montant) * tvente_detail_requisition.taux) as TotalCmdFC')
         ->selectRaw('(ROUND(montant,2)) as TotalCmd')
+        ->selectRaw('(ROUND(paie,2)) as PaieCmd')
+        ->selectRaw('(ROUND(montant,2) - ROUND(paie,2)) as RestePaieCmd')
         ->selectRaw("DATE_FORMAT(dateCmd,'%d/%M/%Y') as dateCmd")
         ->Where('tvente_detail_requisition.refEnteteCmd',$id)               
         ->get();

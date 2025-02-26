@@ -13,6 +13,8 @@
         <v-card-text>
           <!-- layout -->
 
+          <BonCommande ref="BonCommande" />
+
           <v-layout>
             <!--   -->
             <v-flex md12>
@@ -42,10 +44,10 @@
                             <v-autocomplete label="Selectionnez la Commande" prepend-inner-icon="home"
                               :rules="[(v) => !!v || 'Ce champ est requis']" :items="this.CmdList"
                               item-text="designationCommande" item-value="id" dense outlined v-model="svData.refCommande"
-                              chips clearable >
+                              chips clearable @change="getData(svData.refCommande)">
                             </v-autocomplete>
                           </div>
-                        </v-flex>
+                        </v-flex> 
 
                         <v-flex xs12 sm12 md12 lg12>
                           <div class="mr-1">
@@ -209,14 +211,14 @@
                                       <v-list-item-title style="margin-left: -20px">Modifier</v-list-item-title>
                                     </v-list-item>
 
-                                    <v-list-item link @click="printRecuPrivee(item.id)">
+                                    <v-list-item link @click="showBonCommande(item.refCommande,item.noms,'Ventes')">
                                       <v-list-item-icon>
                                         <v-icon color="blue">print</v-icon>
                                       </v-list-item-icon>
                                       <v-list-item-title style="margin-left: -20px">Imprimer Reçu</v-list-item-title>
                                     </v-list-item>
 
-                                    <v-list-item link @click="desactiverData(item.id, item.author, item.created_at, item.montant_paie, item.refEntetepaie,item.date_paie)">
+                                    <v-list-item link @click="deleteData(item.id)">
                                         <v-list-item-icon>
                                           <v-icon color="red">print</v-icon>
                                         </v-list-item-icon>
@@ -254,7 +256,12 @@
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
+import BonCommande from '../Rapports/Finances/BonCommande.vue';
+
 export default {
+  components:{
+      BonCommande
+    },
   data() {
     return {
 
@@ -285,9 +292,9 @@ export default {
         refUser : 0,
         active : "",
 
-        // totalFacture: 0,
-        // totalPaie: 0,
-        // RestePaie: 0
+        totalFacture: 0,
+        totalPaie: 0,
+        RestePaie: 0
       },
       fetchData: [],
       ModeList: [],
@@ -468,6 +475,37 @@ export default {
           }
         );
       });
+    },    
+    getData(idCommande) {
+      this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_requisition/${idCommande}`).then(
+        ({ data }) => {
+            var donnees = data.data;
+            donnees.map((item) => {
+              this.svData.totalFacture=item.montant;
+              this.svData.totalPaie=item.paie;
+              this.svData.RestePaie=item.Reste;
+            });
+            // this.getSvData(this.svData, data.data[0]);           
+        }
+      );
+    },
+    showBonCommande(refCommande, name,ServiceData) {
+
+    if (refCommande != '') {
+
+      this.$refs.BonCommande.$data.dialog2 = true;
+      this.$refs.BonCommande.$data.refCommande = refCommande;
+      this.$refs.BonCommande.$data.ServiceData = ServiceData;
+      this.$refs.BonCommande.showModel(refCommande);
+      this.fetchDataList();
+
+      this.$refs.BonCommande.$data.titleComponent =
+        "Bon d'Entree pour " + name;
+
+    } else {
+      this.showError("Personne n'a fait cette action");
+    }
+
     }
 
 

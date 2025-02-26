@@ -302,7 +302,7 @@
                                     </v-list-item-title>
                                   </v-list-item>
       
-                                  <v-list-item link @click="showFacture(item.id,item.noms,'Ventes')">
+                                  <v-list-item link @click="showBonCommande(item.id,item.noms,'Ventes')">
                                     <v-list-item-icon>
                                       <v-icon color="blue">print</v-icon>
                                     </v-list-item-icon>
@@ -762,14 +762,14 @@ export default {
     this.$refs.ModelFournisseur.$data.titleComponentss =
       "Un nouveau Fournisseur";
     },
-    showBonCommande(refEnteteEntree, name,ServiceData) {
+    showBonCommande(refEnteteCmd, name,ServiceData) {
 
-    if (refEnteteEntree != '') {
+    if (refEnteteCmd != '') {
 
       this.$refs.BonCommande.$data.dialog2 = true;
-      this.$refs.BonCommande.$data.refEnteteEntree = refEnteteEntree;
+      this.$refs.BonCommande.$data.refEnteteCmd = refEnteteCmd;
       this.$refs.BonCommande.$data.ServiceData = ServiceData;
-      this.$refs.BonCommande.showModel(refEnteteEntree);
+      this.$refs.BonCommande.showModel(refEnteteCmd);
       this.fetchDataList();
 
       this.$refs.BonCommande.$data.titleComponent =

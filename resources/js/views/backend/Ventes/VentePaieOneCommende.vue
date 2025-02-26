@@ -12,6 +12,8 @@
           </v-card-title>
           <v-card-text>
             <!-- layout -->
+
+            <BonCommande ref="BonCommande" />
   
             <v-layout>
               <!--   -->
@@ -213,14 +215,14 @@
                                         <v-list-item-title style="margin-left: -20px">Modifier</v-list-item-title>
                                       </v-list-item>
   
-                                      <v-list-item link @click="printRecuPrivee(item.id)">
+                                      <v-list-item link @click="showBonCommande(item.refCommande,item.noms,'Ventes')">
                                         <v-list-item-icon>
                                           <v-icon color="blue">print</v-icon>
                                         </v-list-item-icon>
                                         <v-list-item-title style="margin-left: -20px">Imprimer Reçu</v-list-item-title>
                                       </v-list-item>
   
-                                      <v-list-item link @click="desactiverData(item.id, item.author, item.created_at, item.montant_paie, item.refCommande,item.date_paie)">
+                                      <v-list-item link @click="deleteData(item.id)">
                                           <v-list-item-icon>
                                             <v-icon color="red">delete</v-icon>
                                           </v-list-item-icon>
@@ -258,6 +260,8 @@
   </template>
   <script>
   import { mapGetters, mapActions } from "vuex";
+  import BonCommande from '../Rapports/Finances/BonCommande.vue';
+  
   export default {
     data() {
       return {
@@ -465,7 +469,25 @@
             }
           );
         });
-      }
+      },
+    showBonCommande(refCommande, name,ServiceData) {
+
+    if (refCommande != '') {
+
+      this.$refs.BonCommande.$data.dialog2 = true;
+      this.$refs.BonCommande.$data.refCommande = refCommande;
+      this.$refs.BonCommande.$data.ServiceData = ServiceData;
+      this.$refs.BonCommande.showModel(refCommande);
+      this.fetchDataList();
+
+      this.$refs.BonCommande.$data.titleComponent =
+        "Bon d'Entree pour " + name;
+
+    } else {
+      this.showError("Personne n'a fait cette action");
+    }
+
+    }
   
   
     },

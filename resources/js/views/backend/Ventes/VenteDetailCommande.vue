@@ -13,6 +13,7 @@
           </v-card-title>
           <v-card-text>
             <!-- layout -->
+            <BonCommande ref="BonCommande" />
   
             <div>
   
@@ -177,7 +178,7 @@
                                   <v-tooltip  top color="black">
                                     <template v-slot:activator="{ on, attrs }">
                                       <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="deleteData(item.refEnteteCmd)" fab small><v-icon
+                                        <v-btn @click="showBonCommande(item.refEnteteCmd,item.noms,'Ventes')" fab small><v-icon
                                             color="blue">print</v-icon></v-btn>
                                       </span>
                                     </template>
@@ -219,10 +220,14 @@
   </template>
   <script>
   import { mapGetters, mapActions } from "vuex";
+  import BonCommande from '../Rapports/Finances/BonCommande.vue';
+
   export default {
+    components:{
+      BonCommande
+    },
     data() {
-      return {
-  
+      return {  
         title: "Liste des Details",
         dialog: false,
         edit: false,
@@ -408,7 +413,25 @@
                     // console.error('Error updating unit:', error);
                     // Handle error appropriately, e.g., show a notification 
                 } 
-        }
+        },
+    showBonCommande(refEnteteCmd, name,ServiceData) {
+
+    if (refEnteteCmd != '') {
+
+      this.$refs.BonCommande.$data.dialog2 = true;
+      this.$refs.BonCommande.$data.refEnteteCmd = refEnteteCmd;
+      this.$refs.BonCommande.$data.ServiceData = ServiceData;
+      this.$refs.BonCommande.showModel(refEnteteCmd);
+      this.fetchDataList();
+
+      this.$refs.BonCommande.$data.titleComponent =
+        "Bon d'Entree pour " + name;
+
+    } else {
+      this.showError("Personne n'a fait cette action");
+    }
+
+    }
   
     },
     filters: {

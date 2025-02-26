@@ -220,7 +220,7 @@
                                       <v-list-item-title style="margin-left: -20px">Imprimer Reçu</v-list-item-title>
                                     </v-list-item>
 
-                                    <v-list-item link @click="desactiverData(item.id, item.author, item.created_at, item.montant_paie, item.refEnteteVente,item.date_paie)">
+                                    <v-list-item link @click="deleteData(item.id)">
                                         <v-list-item-icon>
                                           <v-icon color="red">delete</v-icon>
                                         </v-list-item-icon>

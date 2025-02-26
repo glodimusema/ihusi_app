@@ -794,7 +794,7 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_detail_requisition/{id}", 'tvente_detail_requisitionController@delete_data');
     Route::get("fetch_detail_requisition_vente/{id}", 'tvente_detail_requisitionController@fetch_detail_requisition_vente');
 
-    //fetch_detail_facture_chambre
+
     Route::get("fetch_vente_detail_vente", 'tvente_detail_venteController@all');
     Route::get("fetch_vente_detail_vente/{refEntete}", 'tvente_detail_venteController@fetch_data_entete');
     Route::get("fetch_single_vente_detail_vente/{id}", 'tvente_detail_venteController@fetch_single_data');    
@@ -1127,7 +1127,7 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::post("insert_vente_globale_facture_groupe_hotel", 'tvente_detail_facture_groupeController@insert_dataGlobalHotel');
     Route::post("insert_vente_cash_facture_groupe_hotel/{id}", 'tvente_detail_facture_groupeController@insert_paiement_hotel_cash');
     Route::post("insert_vente_globale_facture_groupe_hotel_cash", 'tvente_detail_facture_groupeController@insert_dataGlobalHotelCash');
-    Route::get('/fetch_detail_facture/{id}', 'tvente_detail_facture_groupeController@fetch_detail_facture');
+    Route::get('/fetch_detail_facture_group/{id}', 'tvente_detail_facture_groupeController@fetch_detail_facture');
 
     Route::get("fetch_entete_paiement_groupe", 'tvente_entete_paiement_groupeController@all');
     Route::get("fetch_entete_paiement_groupe_entete/{refEntete}", 'tvente_entete_paiement_groupeController@fetch_data_entete');
