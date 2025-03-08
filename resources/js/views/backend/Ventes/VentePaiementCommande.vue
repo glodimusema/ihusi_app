@@ -273,6 +273,7 @@ export default {
       etatModal: false,
       titleComponent: '',
       refEntetepaie: 0,
+      date_paie : '',
 
       totalFacture: 0,
       totalPaie: 0,
@@ -367,7 +368,7 @@ export default {
     validate() {
       if (this.$refs.form.validate()) {
         this.isLoading(true);
-        if (this.edit) {
+        if (this.edit) {          
           this.svData.refEntetepaie=this.refEntetepaie;
           this.svData.author = this.userData.name;
           this.svData.refUser = this.userData.id;
@@ -390,6 +391,7 @@ export default {
 
         }
         else {
+          this.svData.date_paie=this.date_paie;
           this.svData.refEntetepaie=this.refEntetepaie;
           this.svData.author = this.userData.name;
           this.svData.refUser = this.userData.id;

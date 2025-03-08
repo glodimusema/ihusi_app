@@ -120,7 +120,7 @@
 
                           <v-list dense width="">
 
-                            <v-list-item link @click="showDetailPaiement(item.id, item.nom_module)">
+                            <v-list-item link @click="showDetailPaiement(item.id, item.nom_module, item.date_entete_paie)">
                               <v-list-item-icon>
                                 <v-icon>mdi-cart-outline</v-icon>
                               </v-list-item-icon>
@@ -128,13 +128,13 @@
                               </v-list-item-title>
                             </v-list-item>
 
-                            <v-list-item link @click="printBill(item.id)">
+                            <!-- <v-list-item link @click="printBill(item.id)">
                               <v-list-item-icon>
                                 <v-icon color="blue">print</v-icon>
                               </v-list-item-icon>
                               <v-list-item-title style="margin-left: -20px">Reçu Paiement
                               </v-list-item-title>
-                            </v-list-item>
+                            </v-list-item> -->
 
                             <v-list-item    link @click="editData(item.id)">
                               <v-list-item-icon>
@@ -320,13 +320,15 @@ export default {
     fetchDataList() {
       this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_paiecommande?page=`);
     },
-    showDetailPaiement(refEntetepaie, name) {
+    showDetailPaiement(refEntetepaie, name, date_paie) {
 
       if (refEntetepaie != '') {
 
         this.$refs.VentePaiementCommande.$data.etatModal = true;
         this.$refs.VentePaiementCommande.$data.refEntetepaie = refEntetepaie;
         this.$refs.VentePaiementCommande.$data.svData.refEntetepaie = refEntetepaie;
+        this.$refs.VentePaiementCommande.$data.date_paie = date_paie;
+        this.$refs.VentePaiementCommande.$data.svData.date_paie = date_paie;
         this.$refs.VentePaiementCommande.fetchDataList();
         this.$refs.VentePaiementCommande.get_mode_Paiement();
         this.$refs.VentePaiementCommande.fetchListCommande();

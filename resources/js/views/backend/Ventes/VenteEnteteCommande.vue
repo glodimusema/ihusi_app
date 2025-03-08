@@ -203,10 +203,56 @@
           <!--   -->
           <v-flex md12>
             <v-layout>
-              <v-flex md6>
+              <v-flex md12>
                 <v-text-field placeholder="recherche..." append-icon="search" label="Recherche..." single-line solo outlined
                   rounded hide-details v-model="query" @keyup="fetchDataList" clearable></v-text-field>
               </v-flex>
+
+              <hr />      
+            <hr />
+            <hr />
+            <hr />                    
+              <v-flex md6>
+                <v-text-field type="date" label="Du" prepend-inner-icon="event" dense
+                    :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.date1">
+                  </v-text-field>
+              </v-flex>
+              <hr />
+              <hr />
+              <hr />
+              <v-flex md6>
+                <v-text-field type="date" label="Au" prepend-inner-icon="event" dense
+                    :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.date2">
+                  </v-text-field>
+              </v-flex> 
+              <hr />
+              <hr />
+              <hr />
+
+              <v-flex md6>
+                <v-autocomplete label="Selectionnez le Fournisseur" prepend-inner-icon="mdi-map"
+                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="fournisseurList" item-text="noms"
+                            item-value="id" outlined dense v-model="svData.refFournisseur">
+                        </v-autocomplete>
+              </v-flex> 
+             
+              <hr />
+              <hr />
+              <hr />
+              <v-flex md4>
+                <v-btn color="blue" dark :loading="loading" @click="fetchDataListFilterFss">
+                    {{ "Filtrer" }}
+                  </v-btn>
+              </v-flex> 
+              <hr />
+              <v-flex md4>
+                <v-btn color="blue" dark :loading="loading" @click="fetchDataList">
+                    {{ "Refresh" }}
+                  </v-btn>
+              </v-flex> 
+
+
+
               <v-flex md5>
   
   
@@ -424,7 +470,10 @@
           refUser : 0,
 
           refCcommande : 0,
-          refDestination : 0
+          refDestination : 0,
+
+          date1:'',
+          date2:''
         },
         fetchData: [],
         fournisseurList: [],
@@ -436,6 +485,7 @@
     },
     created() {       
       this.fetchDataList();
+      // this.fetchDataListFilter();
       this.fetchListFournisseur();
       this.fetchListModule();
       this.fetchListService();
@@ -546,6 +596,17 @@
             }
           );
         }); 
+      },
+      fetchDataListFilterFss() {
+        if(this.svData.refFournisseur != '')
+        {
+          this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_requisition_filter_fss?date1=` + this.svData.date1 + "&date2=" + this.svData.date2 + "&refFournisseur=" + this.svData.refFournisseur + "&page=");
+        }
+        else
+        {
+          this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_requisition_filter?date1=` + this.svData.date1 + "&date2=" + this.svData.date2 + "&page=");
+        }
+        
       },
       fetchDataList() {
         this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_requisition?page=`);

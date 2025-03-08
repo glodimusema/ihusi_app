@@ -206,7 +206,7 @@
             this.isLoading(true);
             if (this.edit) {
               this.svData.author = this.userData.name;
-              this.svData.refUser = this.userData.id;
+              
               this.insertOrUpdate(
                 `${this.apiBaseURL}/insert_vente_user_service`,
                 JSON.stringify(this.svData)
@@ -226,7 +226,6 @@
             }
             else {
               this.svData.author = this.userData.name;
-              this.svData.refUser = this.userData.id;
               this.insertOrUpdate(
                 `${this.apiBaseURL}/insert_vente_user_service`,
                 JSON.stringify(this.svData)
@@ -247,9 +246,6 @@
           }
         },
     
-        // s'id','refUser','refService','active','qteUnite','author'
-        //   this.fetchDataList();
-        // }, 300),
     
         editData(id) {
           this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_user_service/${id}`).then(

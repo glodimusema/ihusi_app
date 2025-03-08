@@ -123,13 +123,13 @@
                               </v-list-item-title>
                             </v-list-item>
 
-                            <v-list-item link @click="printBill(item.id)">
+                            <!-- <v-list-item link @click="printBill(item.id)">
                               <v-list-item-icon>
                                 <v-icon color="blue">print</v-icon>
                               </v-list-item-icon>
                               <v-list-item-title style="margin-left: -20px">Reçu Paiement
                               </v-list-item-title>
-                            </v-list-item>
+                            </v-list-item> -->
 
                             <v-list-item    link @click="editData(item.id)">
                               <v-list-item-icon>

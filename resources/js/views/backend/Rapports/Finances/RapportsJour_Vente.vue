@@ -79,6 +79,19 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip> 
+
+                            <br>
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showPaiementFactureCommandeByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS DES PAIEMENTS FOURNISSEUR
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip> 
                             <br>
 
                             <!-- <v-tooltip bottom color="black">
@@ -1344,6 +1357,17 @@ export default {
                 {
                     this.showError("Veillez selectionner le service svp");
                 }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showPaiementFactureCommandeByDate() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                window.open(`${this.apiBaseURL}/fetch_rapport_paiementfacture_commande_date?date1=` + date1+"&date2="+date2);              
                
             } else {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");

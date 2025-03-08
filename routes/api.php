@@ -732,7 +732,10 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::post("update_vente_entete_entree/{id}", 'tvente_entete_entreeController@update_data');
     Route::get("delete_vente_entete_entree/{id}", 'tvente_entete_entreeController@delete_data');
 
+    //all_filter  all_fournisseur_filter 
     Route::get("fetch_vente_entete_requisition", 'tvente_entete_requisitionController@all');
+    Route::get("fetch_vente_entete_requisition_filter", 'tvente_entete_requisitionController@all_filter');
+    Route::get("fetch_vente_entete_requisition_filter_fss", 'tvente_entete_requisitionController@all_fournisseur_filter');
     Route::get("fetch_vente_entete_requisition_encours", 'tvente_entete_requisitionController@fetch_data_encours');
     Route::get("fetch_liste_commande_search", 'tvente_entete_requisitionController@fetch_liste_commande');
     Route::get("fetch_vente_entete_requisition/{refEntete}", 'tvente_entete_requisitionController@fetch_data_entete');

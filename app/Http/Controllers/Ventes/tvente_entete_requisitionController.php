@@ -54,18 +54,175 @@ class tvente_entete_requisitionController extends Controller
         if (!is_null($request->get('query'))) {
             # code...
             $query = $this->Gquery($request);
-
+            //dateCmd
             $data->where('noms', 'like', '%'.$query.'%')          
-            ->orderBy("tvente_entete_requisition.created_at", "desc");
+            ->orderBy("tvente_entete_requisition.dateCmd", "desc");
 
-            return $this->apiData($data->paginate(10));
+            return $this->apiData($data->paginate(100));
            
 
         }
-        $data->orderBy("tvente_entete_requisition.created_at", "desc");
+        $data->orderBy("tvente_entete_requisition.dateCmd", "desc");
         return $this->apiData($data->paginate(10));
         
     }
+
+    public function all_filter(Request $request)
+    { 
+        if ($request->get('date1') && $request->get('date2'))  {
+            // code...
+            $date1 = $request->get('date1');
+            $date2 = $request->get('date2');
+            
+            if (!is_null($request->get('query'))) {
+                # code..s.
+                $query = $this->Gquery($request);
+                $data = DB::table('tvente_entete_requisition')
+                ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+                ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+                ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+                ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+                ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
+                'refService','dateCmd','libelle','cloture',
+                'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
+                'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
+                "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
+                'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
+                ,"tvente_module.nom_module","tvente_services.nom_service")
+                ->selectRaw('(montant - paie) as Reste')   
+                ->where([
+                    ['noms', 'like', '%'.$query.'%'],
+                    ['tvente_entete_requisition.dateCmd','>=', $date1],
+                    ['tvente_entete_requisition.dateCmd','<=', $date2],
+                ])               
+                ->orderBy("tvente_entete_requisition.dateCmd", "desc")          
+                ->paginate(100);
+                return response($data, 200);
+            }
+            else{
+                $data = DB::table('tvente_entete_requisition')
+                ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+                ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+                ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+                ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+                ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
+                'refService','dateCmd','libelle','cloture',
+                'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
+                'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
+                "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
+                'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
+                ,"tvente_module.nom_module","tvente_services.nom_service")
+                ->selectRaw('(montant - paie) as Reste')  
+                ->where([
+                    ['tvente_entete_requisition.dateCmd','>=', $date1],
+                    ['tvente_entete_requisition.dateCmd','<=', $date2]
+                ]) 
+                ->orderBy("tvente_entete_requisition.dateCmd", "desc")          
+                ->paginate(100);
+    
+                return response($data, 200);
+            }
+        
+        }else{}   
+        //tperso_archivages id,name_archive,description_archive,fichier_archive,service_id,author
+
+
+    }
+
+
+    public function all_fournisseur_filter(Request $request)
+    { 
+        if ($request->get('date1') && $request->get('date2') && $request->get('refFournisseur'))  {
+            // code...
+            $date1 = $request->get('date1');
+            $date2 = $request->get('date2');
+            $refFournisseur = $request->get('refFournisseur');
+            
+            if (!is_null($request->get('query'))) {
+                # code..s.
+                $query = $this->Gquery($request);
+                $data = DB::table('tvente_entete_requisition')
+                ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+                ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+                ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+                ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+                ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
+                'refService','dateCmd','libelle','cloture',
+                'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
+                'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
+                "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
+                'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
+                ,"tvente_module.nom_module","tvente_services.nom_service")
+                ->selectRaw('(montant - paie) as Reste')   
+                ->where([
+                    ['noms', 'like', '%'.$query.'%'],
+                    ['tvente_entete_requisition.dateCmd','>=', $date1],
+                    ['tvente_entete_requisition.dateCmd','<=', $date2],
+                    ['tvente_entete_requisition.refFournisseur','=', $refFournisseur],
+                ])               
+                ->orderBy("tvente_entete_requisition.dateCmd", "desc")          
+                ->paginate(100);
+                return response($data, 200);
+            }
+            else{
+                $data = DB::table('tvente_entete_requisition')
+                ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
+                ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
+                ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
+                ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
+                ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+                ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+                ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+                ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+                ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+                ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+                ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
+                'refService','dateCmd','libelle','cloture',
+                'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
+                'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
+                "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
+                'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
+                ,"tvente_module.nom_module","tvente_services.nom_service")
+                ->selectRaw('(montant - paie) as Reste')  
+                ->where([
+                    ['tvente_entete_requisition.dateCmd','>=', $date1],
+                    ['tvente_entete_requisition.dateCmd','<=', $date2],
+                    ['tvente_entete_requisition.refFournisseur','=', $refFournisseur],
+                ]) 
+                ->orderBy("tvente_entete_requisition.dateCmd", "desc")          
+                ->paginate(100);
+    
+                return response($data, 200);
+            }
+        
+        }else{}   
+        //tperso_archivages id,name_archive,description_archive,fichier_archive,service_id,author
+
+
+    }
+
 
 
     public function fetch_data_entete(Request $request,$refEntete)
@@ -96,11 +253,11 @@ class tvente_entete_requisitionController extends Controller
             $query = $this->Gquery($request);
 
             $data ->where('noms', 'like', '%'.$query.'%')          
-            ->orderBy("tvente_entete_requisition.created_at", "desc");
+            ->orderBy("tvente_entete_requisition.dateCmd", "desc");
             return $this->apiData($data->paginate(10));         
 
         }       
-        $data->orderBy("tvente_entete_requisition.created_at", "desc");
+        $data->orderBy("tvente_entete_requisition.dateCmd", "desc");
         return $this->apiData($data->paginate(10));
     }   
     
@@ -133,12 +290,15 @@ class tvente_entete_requisitionController extends Controller
             # code...
             $query = $this->Gquery($request);
 
-            $data ->where('noms', 'like', '%'.$query.'%')          
-            ->orderBy("tvente_entete_requisition.created_at", "desc");
+            $data->where(function ($queryBuilder) use ($query) {
+                $queryBuilder->where('noms', 'like', '%' . $query . '%')
+                             ->orWhere('dateCmd', 'like', '%' . $query . '%');
+            })          
+            ->orderBy("tvente_entete_requisition.dateCmd", "desc");
             return $this->apiData($data->paginate(10));         
 
         }       
-        $data->orderBy("tvente_entete_requisition.created_at", "desc");
+        $data->orderBy("tvente_entete_requisition.dateCmd", "desc");
         return $this->apiData($data->paginate(10));
     } 
 

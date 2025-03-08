@@ -17903,8 +17903,8 @@ function showPaiementFacturationCommande_Fournisseur($date1, $date2,$refFourniss
                 <td class="cs3B0DD49A" style="width:126px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->codeFacture.'&nbsp;:&nbsp;'.$row->noms.'</td>
                 <td class="cs3B0DD49A" style="width:88px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->codeFacture.'</td>
                 <td class="cs3B0DD49A" colspan="3" style="width:96px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->montant_paie.'$</td>
-                <td class="cs3B0DD49A" style="width:52px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->montant_taux.'</td>
-                <td class="cs803D2C52" style="width:59px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->numero_ssouscompte.'</td>
+                <td class="cs3B0DD49A" style="width:52px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->taux.'</td>
+                <td class="cs803D2C52" style="width:59px;height:22px;line-height:12px;text-align:center;vertical-align:middle;">'.$row->numero_ssouscompteBanque.'</td>
                 <td></td>
             </tr>
         '; 
@@ -22335,13 +22335,12 @@ function printRapportSoldeFacture_Fournisseur($date1, $date2)
 function showDetailSoldeFournisseur($date1, $date2)
 {
     // Récupérer les données de stock, mouvements et ventes en une seule requête
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
     $data2 = DB::table('tvente_fournisseur')
     ->select("tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
     "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
     "tvente_fournisseur.created_at",'refCategorieFss')
 
-        ->Join('tvente_entete_requisition as mvtCmd', function ($join) use ($date1, $date2) {
+        ->leftJoin('tvente_entete_requisition as mvtCmd', function ($join) use ($date1, $date2) {
             $join->on('mvtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
                  ->where('mvtCmd.dateCmd', '>=', $date1)
                  ->where('mvtCmd.dateCmd', '<=', $date2);
@@ -22365,7 +22364,7 @@ function showDetailSoldeFournisseur($date1, $date2)
         $SoldeInnitial = 0;
         $data1 = DB::table('tvente_fournisseur')
         ->select("tvente_fournisseur.id")     
-            ->Join('tvente_entete_requisition as dtCmd', function ($join) use ($date1) {
+            ->leftJoin('tvente_entete_requisition as dtCmd', function ($join) use ($date1) {
                 $join->on('dtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
                     ->where('dtCmd.dateCmd', '<', $date1);
             })
