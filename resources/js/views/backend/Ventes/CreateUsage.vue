@@ -93,7 +93,8 @@
                             <v-select label="Type Sortie" :items="[
                             { designation: 'Casse' },
                             { designation: 'Usage Service' },
-                            { designation: 'Peertes deverses' }
+                            { designation: 'Peertes deverses' },
+                            { designation: 'Ecart negatif' }
                             ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
                             item-text="designation" item-value="designation" v-model="item.type_sortie"  @change="TestQuantite(index)">
                         </v-select>
