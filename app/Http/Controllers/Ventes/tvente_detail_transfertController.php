@@ -525,6 +525,7 @@ class tvente_detail_transfertController extends Controller
             $puBase=0;
             $qteBase=0;
             $uniteBase='';
+            $estunite = '';
     
             $data4=DB::table('tvente_detail_unite')
             ->join('tvente_unite','tvente_unite.id','=','tvente_detail_unite.refUnite')
@@ -532,21 +533,20 @@ class tvente_detail_transfertController extends Controller
             ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
             ->select('compte_achat','compte_vente','compte_variationstock','tvente_categorie_produit.code',
             'compte_perte','compte_produit','compte_destockage','compte_stockage','uniteBase','qteBase',
-            'puBase','nom_unite','qteUnite','puUnite','refProduit')
+            'puBase','nom_unite','qteUnite','puUnite','refProduit','estunite')
              ->where([
                 ['tvente_detail_unite.id','=',  $data['refDetailUnite']]
             ])      
             ->get();      
             
             foreach ($data4 as $row) 
-            {
-                 $puTransfert=$row->puUnite;
-                 $qteTransfert=$row->qteUnite;
-                 $uniteTransfert=$row->nom_unite;
-                 $puBase=$row->puBase;
+            {                 
+                 $qteTransfert=$row->qteUnite;               
+                 $uniteTransfert=$row->nom_unite;                 
                  $qteBase=$row->qteBase;
                  $uniteBase=$row->uniteBase;
                  $id_produit = $row->refProduit;
+                 $estunite = $row->estunite;
             }
     
            $stockservicedest = DB::table('tvente_stock_service')       
@@ -561,6 +561,23 @@ class tvente_detail_transfertController extends Controller
                 $temp_idservice = $list->refService;
                 $temp_idproduit = $list->refProduit;
                 $temp_id = $list->id;
+
+
+                if($estunite = "NON")
+                {
+                     if ($qteBase != 0) {
+                         $puBase=  floatval($list->cmup);
+                         $puTransfert = floatval($list->cmup) * floatval($qteBase);  
+                     } else {
+                         $puBase=  floatval($list->cmup);
+                         $puTransfert = floatval($list->cmup) * floatval($qteBase);
+                     }                           
+                }
+                else
+                {
+                   $puBase=  floatval($list->cmup);
+                   $puTransfert=floatval($list->cmup);
+                }
             }
   
             $compte_achat = 0;

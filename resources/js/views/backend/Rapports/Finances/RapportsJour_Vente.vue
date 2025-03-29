@@ -343,6 +343,35 @@
                               <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showFicheStockByDate_Service_SansPrix" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./SANS PRIX
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <v-autocomplete label="Produit Vendable" :items="[
+                                { designation: 'OUI' },
+                                { designation: 'NON' }
+                                ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
+                                item-text="designation" item-value="designation" v-model="svData.statut">
+                            </v-autocomplete>
+                            <!-- <br>showDetailSortieByDate_EtatFactureService -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showFicheStockByDate_Service_Vendable" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                              <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showFicheStockByDate_Service_Cout" block color="  blue" dark>
                                             <v-icon>print</v-icon> FICHE DE STOCK/COUT/SERVICE
                                         </v-btn>
@@ -722,7 +751,7 @@ export default {
     },
     data() {
         return {
-            title: "Pays component",
+            title: "Rapport component",
             header: "Crud operation",
             titleComponent: "",
             query: "",
@@ -736,6 +765,7 @@ export default {
                 refCategorie:0,
                 idCategorie:0,
                 idService:0,
+                statut : '',
                 etat_facture : '',
                 type_sortie : ''               
             },
@@ -995,6 +1025,40 @@ export default {
                 if(this.svData.idService!="")
                 {
                     window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showFicheStockByDate_Service_SansPrix() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="")
+                {
+                    window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_by_sans_prix?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showFicheStockByDate_Service_Vendable() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="" && this.svData.statut != "")
+                {
+                    window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_by_vendable?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&statut="+this.svData.statut);
                 }else
                 {
                     this.showError("Veillez selectionner le service svp");

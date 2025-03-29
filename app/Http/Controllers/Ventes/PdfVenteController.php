@@ -7189,7 +7189,7 @@ function getInfoFicheStockCategorie($date1,$date2,$idCategorie)
            ->where([
                ['tvente_entete_transfert.date_transfert','>=', $date1],
                ['tvente_entete_transfert.date_transfert','<=', $date2],
-               ['tvente_categorie_produit.id','<=', $idCategorie]
+               ['tvente_categorie_produit.id','=', $idCategorie]
            ])               
            ->get();
 
@@ -7769,8 +7769,8 @@ function getInfoFicheStockServicesByCategorie($date1,$date2,$idCategorie,$idServ
            ->where([               
                ['tvente_entete_vente.dateVente','>=', $date1],
                ['tvente_entete_vente.dateVente','<=', $date2],
-               ['tvente_categorie_produit.id','<=', $idCategorie],
-               ['tvente_stock_service.refService','<=', $idService]
+               ['tvente_categorie_produit.id','=', $idCategorie],
+               ['tvente_stock_service.refService','=', $idService]
            ])->get(); 
            
            foreach ($data5 as $row5) 
@@ -8103,7 +8103,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -8141,7 +8141,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -8178,7 +8178,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -8218,7 +8218,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -9129,7 +9129,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.puMvt * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.puMvt * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -9167,7 +9167,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.puMvt * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.puMvt * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -9204,7 +9204,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.puMvt * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.puMvt * mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -9244,7 +9244,7 @@ function showDetailFicheStockCoutServiceByCat($date1,$date2,$refCategorie,$idSer
                 "tvente_stock_service.qte",
                 "tvente_stock_service.uniteBase",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.puMvt * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.puMvt * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -10375,7 +10375,7 @@ function getInfoFicheStockCategorieUnite($date1,$date2,$idCategorie)
            ->where([
                ['tvente_entete_transfert.date_transfert','>=', $date1],
                ['tvente_entete_transfert.date_transfert','<=', $date2],
-               ['tvente_categorie_produit.id','<=', $idCategorie]
+               ['tvente_categorie_produit.id','=', $idCategorie]
            ])               
            ->get();
 
@@ -10698,7 +10698,7 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
     
             )
             ->where([
@@ -10750,7 +10750,7 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
             "tvente_stock_service.unitePivot",
             "tvente_stock_service.cmup",
             "tvente_stock_service.qtePivot",
-            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
         )
         ->where([
             ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -10802,7 +10802,7 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                     "tvente_stock_service.cmup",
                     "tvente_stock_service.qtePivot",
                     "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
         
                 )
                 ->where([
@@ -10859,7 +10859,7 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                     "tvente_stock_service.cmup",
                     "tvente_stock_service.devise",
                     "tvente_stock_service.taux",            
-                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
         
                 )
                 ->where([
@@ -11046,8 +11046,8 @@ function getInfoFicheStockServicesByCategorieUnite($date1,$date2,$idCategorie,$i
            ->where([               
                ['tvente_entete_vente.dateVente','>=', $date1],
                ['tvente_entete_vente.dateVente','<=', $date2],
-               ['tvente_categorie_produit.id','<=', $idCategorie],
-               ['tvente_stock_service.refService','<=', $idService]
+               ['tvente_categorie_produit.id','=', $idCategorie],
+               ['tvente_stock_service.refService','=', $idService]
            ])->get(); 
            
            foreach ($data5 as $row5) 
@@ -11383,7 +11383,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
             "tvente_stock_service.cmup",
             "tvente_stock_service.qtePivot",
             "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -11433,7 +11433,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
         "tvente_stock_service.unitePivot",
         "tvente_stock_service.cmup",
         "tvente_stock_service.qtePivot",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -11484,7 +11484,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.qtePivot",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -11539,7 +11539,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.qtePivot",
                 "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -11721,7 +11721,7 @@ function getInfoFicheStockServicesByUnite($date1,$date2,$idService)
            ->where([               
                ['tvente_entete_vente.dateVente','>=', $date1],
                ['tvente_entete_vente.dateVente','<=', $date2],
-               ['tvente_stock_service.refService','<=', $idService]
+               ['tvente_stock_service.refService','=', $idService]
            ])->get(); 
            
            foreach ($data5 as $row5) 
@@ -20053,7 +20053,7 @@ function getInfoMouvementProduit($date1,$date2,$refProduit,$refService)
 
           $date_temp_entree = DB::table('tvente_mouvement_stock')   
           ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_mouvement_stock.idStockService')
-          ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),0),0) as tempEntree'))
+          ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),3),0) as tempEntree'))
           ->where([               
               ['dateMvt','<', $date1],
               ['tvente_stock_service.refProduit','=', $refProduit],
@@ -20068,7 +20068,7 @@ function getInfoMouvementProduit($date1,$date2,$refProduit,$refService)
 
           $data_temp_sortie = DB::table('tvente_mouvement_stock')   
           ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_mouvement_stock.idStockService')
-          ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),0),0) as tempSortie'))
+          ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),3),0) as tempSortie'))
           ->where([               
               ['dateMvt','<', $date1],
               ['tvente_stock_service.refProduit','=', $refProduit],
@@ -20085,7 +20085,7 @@ function getInfoMouvementProduit($date1,$date2,$refProduit,$refService)
 
             $data_entree = DB::table('tvente_mouvement_stock')   
             ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_mouvement_stock.idStockService')
-            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),0),0) as totalEntree'))
+            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),3),0) as totalEntree'))
             ->where([               
                 ['dateMvt','>=', $date1],
                 ['dateMvt','<=', $date2],
@@ -20101,7 +20101,7 @@ function getInfoMouvementProduit($date1,$date2,$refProduit,$refService)
 
             $data_sortie = DB::table('tvente_mouvement_stock')   
             ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_mouvement_stock.idStockService')
-            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),0),0) as totalSortie'))
+            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),3),0) as totalSortie'))
             ->where([               
                 ['dateMvt','>=', $date1],
                 ['dateMvt','<=', $date2],
@@ -20115,9 +20115,7 @@ function getInfoMouvementProduit($date1,$date2,$refProduit,$refService)
                $totalSortie=$row->totalSortie;                           
             }
 
-            $solde = floatval($report) + floatval($totalEntree) - floatval($totalSortie);
-
-            
+            $solde = floatval($report) + floatval($totalEntree) - floatval($totalSortie);            
 
             $output='';  
             $output=' 
@@ -22371,7 +22369,7 @@ function showDetailSoldeFournisseur($date1, $date2)
             ->select(
                 DB::raw('IFNULL(ROUND(SUM(dtCmd.montant), 2), 0) as totalFacture'),
                 DB::raw('IFNULL(ROUND(SUM(dtCmd.paie), 2), 0) as totalPaie'),
-                DB::raw('(IFNULL(ROUND(SUM(dtCmd.montant), 2), 0) - IFNULL(ROUND(SUM(dtCmd.paie), 0), 0)) as SoldeInit'),           
+                DB::raw('(IFNULL(ROUND(SUM(dtCmd.montant), 2), 0) - IFNULL(ROUND(SUM(dtCmd.paie), 3), 0)) as SoldeInit'),           
             )
             ->where("tvente_fournisseur.id",'=',$row2->id)
             ->get();
@@ -22873,7 +22871,7 @@ function showDetailTransfert_Service_Source($date1,$date2,$idService)
                     <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
                     <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
                     <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
-                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'('.$row->uniteTransfert.')</nobr></td>
                     <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
                     <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
                 </tr>
@@ -23351,7 +23349,7 @@ function showDetailTransfert_Service_Destination($date1,$date2,$idService)
                     <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
                     <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
                     <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
-                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'('.$row->uniteTransfert.')</nobr></td>
                     <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
                     <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
                 </tr>
@@ -23362,6 +23360,1249 @@ function showDetailTransfert_Service_Destination($date1,$date2,$idService)
     return $output;
 
 }
+
+
+
+
+
+
+
+
+
+
+//== FICHE DE STOCK DES SERVICES SANS PRIX ET POUR LES FILTRES DES NON VENDABLES ET VENDABLES=======================================================================================
+
+//pdf_fiche_stock_vente_service_by_vendable
+//pdf_fiche_stock_vente_service_by_sans_prix
+
+function pdf_fiche_stock_vente_service_by_sans_prix(Request $request)
+{
+
+    if ($request->get('date1') && $request->get('date2') && $request->get('idService')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+        
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->getInfoFicheStockServicesBySansPrix($date1,$date2,$idService);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+        
+    }
+    else{
+    }    
+}
+
+function getInfoFicheStockServicesBySansPrix($date1,$date2,$idService)
+{
+           //Info Entreprise
+           $nomEse='';
+           $adresseEse='';
+           $Tel1Ese='';
+           $Tel2Ese='';
+           $siteEse='';
+           $emailEse='';
+           $idNatEse='';
+           $numImpotEse='';
+           $rccEse='';
+           $siege='';
+           $busnessName='';
+           $pic='';
+           $pic2 = $this->displayImg("fichier", 'logo.png');
+           $logo='';
+   
+           $data1 = DB::table('entreprises')
+           ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+           ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+   
+           ->join('pays','pays.id','=','entreprises.idPays')
+           ->join('provinces','provinces.id','=','entreprises.idProvince')
+           ->join('users','users.id','=','entreprises.ceo')        
+           ->select('entreprises.id as id','entreprises.id as idEntreprise',
+           'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+           'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+           'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+           'entreprises.idforme','entreprises.etat',
+           'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+           'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+           'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+           'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+            //forme
+            'forme_juridiques.nomForme','secteurs.nomSecteur',
+            //users
+            'users.name','users.email','users.avatar','users.telephone','users.adresse',
+            //
+            'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+           ->get();
+           $output='';
+           foreach ($data1 as $row1) 
+           {                                
+               $nomEse=$row1->nomEntreprise;
+               $adresseEse=$row1->adresseEntreprise;
+               $Tel1Ese=$row1->telephoneEntreprise;
+               $Tel2Ese=$row1->telephone;
+               $siteEse=$row1->siteweb;
+               $emailEse=$row1->emailEntreprise;
+               $idNatEse=$row1->rccm;
+               $numImpotEse=$row1->rccm;
+               $busnessName=$row1->nomSecteur;
+               $rccmEse=$row1->rccm;
+               $pic = $this->displayImg("fichier", 'logo.png');
+               $siege=$row1->nomForme;         
+           }
+
+
+           $totalVente = 0;
+           $totalTransfert=0;
+           $totalCMUP = 0;
+           $globalTP=0;
+
+           $data5 = DB::table('tvente_detail_vente')
+           ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_detail_vente.idStockService')
+           ->join('tvente_produit','tvente_produit.id','=','tvente_stock_service.refProduit')
+           ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+           ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_detail_vente.refEnteteVente')
+           ->select(DB::raw('IFNULL(ROUND(SUM(qteVente*puVente),0),0) as totalSortie'))
+           ->where([               
+               ['tvente_entete_vente.dateVente','>=', $date1],
+               ['tvente_entete_vente.dateVente','<=', $date2],
+               ['tvente_stock_service.refService','=', $idService]
+           ])->get(); 
+           
+           foreach ($data5 as $row5) 
+           {                                
+            //   $totalVente=$row5->totalSortie;  
+              $totalVente=0;                          
+           }
+
+
+           $CategorieClient=''; 
+
+           $data3=DB::table('tvente_services')
+           ->select('id','nom_service','status','active')
+           ->where([
+              ['tvente_services.id','=', $idService]
+          ])      
+          ->get();      
+          $output='';
+          foreach ($data3 as $row) 
+          {
+              $CategorieClient=$row->nom_service;              
+          }
+  
+   
+            $output=' 
+
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>FicheStock</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1B222893 {color:#000000;background-color:#D6E5F4;border-left:#004000 1px solid;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:27px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6F7E55AC {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csE0D816CD {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:15px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs8F59FFB2 {color:#000000;background-color:#F5F5F5;border-left:#004000 1px solid;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csF3AA49E4 {color:#000000;background-color:#F5F5F5;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csE78F4A6 {color:#000000;background-color:#F5F5F5;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs4B928201 {color:#000000;background-color:#FFFFFF;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .cs2C96DE68 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:italic; padding-left:2px;}
+                    .csE71035DC {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .csAB3AA82A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csC73F4F41 {color:#000000;background-color:transparent;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csD149F8AB {color:#000000;background-color:transparent;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs612ED82F {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .csFFC1C457 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .csCE72709D {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .csFBB219FE {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:958px;height:352px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:6px;"></td>
+                    <td style="height:0px;width:4px;"></td>
+                    <td style="height:0px;width:163px;"></td>
+                    <td style="height:0px;width:47px;"></td>
+                    <td style="height:0px;width:59px;"></td>
+                    <td style="height:0px;width:108px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:88px;"></td>
+                    <td style="height:0px;width:77px;"></td>
+                    <td style="height:0px;width:89px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:18px;"></td>
+                    <td style="height:0px;width:86px;"></td>
+                    <td style="height:0px;width:36px;"></td>
+                    <td style="height:0px;width:132px;"></td>
+                    <td style="height:0px;width:2px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:3px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFBB219FE" colspan="10" rowspan="2" style="width:690px;height:23px;line-height:21px;text-align:left;vertical-align:middle;">'.$nomEse.'</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:13px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="7" style="width:168px;height:144px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:168px;height:144px;">
+                        <img alt="" src="'.$pic2.'" style="width:168px;height:144px;" /></div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="10" style="width:690px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$busnessName.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="10" style="width:690px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$numImpotEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;">'.$adresseEse.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Email&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Site&nbsp;web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs612ED82F" colspan="10" rowspan="2" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>T&#233;l&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'&nbsp;&nbsp;24h/24</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:14px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:34px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs1B222893" colspan="6" style="width:437px;height:32px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>FICHE&nbsp;DE&nbsp;STOCK : '.$CategorieClient.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:7px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="csE71035DC" colspan="10" style="width:676px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL&nbsp;VENTE(USD)</nobr></td>
+                    <td class="csAB3AA82A" colspan="5" style="width:273px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalVente.'$</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PRODUIT</nobr></td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SI</nobr></td>
+                    <td class="csF3AA49E4" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ENTREE</nobr></td>
+                    <td class="csC73F4F41" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SORTIE</nobr></td>
+                    <td class="csF3AA49E4" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SF</nobr></td>                    
+                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Unité</nobr></td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Obs.</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs2C96DE68" colspan="15" style="width:948px;height:20px;line-height:15px;text-align:left;vertical-align:top;"><nobr>'.$date1.'</nobr></td>
+                </tr>
+                ';
+                                                                
+                   $output .= $this->showCategorieFicheStockServiceSansPrix($date1,$date2,$idService); 
+                                                                
+                 $output.='
+            </table>
+            </body>
+            </html>
+
+            '; 
+
+    return $output;
+
+} 
+
+function showCategorieFicheStockServiceSansPrix($date1,$date2,$idService)
+{
+    $data = DB::table("tvente_categorie_produit")
+    ->select("tvente_categorie_produit.id", "tvente_categorie_produit.designation", 
+    "tvente_categorie_produit.created_at", "tvente_categorie_produit.author")    
+    ->orderBy("tvente_categorie_produit.designation", "asc")
+    ->get();
+    
+    $output='';
+
+    foreach ($data as $row) 
+    {
+        $output .='
+                <tr style="vertical-align:top;">
+                <td style="width:0px;height:22px;"></td>
+                <td></td>
+                <td class="csE0D816CD" colspan="15" style="width:948px;height:22px;line-height:17px;text-align:center;vertical-align:middle;">'.$row->designation.'</td>
+            </tr>
+            ';
+                                                    
+                $output .= $this->showDetailFicheStockServiceSansPrix($date1,$date2,$row->id,$idService);                                                     
+                $output.='
+        ';      
+    }
+
+    return $output;
+
+}
+function showDetailFicheStockServiceSansPrix($date1, $date2, $refCategorie, $idService)
+{
+    // Récupérer les données de stock, mouvements et ventes en une seule requête 
+    $data11 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_produit.refCategorie', '=', $refCategorie],
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
+    // Utilisez distinct() avant select()
+    ->distinct()
+    ->select(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation as designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation as Categorie",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+    )
+    ->where([
+        ['tvente_produit.refCategorie', '=', $refCategorie],
+        ['tvente_stock_service.refService', '=', $idService]
+    ])
+    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->orderBy("tvente_produit.designation", "asc")
+    ->get();
+
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Construction de l'output
+    
+    $output = '';
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
+             $output .= '
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSI.' '.$row1->uniteBase.'</td>
+                    <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalGEntree.' '.$row1->uniteBase.' </td>
+                    <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
+                    <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$TGSortie.' '.$row1->uniteBase.'</td>
+                    <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
+                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->uniteBase.'</td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">--</td>
+                </tr>
+            ';   
+
+    }
+    } else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+    return $output;
+}
+
+
+//==============  VENDABLE===========================================================================
+
+function pdf_fiche_stock_vente_service_by_vendable(Request $request)
+{
+
+    if ($request->get('date1') && $request->get('date2') && $request->get('idService')&& $request->get('statut')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+        $statut = $request->get('statut');
+        
+        $html ='<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->getInfoFicheStockServicesByVendable($date1,$date2,$idService,$statut);       
+        $html .='<script>window.print()</script>';
+
+        echo($html); 
+        
+    }
+    else{
+    }    
+}
+function getInfoFicheStockServicesByVendable($date1,$date2,$idService,$statut)
+{
+           //Info Entreprise
+           $nomEse='';
+           $adresseEse='';
+           $Tel1Ese='';
+           $Tel2Ese='';
+           $siteEse='';
+           $emailEse='';
+           $idNatEse='';
+           $numImpotEse='';
+           $rccEse='';
+           $siege='';
+           $busnessName='';
+           $pic='';
+           $pic2 = $this->displayImg("fichier", 'logo.png');
+           $logo='';
+   
+           $data1 = DB::table('entreprises')
+           ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+           ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+   
+           ->join('pays','pays.id','=','entreprises.idPays')
+           ->join('provinces','provinces.id','=','entreprises.idProvince')
+           ->join('users','users.id','=','entreprises.ceo')        
+           ->select('entreprises.id as id','entreprises.id as idEntreprise',
+           'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+           'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+           'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+           'entreprises.idforme','entreprises.etat',
+           'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+           'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+           'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+           'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+            //forme
+            'forme_juridiques.nomForme','secteurs.nomSecteur',
+            //users
+            'users.name','users.email','users.avatar','users.telephone','users.adresse',
+            //
+            'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+           ->get();
+           $output='';
+           foreach ($data1 as $row1) 
+           {                                
+               $nomEse=$row1->nomEntreprise;
+               $adresseEse=$row1->adresseEntreprise;
+               $Tel1Ese=$row1->telephoneEntreprise;
+               $Tel2Ese=$row1->telephone;
+               $siteEse=$row1->siteweb;
+               $emailEse=$row1->emailEntreprise;
+               $idNatEse=$row1->rccm;
+               $numImpotEse=$row1->rccm;
+               $busnessName=$row1->nomSecteur;
+               $rccmEse=$row1->rccm;
+               $pic = $this->displayImg("fichier", 'logo.png');
+               $siege=$row1->nomForme;         
+           }
+
+
+           $totalVente = 0;
+           $totalTransfert=0;
+           $totalCMUP = 0;
+           $globalTP=0;
+
+           $data5 = DB::table('tvente_detail_vente')
+           ->join('tvente_stock_service','tvente_stock_service.id','=','tvente_detail_vente.idStockService')
+           ->join('tvente_produit','tvente_produit.id','=','tvente_stock_service.refProduit')
+           ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+           ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_detail_vente.refEnteteVente')
+           ->select(DB::raw('IFNULL(ROUND(SUM(qteVente*puVente),0),0) as totalSortie'))
+           ->where([               
+               ['tvente_entete_vente.dateVente','>=', $date1],
+               ['tvente_entete_vente.dateVente','<=', $date2],
+               ['tvente_produit.estvendable','=', $statut],
+               ['tvente_stock_service.refService','=', $idService]
+           ])->get(); 
+           
+           foreach ($data5 as $row5) 
+           {                                
+              $totalVente=$row5->totalSortie;                           
+           }
+
+
+           $CategorieClient=''; 
+
+           $data3=DB::table('tvente_services')
+           ->select('id','nom_service','status','active')
+           ->where([
+              ['tvente_services.id','=', $idService]
+          ])      
+          ->get();      
+          $output='';
+          foreach ($data3 as $row) 
+          {
+              $CategorieClient=$row->nom_service;              
+          }
+  
+   
+            $output=' 
+
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>FicheStock</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1B222893 {color:#000000;background-color:#D6E5F4;border-left:#004000 1px solid;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:27px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6F7E55AC {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csE0D816CD {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:15px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs8F59FFB2 {color:#000000;background-color:#F5F5F5;border-left:#004000 1px solid;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csF3AA49E4 {color:#000000;background-color:#F5F5F5;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csE78F4A6 {color:#000000;background-color:#F5F5F5;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs4B928201 {color:#000000;background-color:#FFFFFF;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .cs2C96DE68 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:italic; padding-left:2px;}
+                    .csE71035DC {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .csAB3AA82A {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csC73F4F41 {color:#000000;background-color:transparent;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
+                    .csD149F8AB {color:#000000;background-color:transparent;border-left-style: none;border-top:#004000 1px solid;border-right:#004000 1px solid;border-bottom:#004000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs612ED82F {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .csFFC1C457 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; padding-left:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .csCE72709D {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .csFBB219FE {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:958px;height:352px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:6px;"></td>
+                    <td style="height:0px;width:4px;"></td>
+                    <td style="height:0px;width:163px;"></td>
+                    <td style="height:0px;width:47px;"></td>
+                    <td style="height:0px;width:59px;"></td>
+                    <td style="height:0px;width:108px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:88px;"></td>
+                    <td style="height:0px;width:77px;"></td>
+                    <td style="height:0px;width:89px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:18px;"></td>
+                    <td style="height:0px;width:86px;"></td>
+                    <td style="height:0px;width:36px;"></td>
+                    <td style="height:0px;width:132px;"></td>
+                    <td style="height:0px;width:2px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:3px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:10px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFBB219FE" colspan="10" rowspan="2" style="width:690px;height:23px;line-height:21px;text-align:left;vertical-align:middle;">'.$nomEse.'</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:13px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="7" style="width:168px;height:144px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:168px;height:144px;">
+                        <img alt="" src="'.$pic2.'" style="width:168px;height:144px;" /></div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="10" style="width:690px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$busnessName.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csCE72709D" colspan="10" style="width:690px;height:22px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>RCCM'.$rccEse.'.&nbsp;ID-NAT.'.$numImpotEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;">'.$adresseEse.'</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Email&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csFFC1C457" colspan="10" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Site&nbsp;web&nbsp;:&nbsp;'.$siteEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs612ED82F" colspan="10" rowspan="2" style="width:690px;height:22px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>T&#233;l&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.'&nbsp;&nbsp;24h/24</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:14px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:34px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs1B222893" colspan="6" style="width:437px;height:32px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>FICHE&nbsp;DE&nbsp;STOCK : '.$CategorieClient.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:7px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="csE71035DC" colspan="10" style="width:676px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL&nbsp;VENTE(USD)</nobr></td>
+                    <td class="csAB3AA82A" colspan="5" style="width:273px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalVente.'$</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PRODUIT</nobr></td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SI</nobr></td>
+                    <td class="csF3AA49E4" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ENTREE</nobr></td>
+                    <td class="csC73F4F41" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SORTIE</nobr></td>
+                    <td class="csF3AA49E4" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>SF</nobr></td>                    
+                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PU(USD)</nobr></td>
+                    <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PT(USD)</nobr></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td class="cs2C96DE68" colspan="15" style="width:948px;height:20px;line-height:15px;text-align:left;vertical-align:top;"><nobr>'.$date1.'</nobr></td>
+                </tr>
+                ';
+                                                                
+                   $output .= $this->showCategorieFicheStockServiceVendable($date1,$date2,$idService,$statut); 
+                                                                
+                 $output.='
+            </table>
+            </body>
+            </html>
+
+            '; 
+
+    return $output;
+
+} 
+function showCategorieFicheStockServiceVendable($date1,$date2,$idService,$statut)
+{
+    $data = DB::table("tvente_categorie_produit")
+    ->select("tvente_categorie_produit.id", "tvente_categorie_produit.designation", 
+    "tvente_categorie_produit.created_at", "tvente_categorie_produit.author")    
+    ->orderBy("tvente_categorie_produit.designation", "asc")
+    ->get();
+    
+    $output='';
+
+    foreach ($data as $row) 
+    {
+        $output .='
+                <tr style="vertical-align:top;">
+                <td style="width:0px;height:22px;"></td>
+                <td></td>
+                <td class="csE0D816CD" colspan="15" style="width:948px;height:22px;line-height:17px;text-align:center;vertical-align:middle;">'.$row->designation.'</td>
+            </tr>
+            ';
+                                                    
+                $output .= $this->showDetailFicheStockServiceByVendable($date1, $date2, $row->id, $idService,$statut);                                                     
+                $output.='
+        ';      
+    }
+
+    return $output;
+
+}
+function showDetailFicheStockServiceByVendable($date1, $date2, $refCategorie, $idService,$statut)
+{
+    // Récupérer les données de stock, mouvements et ventes en une seule requête 
+    $data11 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_produit.refCategorie', '=', $refCategorie],
+            ['tvente_stock_service.refService', '=', $idService],
+            ['tvente_produit.estvendable','=', $statut],
+        ])
+        ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+        "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+        "tvente_stock_service.devise","tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
+    // Utilisez distinct() avant select()
+    ->distinct()
+    ->select(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation as designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation as Categorie",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+    )
+    ->where([
+        ['tvente_produit.refCategorie', '=', $refCategorie],
+        ['tvente_stock_service.refService', '=', $idService],
+        ['tvente_produit.estvendable','=', $statut],
+    ])
+    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup")
+    ->orderBy("tvente_produit.designation", "asc")
+    ->get();
+
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService],
+                ['tvente_produit.estvendable','=', $statut],
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "tvente_stock_service.cmup","tvente_stock_service.devise","tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_produit.refCategorie', '=', $refCategorie],
+                ['tvente_stock_service.refService', '=', $idService],
+                ['tvente_produit.estvendable','=', $statut],
+            ])
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase","cmup",
+            "tvente_stock_service.devise","tvente_stock_service.taux")
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Construction de l'output
+    
+    $output = '';
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
+            $output .= '
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:24px;"></td>
+                <td></td>
+                <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+                <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSI.' '.$row1->uniteBase.'</td>
+                <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalGEntree.' '.$row1->uniteBase.' </td>
+                <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalG.' '.$row1->uniteBase.'</td>
+                <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$TGSortie.' '.$row1->uniteBase.'</td>
+                <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$totalSF.' '.$row1->uniteBase.'</td>                
+                <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->cmup, 2).'$</td>
+                <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
+            </tr>
+        '; 
+
+    }
+    } else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+    return $output;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //===================================================================================================================
 //======================== FICHE STOCK AVEC EXCEL ====================================================================
 
@@ -23402,7 +24643,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             "tvente_stock_service.cmup",
             "tvente_stock_service.devise",
             "tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -23446,7 +24687,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_stock_service.refService', '=', $idService]
@@ -23494,7 +24735,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree')
     
             )
             ->where([
@@ -23547,7 +24788,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -23625,9 +24866,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
 
     return response()->json(['error' => 'Invalid parameters'], 400);
 }
-
 //=============== FICHE DE STOCK DES SERVICES BY CATEGORIE EXCEL=======================================================================================
-
 function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
 {
     if ($request->get('date1') && $request->get('date2') && $request->get('idCategorie') && $request->get('idService')) {
@@ -23664,7 +24903,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+                DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
     
             )
             ->where([
@@ -23709,7 +24948,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
             "tvente_stock_service.qte",
             "tvente_stock_service.uniteBase",
             "tvente_stock_service.cmup",
-            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+            DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
         )
         ->where([
             ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -23759,7 +24998,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     "tvente_stock_service.cmup",
                     "tvente_stock_service.devise",
                     "tvente_stock_service.taux",            
-                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+                    DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree')
         
                 )
                 ->where([
@@ -23811,7 +25050,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     "tvente_stock_service.cmup",
                     "tvente_stock_service.devise",
                     "tvente_stock_service.taux",            
-                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                    DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
         
                 )
                 ->where([
@@ -23886,8 +25125,6 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
     return response()->json(['error' => 'Invalid parameters'], 400);
 }
 
-
-
 //=============== FICHE DE STOCK DES SERVICES BY CATEGORIE AVEC GRAANDE UNITE=======================================================================================
 
 function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
@@ -23930,7 +25167,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             "tvente_stock_service.cmup",
             "tvente_stock_service.devise",
             "tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -23976,7 +25213,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_produit.refCategorie', '=', $refCategorie],
@@ -24029,7 +25266,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree')
     
             )
             ->where([
@@ -24086,7 +25323,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -24163,9 +25400,6 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
     else{
     }    
 }
-
-
-
 function pdf_fiche_stock_vente_service_unite_excel(Request $request)
 {
 
@@ -24203,7 +25437,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             "tvente_stock_service.cmup",
             "tvente_stock_service.devise",
             "tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 0), 0) as totalEntree'),
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
 
         )
         ->where([
@@ -24248,7 +25482,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
         "tvente_stock_service.qte",
         "tvente_stock_service.uniteBase",
         "tvente_stock_service.cmup",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 0), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tvente_stock_service.refService', '=', $idService]
@@ -24296,7 +25530,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 0), 0) as stockEntree')
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree')
     
             )
             ->where([
@@ -24348,7 +25582,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 "tvente_stock_service.cmup",
                 "tvente_stock_service.devise",
                 "tvente_stock_service.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 0), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -24427,13 +25661,8 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
 
 }
 
-
-
 //==========================================================================================================
 //==================== GESTION DES FOURNISSEURS ===========================================================
-
-
-
 
 function pdf_detail_commande_fournisseur_excel(Request $request)
 {

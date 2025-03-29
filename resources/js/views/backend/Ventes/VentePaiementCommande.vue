@@ -267,6 +267,7 @@ export default {
 
       title: "Liste des Details",
       dialog: false,
+      dialog2: false,
       edit: false,
       loading: false,
       disabled: false,

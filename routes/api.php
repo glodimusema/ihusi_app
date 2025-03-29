@@ -845,6 +845,10 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_mouvement_stock/{id}", 'tvente_mouvement_stockController@delete_data');
 
 
+
+    Route::get("pdf_fiche_stock_vente_service_by_vendable", 'PdfVenteController@pdf_fiche_stock_vente_service_by_vendable');
+    Route::get("pdf_fiche_stock_vente_service_by_sans_prix", 'PdfVenteController@pdf_fiche_stock_vente_service_by_sans_prix');
+
     Route::get("fetch_rapport_solde_facture_date_fournisseur", 'PdfVenteController@fetch_rapport_solde_facture_date_fournisseur');
 
     Route::get("fetch_rapport_entete_facture_cmd_date", 'PdfVenteController@fetch_rapport_entete_facture_cmd_date');

@@ -117,17 +117,24 @@
                     </div>
                 </v-flex> -->
 
-                <v-flex xs12 sm12 md12 lg12>
+                <!-- <v-flex xs12 sm12 md12 lg12>
                     <div class="mr-1">
                       <v-autocomplete label="Selectionnez le Module" prepend-inner-icon="mdi-map"
                       :rules="[(v) => !!v || 'Ce champ est requis']" :items="moduleList" item-text="nom_module"
                       item-value="id" dense outlined v-model="svData.module_id" chips clearable >
                     </v-autocomplete>
                     </div>
-                </v-flex>
+                </v-flex> -->
+
+                
 
                 <v-flex xs12 sm12 md12 lg12>
                     <div class="mr-1">
+
+                      <!-- <v-autocomplete label="Selectionnez le Service" prepend-inner-icon="mdi-map"
+                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="servicedestList" item-text="nom_service"
+                            item-value="refService" dense outlined v-model="svData.refService" chips clearable >
+                        </v-autocomplete>  -->
                       <v-autocomplete label="Selectionnez le Service" prepend-inner-icon="mdi-map"
                         :rules="[(v) => !!v || 'Ce champ est requis']" :items="serviceList" item-text="nom_service"
                         item-value="id" dense outlined v-model="svData.refService" chips clearable >
@@ -277,6 +284,8 @@
                   <template v-slot:default>
                     <thead>
                       <tr>
+                        <th class="text-left">Action</th>
+                        <th class="text-left">Observ.</th>
                         <th class="text-left">N°BE</th>
                         <th class="text-left">DateCmd</th>
                         <th class="text-left">Fournisseur</th>
@@ -290,43 +299,12 @@
                         <th class="text-left">Author</th>
                         <th class="text-left">Activé</th>
                         <th class="text-left">Cloturé</th>
-                        <th class="text-left">Created_at</th>
-                        <th class="text-left">Observ.</th>
-                        <th class="text-left">Action</th>
+                        <th class="text-left">Created_at</th>  
+
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="item in fetchData" :key="item.id">
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.dateCmd | formatDate }}</td>
-                        <td>{{ item.noms }}</td>
-                        <td>{{ item.nom_module }}</td>
-                        <td>{{ item.nom_service }}</td>
-                        <td>{{ item.contact }}</td>
-                        <td>{{ item.libelle }}</td>
-                        <td>{{ item.montant }}$</td>
-                        <td>{{ item.paie }}$</td>
-                        <td>{{ item.Reste }}$</td>
-                        <td>{{ item.author }}</td>
-                        <td>{{ item.active }}</td>
-                        <td>{{ item.cloture }}</td>
-                        <td>
-                            {{ item.created_at | formatDate }}
-                            {{ item.created_at | formatHour }}
-                        </td>
-                        <td>
-                            
-                            <v-btn
-                                      elevation="2"
-                                      x-small
-                                      class="white--text"
-                                      :color="item.active =='OUI' ? '#3DA60C' : '#F13D17'"
-                                      depressed                            
-                                    >
-                                    {{ item.active =='OUI' ?  'Encours' : 'Déjà Stocké' }}
-                            </v-btn>                         
-                                
-                         </td>
                         <td>
                           <v-menu bottom rounded offset-y transition="scale-transition">
                             <template v-slot:activator="{ on }">
@@ -405,6 +383,38 @@
                           </v-menu>
   
                         </td>
+                        <td>
+                            
+                            <v-btn
+                                      elevation="2"
+                                      x-small
+                                      class="white--text"
+                                      :color="item.active =='OUI' ? '#3DA60C' : '#F13D17'"
+                                      depressed                            
+                                    >
+                                    {{ item.active =='OUI' ?  'Encours' : 'Déjà Stocké' }}
+                            </v-btn>                         
+                                
+                         </td>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.dateCmd | formatDate }}</td>
+                        <td>{{ item.noms }}</td>
+                        <td>{{ item.nom_module }}</td>
+                        <td>{{ item.nom_service }}</td>
+                        <td>{{ item.contact }}</td>
+                        <td>{{ item.libelle }}</td>
+                        <td>{{ item.montant }}$</td>
+                        <td>{{ item.paie }}$</td>
+                        <td>{{ item.Reste }}$</td>
+                        <td>{{ item.author }}</td>
+                        <td>{{ item.active }}</td>
+                        <td>{{ item.cloture }}</td>
+                        <td>
+                            {{ item.created_at | formatDate }}
+                            {{ item.created_at | formatHour }}
+                        </td>
+                        
+                       
                       </tr>
                     </tbody>
                   </template>
@@ -479,6 +489,7 @@
         fournisseurList: [],
         moduleList: [],
         serviceList: [],
+        servicedestList: [],
         query: ""
   
       }
@@ -504,6 +515,7 @@
           if (this.edit) {
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
+            this.svData.module_id=1;
             this.insertOrUpdate(
               `${this.apiBaseURL}/update_vente_entete_requisition/${this.svData.id}`,
               JSON.stringify(this.svData)
@@ -524,6 +536,7 @@
           else {
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
+            this.svData.module_id=1;
             this.insertOrUpdate(
               `${this.apiBaseURL}/insert_vente_entete_requisition`,
               JSON.stringify(this.svData)

@@ -1118,6 +1118,7 @@ class tvente_detail_entreeController extends Controller
 
             $refProduit=0;
             $qteBase=1;
+            $qtePivot=0;
             $cmupTemp=0;
             $SI=0;
             $data99=DB::table('tvente_stock_service') 
@@ -1133,8 +1134,8 @@ class tvente_detail_entreeController extends Controller
             ->first();
             if ($data99) 
             {
-                $refProduit =  $data99->refProduit;  
-                $qteBase = $data99->qtePivot;
+                $refProduit =  $data99->refProduit; 
+                $qtePivot= $data99->qtePivot;
                 $cmupTemp = $data99->cmup;    
                 $SI = $data99->qte;          
             }
@@ -1147,10 +1148,7 @@ class tvente_detail_entreeController extends Controller
             $compte_destockage=0;
             $compte_stockage=0;
             $cmupVente=0;
-            $cmupTemp=0;
-            
-
-
+            $cmupTemp=0; 
     
             $data3=DB::table('tvente_produit')
              ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -1186,7 +1184,8 @@ class tvente_detail_entreeController extends Controller
             $data4=DB::table('tvente_detail_unite')
             ->join('tvente_unite','tvente_unite.id','=','tvente_detail_unite.refUnite')
             ->join('tvente_produit','tvente_produit.id','=','tvente_detail_unite.refProduit') 
-            ->select('tvente_detail_unite.id','refProduit','refUnite','puUnite','qteUnite','puBase','qteBase','estunite',
+            ->select('tvente_detail_unite.id','refProduit','refUnite','puUnite','qteUnite',
+            'puBase','qteBase','estunite',
             'tvente_detail_unite.active','tvente_detail_unite.author','tvente_detail_unite.refUser',
             'nom_unite','uniteBase')
             ->where([
@@ -1197,6 +1196,7 @@ class tvente_detail_entreeController extends Controller
            if ($data4) 
            {
                $uniteEntree = $data4->nom_unite;
+               $qteBase = $data4->qteBase;
                $uniteBase = $data4->uniteBase;
                $puBase=$data4->puBase;      
                $estunite=$data4->estunite;
@@ -1255,6 +1255,16 @@ class tvente_detail_entreeController extends Controller
                 ['qteTempo' => $data['qteEntree'],'refEnteteCmd' => $request->refRecquisition,'idStockService' => $data['idStockService']]
         );
 
+        $data2 = DB::update(
+            'update tvente_stock_service set qte = qte + :qteEntree, cmup = :cmup where id = :idStockService',
+            ['qteEntree' => $qteEntree,'cmup' => $cmupVente,'idStockService' => $data['idStockService']]
+        );
+
+        $data34 = DB::update(
+            'update tvente_entete_entree set montant = montant + (:pu * :qte) where id = :refEnteteEntree',
+            ['pu' => $montants,'qte' => $data['qteEntree'],'refEnteteEntree' => $idmax]
+        );
+
     
         $id_detail_max=0;
         $detail_list = DB::table('tvente_detail_entree')       
@@ -1300,15 +1310,7 @@ class tvente_detail_entreeController extends Controller
         ]);
 
 
-        $data2 = DB::update(
-            'update tvente_stock_service set qte = qte + :qteEntree, cmup = :cmup where id = :idStockService',
-            ['qteEntree' => $qteEntree,'cmup' => $cmupVente,'idStockService' => $data['idStockService']]
-        );
-
-            $data34 = DB::update(
-                'update tvente_entete_entree set montant = montant + (:pu * :qte) where id = :refEnteteEntree',
-                ['pu' => $montants,'qte' => $data['qteEntree'],'refEnteteEntree' => $idmax]
-            );
+           
             
         }
 

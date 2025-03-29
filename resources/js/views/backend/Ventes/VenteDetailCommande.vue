@@ -414,29 +414,29 @@
                     // Handle error appropriately, e.g., show a notification 
                 } 
         },
-    showBonCommande(refEnteteCmd, name,ServiceData) {
+        showBonCommande(refEnteteCmd, name,ServiceData) {
 
-    if (refEnteteCmd != '') {
+        if (refEnteteCmd != '') {
 
-      this.$refs.BonCommande.$data.dialog2 = true;
-      this.$refs.BonCommande.$data.refEnteteCmd = refEnteteCmd;
-      this.$refs.BonCommande.$data.ServiceData = ServiceData;
-      this.$refs.BonCommande.showModel(refEnteteCmd);
-      this.fetchDataList();
+          this.$refs.BonCommande.$data.dialog2 = true;
+          this.$refs.BonCommande.$data.refEnteteCmd = refEnteteCmd;
+          this.$refs.BonCommande.$data.ServiceData = ServiceData;
+          this.$refs.BonCommande.showModel(refEnteteCmd);
+          this.fetchDataList();
 
-      this.$refs.BonCommande.$data.titleComponent =
-        "Bon d'Entree pour " + name;
+          this.$refs.BonCommande.$data.titleComponent =
+            "Bon d'Entree pour " + name;
 
-    } else {
-      this.showError("Personne n'a fait cette action");
-    }
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }
 
-    }
-  
-    },
-    filters: {
-  
-    }
+        }
+      
+        },
+        filters: {
+      
+        }
   }
   </script>
     

@@ -263,6 +263,9 @@
   import BonCommande from '../Rapports/Finances/BonCommande.vue';
   
   export default {
+    components:{
+      BonCommande
+    },
     data() {
       return {
   

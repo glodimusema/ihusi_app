@@ -55,8 +55,10 @@ class tvente_detail_requisitionController extends Controller
         'compteproduit.numero_ssouscompte as numero_ssouscompteProduit','noms','contact','mail','adresse','dateCmd')
         ->selectRaw('(qteCmd*puCmd) as PTCmd')
         ->selectRaw('(qteCmd*puCmd) as PTBase')
-        ->selectRaw('(qteTempo * (-1)) as qteTempo')
-        ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
+        ->selectRaw('((qteTempo)) as resteCmd')
+        ->selectRaw('(qteTempo) as qteTempo')
+        // ->selectRaw('(qteTempo * (-1)) as qteTempo')
+        // ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTCmdFC')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTBaseFC');
         if (!is_null($request->get('query'))) {
@@ -99,8 +101,10 @@ class tvente_detail_requisitionController extends Controller
         'compteproduit.numero_ssouscompte as numero_ssouscompteProduit','noms','contact','mail','adresse','dateCmd')
         ->selectRaw('(qteCmd*puCmd) as PTCmd')
         ->selectRaw('(qteCmd*puCmd) as PTBase')
-        ->selectRaw('(qteTempo * (-1)) as qteTempo')
-        ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
+        ->selectRaw('((qteTempo)) as resteCmd')
+        ->selectRaw('(qteTempo) as qteTempo')
+        // ->selectRaw('(qteTempo * (-1)) as qteTempo')
+        // ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTCmdFC')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTBaseFC')
         ->Where('refEnteteCmd',$refEntete);
@@ -140,8 +144,10 @@ class tvente_detail_requisitionController extends Controller
         ,'compteproduit.refSousCompte as refSousCompteProduit','compteproduit.nom_ssouscompte as nom_ssouscompteProduit',
         'compteproduit.numero_ssouscompte as numero_ssouscompteProduit','noms','contact','mail','adresse','dateCmd','libelle')
         ->selectRaw('(qteCmd * puCmd) as PTCmd')
-        ->selectRaw('(qteTempo * (-1)) as qteTempo')
-        ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
+        ->selectRaw('((qteTempo)) as resteCmd')
+        ->selectRaw('(qteTempo) as qteTempo')
+        // ->selectRaw('(qteTempo * (-1)) as qteTempo')
+        // ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
         ->selectRaw('((qteCmd * puCmd) * tvente_detail_requisition.taux) as PTCmdFC')
         ->selectRaw('((montant) * tvente_detail_requisition.taux) as TotalCmdFC')
         ->selectRaw('(ROUND(montant,2)) as TotalCmd')
@@ -178,8 +184,10 @@ class tvente_detail_requisitionController extends Controller
         ,'compteproduit.refSousCompte as refSousCompteProduit','compteproduit.nom_ssouscompte as nom_ssouscompteProduit',
         'compteproduit.numero_ssouscompte as numero_ssouscompteProduit','noms','contact','mail','adresse','dateCmd')
         ->selectRaw('(qteCmd*puCmd) as PTCmd')
-        ->selectRaw('(qteCmd*puCmd) as PTBase')
-        ->selectRaw('(qteTempo * (-1)) as qteTempo')
+        ->selectRaw('((qteTempo)) as resteCmd')
+        ->selectRaw('(qteTempo) as qteTempo')
+        // ->selectRaw('(qteCmd*puCmd) as PTBase')
+        // ->selectRaw('(qteTempo * (-1)) as qteTempo')
         ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTCmdFC')
         ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTBaseFC')
@@ -208,12 +216,13 @@ class tvente_detail_requisitionController extends Controller
         'tvaapplique','estvendable',"tvente_categorie_produit.designation as Categorie",'noms','contact',
         'mail','adresse','dateCmd as dateCmd','idStockService')
         ->selectRaw('(qteCmd*puCmd) as PTCmd')
-        ->selectRaw('((qteCmd + qteTempo)) as resteCmd')
-        ->selectRaw('(qteTempo * (-1)) as qteTempo')
+        ->selectRaw('((qteTempo)) as resteCmd')
+        ->selectRaw('(qteTempo) as qteTempo')
         ->selectRaw('(qteCmd*puCmd) as PTBase')
         // ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTCmdFC')
         // ->selectRaw('((qteCmd*puCmd)/tvente_detail_requisition.taux) as PTBaseFC')
         ->where('tvente_detail_requisition.refEnteteCmd', $refEnteteCmd)
+        ->orderBy("tvente_detail_requisition.created_at", "desc")
         ->get();
 
         return response()->json([
