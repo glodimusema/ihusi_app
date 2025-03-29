@@ -357,12 +357,23 @@
                                 ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
                                 item-text="designation" item-value="designation" v-model="svData.statut">
                             </v-autocomplete>
-                            <!-- <br>showDetailSortieByDate_EtatFactureService -->
+                            <!-- <br>showFicheStockByDate_Service_Vendable_cmup -->
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showFicheStockByDate_Service_Vendable" block color="  blue" dark>
                                             <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showFicheStockByDate_Service_Vendable_cmup" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE/CMUP
                                         </v-btn>
                                     </span>
                                 </template>
@@ -1059,6 +1070,23 @@ export default {
                 if(this.svData.idService!="" && this.svData.statut != "")
                 {
                     window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_by_vendable?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&statut="+this.svData.statut);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showFicheStockByDate_Service_Vendable_cmup() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="" && this.svData.statut != "")
+                {
+                    window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_by_vendable_cmup?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&statut="+this.svData.statut);
                 }else
                 {
                     this.showError("Veillez selectionner le service svp");

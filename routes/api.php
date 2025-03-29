@@ -845,7 +845,8 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_mouvement_stock/{id}", 'tvente_mouvement_stockController@delete_data');
 
 
-
+    //
+    Route::get("pdf_fiche_stock_vente_service_by_vendable_cmup", 'PdfVenteController@pdf_fiche_stock_vente_service_by_vendable_cmup');
     Route::get("pdf_fiche_stock_vente_service_by_vendable", 'PdfVenteController@pdf_fiche_stock_vente_service_by_vendable');
     Route::get("pdf_fiche_stock_vente_service_by_sans_prix", 'PdfVenteController@pdf_fiche_stock_vente_service_by_sans_prix');
 

@@ -679,6 +679,7 @@
               this.$refs.VentePaieOneCommende.$data.totalFacture = totalFacture;
               this.$refs.VentePaieOneCommende.$data.totalPaie = totalPaie;
               this.$refs.VentePaieOneCommende.$data.RestePaie = RestePaie;
+              this.$refs.VentePaieOneCommende.$data.svData.montant_paie = RestePaie;
               this.$refs.VentePaieOneCommende.$data.svData.refCommande = refCommande;
               this.$refs.VentePaieOneCommende.fetchDataList();
               this.$refs.VentePaieOneCommende.get_mode_Paiement();

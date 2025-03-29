@@ -562,7 +562,7 @@ class tvente_detail_transfertController extends Controller
                 $temp_idproduit = $list->refProduit;
                 $temp_id = $list->id;
 
-
+ 
                 if($estunite = "NON")
                 {
                      if ($qteBase != 0) {
