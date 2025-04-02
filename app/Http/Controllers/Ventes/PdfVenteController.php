@@ -8116,7 +8116,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         ->orderBy("tvente_produit.designation", "asc")
         ->get();
 
-//======================================================================
+
 
     $data22 = DB::table('tvente_stock_service')
     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
@@ -22332,78 +22332,129 @@ function printRapportSoldeFacture_Fournisseur($date1, $date2)
 
 function showDetailSoldeFournisseur($date1, $date2)
 {
-    // Récupérer les données de stock, mouvements et ventes en une seule requête
-    $data2 = DB::table('tvente_fournisseur')
-    ->select("tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
-    "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
-    "tvente_fournisseur.created_at",'refCategorieFss')
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
 
-        ->leftJoin('tvente_entete_requisition as mvtCmd', function ($join) use ($date1, $date2) {
-            $join->on('mvtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
-                 ->where('mvtCmd.dateCmd', '>=', $date1)
-                 ->where('mvtCmd.dateCmd', '<=', $date2);
+        $data1 = DB::table('tvente_fournisseur')
+            ->leftJoin('tvente_entete_requisition as dataCmd', function ($join) use ($date1) {
+                $join->on('dataCmd.refFournisseur', '=', 'tvente_fournisseur.id')
+                     ->where('dataCmd.dateCmd', '<', $date1);
+            })
+            ->select(
+                "tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
+                'refCategorieFss',
+                DB::raw('IFNULL(ROUND(SUM(dataCmd.montant), 2), 0) as dataFacture')                
+            )
+            ->groupBy("tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
+                "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
+                'refCategorieFss')
+            ->orderBy("tvente_fournisseur.noms", "asc")
+            ->get();
+
+
+            $data2 = DB::table('tvente_fournisseur') 
+            ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')  
+            ->leftJoin('tvente_paiement_commande as dataPaie', function ($join) use ($date1) {
+                $join->on('dataPaie.refCommande', '=', 'tvente_entete_requisition.id')
+                ->where('dataPaie.date_paie', '<', $date1);
+            })
+            ->select(
+                "tvente_fournisseur.id",
+                'tvente_fournisseur.noms',
+                DB::raw('IFNULL(ROUND(SUM(dataPaie.montant_paie), 2), 0) as dataPaie')
+            )
+            ->groupBy("tvente_fournisseur.id", "tvente_fournisseur.noms")
+            ->orderBy("tvente_fournisseur.noms", "asc")
+            ->get();
+    
+
+        //=============================================================================================
+
+        $data11 = DB::table('tvente_fournisseur')    
+            ->leftJoin('tvente_entete_requisition as mvtCmd', function ($join) use ($date1, $date2) {
+                $join->on('mvtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
+                ->on('mvtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
+                     ->where('mvtCmd.dateCmd', '<=', $date2);
+            })
+            ->select(
+                "tvente_fournisseur.id",
+                'tvente_fournisseur.noms',
+                DB::raw('IFNULL(ROUND(SUM(mvtCmd.montant), 2), 0) as mvtFacture'),
+                // DB::raw('IFNULL(ROUND(SUM(mvtCmd.paie), 2), 0) as dataPaie')
+            )
+            ->groupBy("tvente_fournisseur.id", "tvente_fournisseur.noms")
+            ->orderBy("tvente_fournisseur.noms", "asc")
+            ->get();
+    
+    
+        $data22 = DB::table('tvente_fournisseur')   
+        ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')
+        ->leftJoin('tvente_paiement_commande as mvtPaie', function ($join) use ($date1, $date2) {
+            $join->on('mvtPaie.refCommande', '=', 'tvente_entete_requisition.id')
+            ->whereBetween('mvtPaie.date_paie', [$date1, $date2]);
         })
-
         ->select(
             "tvente_fournisseur.id",
             'tvente_fournisseur.noms',
-            DB::raw('IFNULL(ROUND(SUM(mvtCmd.montant), 2), 0) as dataFacture'),
-            DB::raw('IFNULL(ROUND(SUM(mvtCmd.paie), 2), 0) as dataPaie')
+            DB::raw('IFNULL(ROUND(SUM(mvtPaie.montant_paie), 2), 0) as mvtPaie')
         )
         ->groupBy("tvente_fournisseur.id", "tvente_fournisseur.noms")
         ->orderBy("tvente_fournisseur.noms", "asc")
         ->get();
 
-    // Construction de l'output
-    $count = 0;
-    $output = '';
-    foreach ($data2 as $row2) 
-    {
-        $SoldeInnitial = 0;
-        $data1 = DB::table('tvente_fournisseur')
-        ->select("tvente_fournisseur.id")     
-            ->leftJoin('tvente_entete_requisition as dtCmd', function ($join) use ($date1) {
-                $join->on('dtCmd.refFournisseur', '=', 'tvente_fournisseur.id')
-                    ->where('dtCmd.dateCmd', '<', $date1);
-            })
-            ->select(
-                DB::raw('IFNULL(ROUND(SUM(dtCmd.montant), 2), 0) as totalFacture'),
-                DB::raw('IFNULL(ROUND(SUM(dtCmd.paie), 2), 0) as totalPaie'),
-                DB::raw('(IFNULL(ROUND(SUM(dtCmd.montant), 2), 0) - IFNULL(ROUND(SUM(dtCmd.paie), 3), 0)) as SoldeInit'),           
-            )
-            ->where("tvente_fournisseur.id",'=',$row2->id)
-            ->get();
-            foreach ($data1 as $row1) 
-            {
-                $SoldeInnitial = $row1->SoldeInit;
-            }
 
-            $montantDu = floatval($SoldeInnitial) + floatval($row2->dataFacture);
-            $SoldeFinal = floatval($SoldeInnitial) + floatval($row2->dataFacture) - floatval($row2->dataPaie);
+
+        // Construction de l'output
         
+        $output = '';
+    
+        // Vérifiez que les deux tableaux ont la même longueur
+        if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+        && (count($data1) === count($data22)))
+        {
+            $counts = 0;
+            for ($i = 0; $i < count($data1); $i++) {
 
+                $counts ++;
+                $row1 = $data1[$i];
+                $row2 = $data2[$i];
+                $row11 = $data11[$i];
+                $row22 = $data22[$i];                            
+    
+                $dataFacture = floatval($row1->dataFacture);
+                $dataPaie = floatval($row2->dataPaie);
+    
+                $mvtFacture = floatval($row11->mvtFacture);            
+                $mvtPaie = floatval($row22->mvtPaie);
 
-        $count ++;
+                $soldeInnitial = ((floatval($dataFacture)) - (floatval($dataPaie)));
+                $montantDu = ((floatval($soldeInnitial)) + (floatval($mvtFacture)));
+                $soldeFinal = ((floatval($montantDu)) - (floatval($mvtPaie)));
+  
+    
+                $output .= '
 
-        $output .='
-            	<tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="csE71035DC" style="width:68px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
-                <td class="cs82D98BB6" colspan="3" style="width:307px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row2->noms.'</td>
-                <td class="cs82D98BB6" colspan="3" style="width:119px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$SoldeInnitial.'$</td>
-                <td class="cs82D98BB6" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->dataFacture.'$</td>
-                <td class="cs82D98BB6" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row2->dataPaie.'$</td>
-                <td class="cs82D98BB6" colspan="2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$SoldeFinal.'$</td>
-                <td></td>
-            </tr>
-        ';
-     
-    }
+                    <tr style="vertical-align:top;">
+                        <td style="width:0px;height:24px;"></td>
+                        <td></td>
+                        <td class="csE71035DC" style="width:68px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$counts.'</nobr></td>
+                        <td class="cs82D98BB6" colspan="3" style="width:307px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row1->noms.'</td>
+                        <td class="cs82D98BB6" colspan="3" style="width:119px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$soldeInnitial.'$</td>
+                        <td class="cs82D98BB6" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$montantDu.'$</td>
+                        <td class="cs82D98BB6" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$mvtPaie.'$</td>
+                        <td class="cs82D98BB6" colspan="2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$soldeFinal.'$</td>
+                        <td></td>
+                    </tr>';   
+    
+        }
+        } else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
+        }
+    
+        return $output;
+    
 
-
-
-    return $output;
 }
 
 //==================== RAPPORT TRANSFERT PAR SERVICE SOURCE =======================================
