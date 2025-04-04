@@ -437,6 +437,7 @@ class tvente_detail_venteController extends Controller
         }  
 
 
+            $cmup_data = 0;
             $refProduit=0;
             $data99=DB::table('tvente_stock_service') 
             ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
@@ -447,7 +448,8 @@ class tvente_detail_venteController extends Controller
             ->first();
             if ($data99) 
             {
-                $refProduit =  $data99->refProduit;           
+                $refProduit =  $data99->refProduit; 
+                $cmup_data =  $data99->cmup;           
             }
 
 
@@ -481,8 +483,7 @@ class tvente_detail_venteController extends Controller
                 $compte_perte= $data3->compte_perte;
                 $compte_produit= $data3->compte_produit;
                 $compte_destockage= $data3->compte_destockage;
-                $compte_stockage= $data3->compte_stockage; 
-                $cmupVente=$data3->cmup;         
+                $compte_stockage= $data3->compte_stockage;       
             }
 
             $uniteVente = '';
@@ -490,14 +491,13 @@ class tvente_detail_venteController extends Controller
             $puBase=0;
             $qteBase=0;
             $estunite='';
-            $cmupVente=0;
+            $cmupVente = $cmup_data;
 
             $uniteVente = $request->nom_unite;
             $uniteBase = $request->nom_unite;           
             $qteBase =  1;
             $puBase = $montants;      
             $estunite = 'OUI';
-            $cmupVente = $montants; 
 
             $qteVente = $qteBase * floatval($request->qteVente);
             if($estunite = "OUI")
@@ -666,18 +666,20 @@ class tvente_detail_venteController extends Controller
         }  
 
 
-            $refProduit=0;
-            $data99=DB::table('tvente_stock_service') 
-            ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
-            'devise','taux','active','refUser','author')
-            ->where([
-                ['tvente_stock_service.id','=', $request->idStockService]
-            ])      
-            ->get();
-            foreach ($data99 as $row) 
-            {
-                $refProduit =  $row->refProduit;           
-            }
+        $cmup_data = 0;
+        $refProduit=0;
+        $data99=DB::table('tvente_stock_service') 
+        ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
+        'devise','taux','active','refUser','author')
+        ->where([
+            ['tvente_stock_service.id','=', $request->idStockService]
+        ])      
+        ->first();
+        if ($data99) 
+        {
+            $refProduit =  $data99->refProduit; 
+            $cmup_data =  $data99->cmup;           
+        }
 
 
 
@@ -692,7 +694,6 @@ class tvente_detail_venteController extends Controller
             $compte_produit=0;
             $compte_destockage=0;
             $compte_stockage=0;
-            $cmupVente=0;
 
             $data3=DB::table('tvente_produit')
             ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -711,7 +712,6 @@ class tvente_detail_venteController extends Controller
                 $compte_produit= $row->compte_produit;
                 $compte_destockage= $row->compte_destockage;
                 $compte_stockage= $row->compte_stockage; 
-                $cmupVente=$row->cmup;         
             }
 
             $uniteVente = '';
@@ -726,7 +726,7 @@ class tvente_detail_venteController extends Controller
             $qteBase =  1;
             $puBase = $montants;      
             $estunite = 'OUI';
-            $cmupVente = $montants; 
+            $cmupVente = $cmup_data; 
 
             $qteVente = $qteBase * floatval($request->qteVente);
             if($estunite = "OUI")
@@ -954,7 +954,7 @@ class tvente_detail_venteController extends Controller
                 $devises = $request->devise;
             }  
 
-
+         $cmup_data = 0;
          $refProduit=0;
          $data99=DB::table('tvente_stock_service') 
          ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
@@ -965,7 +965,8 @@ class tvente_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refProduit =  $row->refProduit;           
+             $refProduit =  $row->refProduit;
+             $cmup_data =  $row->cmup;           
          }
 
 
@@ -1000,7 +1001,6 @@ class tvente_detail_venteController extends Controller
              $compte_produit= $row->compte_produit;
              $compte_destockage= $row->compte_destockage;
              $compte_stockage= $row->compte_stockage; 
-             $cmupVente=$row->cmup;         
          }
  
 
@@ -1010,14 +1010,13 @@ class tvente_detail_venteController extends Controller
          $puBase=0;
          $qteBase=0;
          $estunite='';
-         $cmupVente=0;
  
          $uniteVente = $data['nom_unite'];
          $uniteBase = $data['nom_unite'];           
          $qteBase =  1;
          $puBase = $montants;      
          $estunite = 'OUI';
-         $cmupVente = $montants; 
+         $cmupVente = $cmup_data; 
  
         $qteVente = $qteBase * floatval($data['qteVente']);
         if($estunite = "OUI")
@@ -1202,18 +1201,20 @@ class tvente_detail_venteController extends Controller
             }  
 
 
-         $refProduit=0;
-         $data99=DB::table('tvente_stock_service') 
-         ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
-         'devise','taux','active','refUser','author')
-         ->where([
-            ['tvente_stock_service.id','=', $data['idStockService']]
-         ])      
-         ->get();
-         foreach ($data99 as $row) 
-         {
-             $refProduit =  $row->refProduit;           
-         }
+            $cmup_data = 0;
+            $refProduit=0;
+            $data99=DB::table('tvente_stock_service') 
+            ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
+            'devise','taux','active','refUser','author')
+            ->where([
+               ['tvente_stock_service.id','=', $data['idStockService']]
+            ])      
+            ->get();
+            foreach ($data99 as $row) 
+            {
+                $refProduit =  $row->refProduit;
+                $cmup_data =  $row->cmup;           
+            }
 
 
 
@@ -1228,7 +1229,7 @@ class tvente_detail_venteController extends Controller
          $compte_produit=0;
          $compte_destockage=0;
          $compte_stockage=0;
-         $cmupVente=0;
+         $cmupVente = $cmup_data;
  
          $data3=DB::table('tvente_produit')
           ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -1246,8 +1247,7 @@ class tvente_detail_venteController extends Controller
              $compte_perte= $row->compte_perte;
              $compte_produit= $row->compte_produit;
              $compte_destockage= $row->compte_destockage;
-             $compte_stockage= $row->compte_stockage; 
-             $cmupVente=$row->cmup;         
+             $compte_stockage= $row->compte_stockage;      
          }
  
 
@@ -1257,14 +1257,13 @@ class tvente_detail_venteController extends Controller
          $puBase=0;
          $qteBase=0;
          $estunite='';
-         $cmupVente=0;
  
          $uniteVente = $data['nom_unite'];
          $uniteBase = $data['nom_unite'];           
          $qteBase =  1;
          $puBase = $montants;      
          $estunite = 'OUI';
-         $cmupVente = $montants; 
+         $cmupVente = $cmup_data; 
  
         $qteVente = $qteBase * floatval($data['qteVente']);
         if($estunite = "OUI")

@@ -22039,32 +22039,7 @@ function printRapportSoldeFacture_Fournisseur($date1, $date2)
             $rccmEse=$data1->rccm;
             $pic = $this->displayImg("fichier", 'logo.png');
             $siege=$data1->nomForme;         
-        }
-
-
-        //  $totalFact=0;
-        //  $totalPaie=0;
-        //  $totalReste=0;
-                 
-        //  //
-        //  $data2 = DB::table('tvente_entete_requisition') 
-        //  ->selectRaw('ROUND(SUM( IFNULL(montant,0)),2) as TotalFacture')
-        //  ->selectRaw('ROUND(SUM( IFNULL(paie,0)),2) as TotalPaie')
-        //  ->selectRaw('ROUND(SUM(IFNULL((IFNULL(montant,0) - IFNULL(paie,0)),0)),2) as TotalReste')
-        //  ->where([
-        //     ['dateCmd','>=', $date1],
-        //     ['dateCmd','<=', $date2],
-        //     ['refFournisseur','=', $refFournisseur]
-        // ])    
-        //  ->first(); 
-        //  $output='';
-        //  if ($data2) 
-        //  {                                
-        //     $totalFact=$data2->TotalFacture;
-        //     $totalPaie=$data2->TotalPaie;
-        //     $totalReste=$data2->TotalReste;                           
-        //  }
-         
+        }        
 
         $output='
        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -22280,16 +22255,11 @@ function printRapportSoldeFacture_Fournisseur($date1, $date2)
                     $output .= $this->showDetailSoldeFournisseur($date1, $date2); 
 
                     $output.='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs275E312D" colspan="4" style="width:376px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                <td class="csAB3AA82A" colspan="3" style="width:119px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                <td class="csAB3AA82A" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                <td class="csAB3AA82A" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                <td class="csAB3AA82A" colspan="2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
-                <td></td>
-            </tr>
+            ';
+
+                    $output .= $this->showSommeSoldeFournisseur($date1, $date2); 
+
+                    $output.='
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:16px;"></td>
                 <td></td>
@@ -22469,6 +22439,143 @@ function showDetailSoldeFournisseur($date1, $date2)
             // Gérer le cas où les tableaux n'ont pas la même longueur
             echo 'Les tableaux ont pas la même longueur.';
         }
+    
+        return $output;
+    
+
+}
+
+function showSommeSoldeFournisseur($date1, $date2)
+{
+
+        $data1 = DB::table('tvente_fournisseur') 
+        ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')  
+        ->leftJoin('tvente_detail_requisition as dataCmd', function ($join) use ($date1) {
+            $join->on('dataCmd.refEnteteCmd', '=', 'tvente_entete_requisition.id')
+            ->where('tvente_entete_requisition.dateCmd', '<', $date1);
+        })
+        ->select(
+            "tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
+            "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
+            'refCategorieFss',
+            DB::raw('IFNULL(ROUND(SUM(dataCmd.puCmd * dataCmd.qteCmd), 2), 0) as dataFacture')
+        )
+        ->groupBy("tvente_fournisseur.id","tvente_fournisseur.noms","tvente_fournisseur.contact",
+                 "tvente_fournisseur.mail","tvente_fournisseur.adresse","tvente_fournisseur.author",
+                'refCategorieFss')
+        ->orderBy("tvente_fournisseur.noms", "asc")
+        ->get();
+
+
+            $data2 = DB::table('tvente_fournisseur') 
+            ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')  
+            ->leftJoin('tvente_paiement_commande as dataPaie', function ($join) use ($date1) {
+                $join->on('dataPaie.refCommande', '=', 'tvente_entete_requisition.id')
+                ->where('dataPaie.date_paie', '<', $date1);
+            })
+            ->select(
+                "tvente_fournisseur.id",
+                'tvente_fournisseur.noms',
+                DB::raw('IFNULL(ROUND(SUM(dataPaie.montant_paie), 2), 0) as dataPaie')
+            )
+            ->groupBy("tvente_fournisseur.id", "tvente_fournisseur.noms")
+            ->orderBy("tvente_fournisseur.noms", "asc")
+            ->get();
+    
+
+        //=============================================================================================
+
+        $data11 = DB::table('tvente_fournisseur') 
+        ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')  
+        ->leftJoin('tvente_detail_requisition as mvtCmd', function ($join) use ($date1, $date2) {
+            $join->on('mvtCmd.refEnteteCmd', '=', 'tvente_entete_requisition.id')
+            ->whereBetween('tvente_entete_requisition.dateCmd', [$date1, $date2]);
+        })
+        ->select(
+            "tvente_fournisseur.id","tvente_fournisseur.noms",
+            DB::raw('IFNULL(ROUND(SUM(mvtCmd.puCmd * mvtCmd.qteCmd), 2), 0) as mvtFacture')
+        )
+        ->groupBy("tvente_fournisseur.id","tvente_fournisseur.noms")
+        ->orderBy("tvente_fournisseur.noms", "asc")
+        ->get();
+    
+    
+        $data22 = DB::table('tvente_fournisseur')   
+        ->leftjoin('tvente_entete_requisition', 'tvente_entete_requisition.refFournisseur', '=', 'tvente_fournisseur.id')
+        ->leftJoin('tvente_paiement_commande as mvtPaie', function ($join) use ($date1, $date2) {
+            $join->on('mvtPaie.refCommande', '=', 'tvente_entete_requisition.id')
+            ->whereBetween('mvtPaie.date_paie', [$date1, $date2]);
+        })
+        ->select(
+            "tvente_fournisseur.id",
+            'tvente_fournisseur.noms',
+            DB::raw('IFNULL(ROUND(SUM(mvtPaie.montant_paie), 2), 0) as mvtPaie')
+        )
+        ->groupBy("tvente_fournisseur.id", "tvente_fournisseur.noms")
+        ->orderBy("tvente_fournisseur.noms", "asc")
+        ->get();
+
+
+
+        // Construction de l'output
+        
+        $output = '';
+    
+        // Vérifiez que les deux tableaux ont la même longueur
+        if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+        && (count($data1) === count($data22)))
+        {
+
+            $somme_total_du=0;
+            $somme_total_innitial=0;
+            $somme_total_paie=0;
+            $somme_total_solde=0;
+
+            $counts = 0;
+            for ($i = 0; $i < count($data1); $i++) {
+
+                $counts ++;
+                $row1 = $data1[$i];
+                $row2 = $data2[$i];
+                $row11 = $data11[$i];
+                $row22 = $data22[$i];                            
+    
+                $dataFacture = floatval($row1->dataFacture);
+                $dataPaie = floatval($row2->dataPaie);
+    
+                $mvtFacture = floatval($row11->mvtFacture);            
+                $mvtPaie = floatval($row22->mvtPaie);
+
+                $soldeInnitial = ((floatval($dataFacture)) - (floatval($dataPaie)));
+                $montantDu = ((floatval($soldeInnitial)) + (floatval($mvtFacture)));
+                $soldeFinal = ((floatval($montantDu)) - (floatval($mvtPaie)));
+
+                $somme_total_innitial = floatval($somme_total_innitial) + floatval($soldeInnitial);
+                $somme_total_du = floatval($somme_total_du) + floatval($mvtFacture);                
+                $somme_total_paie = floatval($somme_total_paie) + floatval($mvtPaie);
+                $somme_total_solde = floatval($somme_total_solde) + floatval($soldeFinal);                   
+    
+        }
+
+        $output .= '
+
+           <tr style="vertical-align:top;">
+                <td style="width:0px;height:24px;"></td>
+                <td></td>
+                <td class="cs275E312D" colspan="4" style="width:376px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                <td class="csAB3AA82A" colspan="3" style="width:119px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$somme_total_innitial.'$</nobr></td>
+                <td class="csAB3AA82A" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$somme_total_du.'$</nobr></td>
+                <td class="csAB3AA82A" colspan="3" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$somme_total_paie.'$</nobr></td>
+                <td class="csAB3AA82A" colspan="2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$somme_total_solde.'$</nobr></td>
+                <td></td>
+            </tr>';
+
+        } else {
+            // Gérer le cas où les tableaux n'ont pas la même longueur
+            echo 'Les tableaux ont pas la même longueur.';
+        }
+
+        
     
         return $output;
     
@@ -25055,6 +25162,37 @@ function showCategorieFicheStockServiceVendableCMUP($date1,$date2,$idService,$st
 
 }
 
+function calculerCoutMoyen($articleIdStk, $date1, $date2) {
+    // Exécuter la requête pour obtenir le stock final et la valeur totale
+    $result = DB::table('tvente_mouvement_stock')
+        ->select(
+            DB::raw('SUM(CASE WHEN type_mouvement = "Entree" THEN qteMvt * qteBase ELSE 0 END) as stock_final'),
+            DB::raw('SUM(CASE WHEN type_mouvement = "Entree" THEN qteMvt * qteBase * (puMvt / qteBase) ELSE 0 END) as valeur_totale')
+        )
+        ->where([
+            ['tvente_mouvement_stock.dateMvt','>=', $date1],
+            ['tvente_mouvement_stock.dateMvt','<=', $date2],
+            ['idStockService','=', $articleIdStk],
+            ['type_mouvement','=', 'Entree'],
+        ])
+        // ->where('idStockService', $articleIdStk)
+        // ->where('type_mouvement', 'Entree')
+        // ->whereBetween('tvente_mouvement_stock.dateMvt', [$date1, $date2])        
+        ->first();
+
+    // Initialiser les variables
+    $coutMoyen = 0;
+    $stockFinal = $result->stock_final ?? 0;
+    $valeurTotale = $result->valeur_totale ?? 0;
+
+    // Calculer le coût moyen si le stock final est supérieur à 0
+    if ($stockFinal > 0) {
+        $coutMoyen = round($valeurTotale / $stockFinal, 2);
+    }
+
+    return $coutMoyen;
+}
+
 
 
 function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie, $idService,$statut)
@@ -25144,7 +25282,7 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
         ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
             $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
                  ->where('mvtEntree.type_mouvement', '=', 'Entree')
-                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);
         })
     
             // Utilisez distinct() avant select()
@@ -25216,82 +25354,82 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
 
 
 
-    // Requête pour récupérer les informations nécessaires
-    $data_cmup = DB::table('tvente_stock_service')
-        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
-        ->join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
-        ->join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
-        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $date2, $idService) {
-            $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
-                 ->where('dtEntree.type_mouvement', '=', 'Entree')
-                 ->whereBetween('dtEntree.dateMvt', [$date1, $date2]);
-        })
-        ->distinct()
-        ->select(
-            "tvente_stock_service.id",
-            'tvente_stock_service.refService',
-            'tvente_stock_service.refProduit',
-            "tvente_produit.designation as designation",
-            "refCategorie",
-            "tvente_stock_service.pu",
-            "tvente_categorie_produit.designation as Categorie",
-            "tvente_stock_service.qte",
-            "tvente_stock_service.uniteBase",
-            "tvente_stock_service.devise",
-            "tvente_stock_service.taux",            
-            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree')
-        )
-        ->where([
-            ['tvente_produit.refCategorie', '=', $refCategorie],
-            ['tvente_stock_service.refService', '=', $idService],
-            ['tvente_produit.estvendable', '=', $statut],
-        ])
-        ->groupBy(
-            "tvente_stock_service.id", 
-            "tvente_stock_service.refService", 
-            "tvente_stock_service.refProduit", 
-            "designation", 
-            "refCategorie", 
-            "pu", 
-            "Categorie", 
-            "qte", 
-            "uniteBase",
-            "devise",
-            "taux"
-        )
-        ->orderBy("tvente_produit.designation", "asc")
-        ->get();
+    // // Requête pour récupérer les informations nécessaires
+    // $data_cmup = DB::table('tvente_stock_service')
+    //     ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    //     ->join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    //     ->join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    //     ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $date2, $idService) {
+    //         $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+    //              ->where('dtEntree.type_mouvement', '=', 'Entree')
+    //              ->whereBetween('dtEntree.dateMvt', [$date1, $date2]);
+    //     })
+    //     ->distinct()
+    //     ->select(
+    //         "tvente_stock_service.id",
+    //         'tvente_stock_service.refService',
+    //         'tvente_stock_service.refProduit',
+    //         "tvente_produit.designation as designation",
+    //         "refCategorie",
+    //         "tvente_stock_service.pu",
+    //         "tvente_categorie_produit.designation as Categorie",
+    //         "tvente_stock_service.qte",
+    //         "tvente_stock_service.uniteBase",
+    //         "tvente_stock_service.devise",
+    //         "tvente_stock_service.taux",            
+    //         DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree')
+    //     )
+    //     ->where([
+    //         ['tvente_produit.refCategorie', '=', $refCategorie],
+    //         ['tvente_stock_service.refService', '=', $idService],
+    //         ['tvente_produit.estvendable', '=', $statut],
+    //     ])
+    //     ->groupBy(
+    //         "tvente_stock_service.id", 
+    //         "tvente_stock_service.refService", 
+    //         "tvente_stock_service.refProduit", 
+    //         "designation", 
+    //         "refCategorie", 
+    //         "pu", 
+    //         "Categorie", 
+    //         "qte", 
+    //         "uniteBase",
+    //         "devise",
+    //         "taux"
+    //     )
+    //     ->orderBy("tvente_produit.designation", "asc")
+    //     ->get();
 
-    // Calculer le CMUP en PHP
-    $cmupData = [];
+    // // Calculer le CMUP en PHP
+    // $cmupData = [];
     
-    foreach ($data11 as $item) {
-        // Calculer le CMUP : (Total des Coûts / Total des Quantités)
-        $totalCout = ($item->totalEntree * $item->pu); // Coût total basé sur les entrées et le prix unitaire
-        $totalQte = $item->qte;
+    // foreach ($data11 as $item) {
+    //     // Calculer le CMUP : (Total des Coûts / Total des Quantités)
+    //     $totalCout = ($item->totalEntree * $item->pu); // Coût total basé sur les entrées et le prix unitaire
+    //     $totalQte = $item->qte;
 
-        // Éviter la division par zéro
-        $cmup = ($totalQte > 0) ? round($totalCout / $totalQte, 3) : 0;
+    //     // Éviter la division par zéro
+    //     $cmup = ($totalQte > 0) ? round($totalCout / $totalQte, 3) : 0;
 
-        // Ajouter les résultats au tableau
-        $cmupData[] = [
-            'id' => $item->id,
-            'designation' => $item->designation,
-            'cmup' => $cmup,
-            'totalEntree' => $item->totalEntree,
-            'categorie' => $item->Categorie,
-            'uniteBase' => $item->uniteBase,
-            'devise' => $item->devise,
-            'taux' => $item->taux,
-        ];
-    };
+    //     // Ajouter les résultats au tableau
+    //     $cmupData[] = [
+    //         'id' => $item->id,
+    //         'designation' => $item->designation,
+    //         'cmup' => $cmup,
+    //         'totalEntree' => $item->totalEntree,
+    //         'categorie' => $item->Categorie,
+    //         'uniteBase' => $item->uniteBase,
+    //         'devise' => $item->devise,
+    //         'taux' => $item->taux,
+    //     ];
+    // };
     // Construction de l'output
     
     $output = '';
 
     // Vérifiez que les deux tableaux ont la même longueur
     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
-    && (count($data1) === count($data22)) && (count($data1) === count($cmupData))) {
+    && (count($data1) === count($data22))) {
 
     for ($i = 0; $i < count($data1); $i++) {
         $row11 = $data11[$i];
@@ -25299,20 +25437,8 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
         $row1 = $data1[$i];
         $row2 = $data2[$i];
 
-        $cmup_data = 0;
-        // Vérifiez que $cmupData[$i] est défini et est un objet
-        error_log("Traitement de l'index $i");
-        if (isset($cmupData[$i]) && is_object($cmupData[$i])) {
-            error_log("Objet trouvé : " . print_r($cmupData[$i], true));
-            if (property_exists($cmupData[$i], 'cmup')) {
-                error_log("Valeur de cmup : " . $cmupData[$i]->cmup);
-            } else {
-                error_log("Erreur : La propriété 'cmup' n'existe pas.");
-            }
-        } else {
-            error_log("Erreur : L'élément à l'index $i n'est pas un objet.");
-        }
-
+        $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
+        
         // Assurez-vous que toutes les variables nécessaires sont définies
         $totalEntree = isset($row11->totalEntree) ? floatval($row11->totalEntree) : 0;
         $totalSortie = isset($row22->totalSortie) ? floatval($row22->totalSortie) : 0;
@@ -25613,6 +25739,266 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 'SF' => $totalSF,
                 'PU' => round($row1->cmup,2),
                 'PT' => round($totalPT,2),
+                'Unité' => $row1->uniteBase
+            ];
+
+        }
+    } 
+    else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+    return response()->json($data_return);
+
+    }
+
+
+
+    return response()->json(['error' => 'Invalid parameters'], 400);
+}
+//=============== FICHE DE STOCK DES SERVICES EXCEL=======================================================================================
+function pdf_fiche_stock_vente_service_sans_prix_excel(Request $request)
+{
+    if ($request->get('date1') && $request->get('date2') && $request->get('idService')) {
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
+
+            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data11 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+        ->leftJoin('tvente_mouvement_stock as dtEntree', function ($join) use ($date1, $idService) {
+        $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtEntree.type_mouvement', '=', 'Entree')
+             ->where('dtEntree.dateMvt', '<', $date1);
+    })
+
+        // Utilisez distinct() avant select()
+        ->distinct()
+        ->select(
+            "tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation as designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation as Categorie",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux",            
+            DB::raw('IFNULL(ROUND(SUM(dtEntree.qteBase * dtEntree.qteMvt), 3), 0) as totalEntree'),
+
+        )
+        ->where([
+            ['tvente_stock_service.refService', '=', $idService]
+        ])
+        ->groupBy("tvente_stock_service.id",
+            'tvente_stock_service.refService',
+            'tvente_stock_service.refProduit',
+            "tvente_produit.designation",
+            "refCategorie",
+            "tvente_stock_service.pu",
+            "tvente_categorie_produit.designation",
+            "tvente_stock_service.qte",
+            "tvente_stock_service.uniteBase",
+            "tvente_stock_service.cmup",
+            "tvente_stock_service.devise",
+            "tvente_stock_service.taux")
+        ->orderBy("tvente_produit.designation", "asc")
+        ->get();
+
+    $data22 = DB::table('tvente_stock_service')
+    ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+    ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+    ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+
+    ->leftJoin('tvente_mouvement_stock as dtSortie', function ($join) use ($date1, $idService) {
+        $join->on('dtSortie.idStockService', '=', 'tvente_stock_service.id')        
+             ->where('dtSortie.type_mouvement', '=', 'Sortie')
+             ->where('dtSortie.dateMvt', '<', $date1);
+    })
+    // Utilisez distinct() avant select()
+    ->distinct()
+    ->select(
+        "tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation as designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation as Categorie",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup",
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+    )
+    ->where([
+        ['tvente_stock_service.refService', '=', $idService]
+    ])
+    ->groupBy("tvente_stock_service.id",
+        'tvente_stock_service.refService',
+        'tvente_stock_service.refProduit',
+        "tvente_produit.designation",
+        "refCategorie",
+        "tvente_stock_service.pu",
+        "tvente_categorie_produit.designation",
+        "tvente_stock_service.qte",
+        "tvente_stock_service.uniteBase",
+        "tvente_stock_service.cmup"
+        )
+    ->orderBy("tvente_produit.designation", "asc")
+    ->get();
+
+    // ============ LEs Mouvements =========================================================================
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data1 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtEntree', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtEntree.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtEntree.type_mouvement', '=', 'Entree')
+                 ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree')
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux"
+                )
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+    //======================================================================
+    
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data2 = DB::table('tvente_stock_service')
+        ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
+        ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
+        ->Join('tvente_categorie_produit', 'tvente_categorie_produit.id', '=', 'tvente_produit.refCategorie')
+    
+        ->leftJoin('tvente_mouvement_stock as mvtSortie', function ($join) use ($date1, $date2, $idService) {
+            $join->on('mvtSortie.idStockService', '=', 'tvente_stock_service.id')        
+                 ->where('mvtSortie.type_mouvement', '=', 'Sortie')
+                 ->whereBetween('mvtSortie.dateMvt', [$date1, $date2]);;
+        })
+    
+            // Utilisez distinct() avant select()
+            ->distinct()
+            ->select(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation as designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation as Categorie",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase","nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux",            
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+    
+            )
+            ->where([
+                ['tvente_stock_service.refService', '=', $idService]
+            ])
+            ->groupBy(
+                "tvente_stock_service.id",
+                'tvente_stock_service.refService',
+                'tvente_stock_service.refProduit',
+                "tvente_produit.designation",
+                "refCategorie",
+                "tvente_stock_service.pu",
+                "tvente_categorie_produit.designation",
+                "tvente_stock_service.qte",
+                "tvente_stock_service.uniteBase",
+                "nom_service",
+                "tvente_stock_service.cmup",
+                "tvente_stock_service.devise",
+                "tvente_stock_service.taux"
+                )
+            ->orderBy("tvente_produit.designation", "asc")
+            ->get();
+    
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
+    && (count($data1) === count($data22)))
+    {
+        for ($i = 0; $i < count($data1); $i++) {
+            $row11 = $data11[$i];
+            $row22 = $data22[$i];
+            $row1 = $data1[$i];
+            $row2 = $data2[$i];            
+
+            $totalSortie = floatval($row22->totalSortie);
+            $totalEntree = floatval($row11->totalEntree);
+
+            $stockSortie = floatval($row2->stockSortie);            
+            $stockEntree = floatval($row1->stockEntree);
+
+            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+            $totalGEntree = floatval($stockEntree);
+            $totalG = floatval($totalSI) + floatval($stockEntree);
+            $TGSortie = floatval($stockSortie);
+            $totalSF = floatval($totalG) - floatval($stockSortie);
+            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+
+            $data_return[] = [
+                'id' => $row1->id,
+                'Service' => $row1->nom_service,
+                'designation' => $row1->designation,
+                'Categorie' => $row1->Categorie,
+                'SI' => $totalSI,
+                'Entree' =>$totalGEntree,
+                'Total' => $totalG,
+                'Sortie' => $TGSortie,
+                'SF' => $totalSF,
+                // 'PU' => round($row1->cmup,2),
+                // 'PT' => round($totalPT,2),
                 'Unité' => $row1->uniteBase
             ];
 
@@ -26556,6 +26942,124 @@ function pdf_entete_commande_fournisseur_excel(Request $request)
                 'MONTANT PAIE($)' => $row1->totalPaie,
                 'RESTE($)' => $row1->RestePaie,
                 'OBSERV.(J)' => $row1->nombreJr             
+            ];
+
+        }
+    } 
+    else {
+        // Gérer le cas où les tableaux n'ont pas la même longueur
+        echo 'Les tableaux ont pas la même longueur.';
+    }
+
+     return response()->json($data_return);
+
+    }
+
+    return response()->json(['error' => 'Invalid parameters'], 400);
+}
+
+
+
+
+function pdf_detail_vente_service_excel(Request $request)
+{
+
+   if ($request->get('date1') && $request->get('date2') && $request->get('idService')) {
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $idService = $request->get('idService');
+
+        $data_return = []; // Initialisation du tableau pour stocker les résultats
+
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        $data = DB::table('tvente_detail_vente')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_vente.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
+    
+        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tvente_detail_vente.refEnteteVente')        
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
+        // ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
+    
+        // ->join('tfin_ssouscompte as comptevente','comptevente.id','=','tvente_categorie_produit.compte_vente')
+        // ->join('tfin_ssouscompte as comptevariation','comptevariation.id','=','tvente_categorie_produit.compte_variationstock')
+        // ->join('tfin_ssouscompte as compteperte','compteperte.id','=','tvente_categorie_produit.compte_perte')
+        // ->join('tfin_ssouscompte as compteproduit','compteproduit.id','=','tvente_categorie_produit.compte_produit')
+        // ->join('tfin_ssouscompte as comptedestockage','comptedestockage.id','=','tvente_categorie_produit.compte_destockage')
+      
+    
+        ->select('tvente_detail_vente.id','refEnteteVente','refProduit','tvente_detail_vente.compte_vente',
+        'tvente_detail_vente.compte_variationstock','tvente_detail_vente.compte_perte','tvente_detail_vente.compte_produit',
+        'tvente_detail_vente.compte_destockage','puVente','qteVente','uniteVente','puBase','qteBase',
+        'tvente_detail_vente.uniteBase','cmupVente','tvente_detail_vente.devise','tvente_detail_vente.taux',
+        'montanttva','montantreduction',
+        'tvente_detail_vente.active','tvente_detail_vente.author','tvente_detail_vente.refUser',
+        'tvente_detail_vente.created_at','idStockService',
+        //Produit
+        'tvente_produit.designation','tvente_produit.refCategorie','tvente_produit.refUniteBase',
+        'tvente_produit.pu','tvente_produit.qte','tvente_produit.cmup','tvente_produit.taux',
+        'tvente_produit.Oldcode','tvente_produit.Newcode','tvente_produit.tvaapplique',
+        'tvente_produit.estvendable','tvente_categorie_produit.designation as Categorie',
+        //client 
+        'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
+        'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
+        'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug',
+        "tvente_categorie_client.designation as CategorieClient","compte_client",
+        // 'compteclient.refSousCompte','compteclient.nom_ssouscompte','compteclient.numero_ssouscompte',
+        //ente vente
+        'nom_service', "tvente_module.nom_module",'tvente_entete_vente.code','refClient','refService','refReservation','module_id',
+        'dateVente','libelle','tvente_entete_vente.montant','tvente_entete_vente.paie','reduction','totaltva',
+        //compte produit
+        // 'comptevente.refSousCompte as refSousCompteVente','comptevente.nom_ssouscompte as nom_ssouscompteVente',
+        // 'comptevente.numero_ssouscompte as numero_ssouscompteVente'
+        // ,'comptevariation.refSousCompte as refSousCompteVariation','comptevariation.nom_ssouscompte as nom_ssouscompteVariation',
+        // 'comptevariation.numero_ssouscompte as numero_ssouscompteVariation'
+        // ,'compteperte.refSousCompte as refSousComptePerte','compteperte.nom_ssouscompte as nom_ssouscomptePerte',
+        // 'compteperte.numero_ssouscompte as numero_ssouscomptePerte'
+        // ,'compteproduit.refSousCompte as refSousCompteProduit','compteproduit.nom_ssouscompte as nom_ssouscompteProduit',
+        // 'compteproduit.numero_ssouscompte as numero_ssouscompteProduit'
+        // ,'comptedestockage.refSousCompte as refSousCompteDestockage','comptedestockage.nom_ssouscompte as nom_ssouscompteDestockage',
+        // 'comptedestockage.numero_ssouscompte as numero_ssouscompteDestockage',
+        'priseencharge')
+       ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
+       ->selectRaw('ROUND(((qteVente*puVente) - montantreduction + montanttva),2) as PTVenteTVA')
+       ->selectRaw('ROUND((IFNULL(montant,0)),2) as totalFacture')
+       ->selectRaw('ROUND((montanttva),2) as TotalTVA')
+       ->selectRaw('ROUND((((IFNULL(montant,0)) - montantreduction)+(montanttva)),2) as PTTTC')
+       ->selectRaw('((qteVente*puVente)/tvente_detail_vente.taux) as PTVenteFC')
+       ->selectRaw('(qteBase*puBase) as PTBase')
+       ->selectRaw('IFNULL(paie,0) as totalPaie')
+       ->selectRaw('(IFNULL(montant,0)-IFNULL(paie,0)) as RestePaie')
+        ->selectRaw('CONCAT("S",YEAR(dateVente),"",MONTH(dateVente),"00",refEnteteVente) as codeFacture')
+        ->where([
+            ['dateVente','>=', $date1],
+            ['dateVente','<=', $date2],
+            ['tvente_services.id','=', $idService]
+        ])
+        ->orderBy("tvente_detail_vente.created_at", "asc")    
+        ->get();   
+
+    // Vérifiez que les deux tableaux ont la même longueur
+    if ($data)
+    {
+        for ($i = 0; $i < count($data); $i++) {
+            $row1 = $data[$i];
+
+            $data_return[] = [
+                'N°FACT.' => $row1->codeFacture,
+                'CLIENT' => $row1->noms,
+                'DATE FACTURE.' => $row1->dateVente,
+                'CATEGORIE' => $row1->Categorie,
+                'PRODUIT' => $row1->designation,
+                'UNITE' => $row1->uniteVente,
+                'QTE' => $row1->qteVente,
+                'PU' => $row1->puVente,
+                'PT' => $row1->PTVente,
+                'TVA' => $row1->montanttva,                
+                'PT_TVA' => $row1->PTVenteTVA,                
+                'DEVISE' => $row1->devise            
             ];
 
         }

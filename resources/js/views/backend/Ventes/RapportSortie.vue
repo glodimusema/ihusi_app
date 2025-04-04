@@ -169,6 +169,18 @@
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelDetailVenteService" block color="  blue" dark>
+                                            <v-icon>print</v-icon> LES VENTES/SERVICE/EXCEL
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showDetailVenteByDate_ServiceByProduit" block color="  blue" dark>
                                             <v-icon>print</v-icon> LES VENTES/SERVICE/PRODUIT
                                         </v-btn>
@@ -303,6 +315,17 @@
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showFicheStockByDate_Service_Vendable" block color="  blue" dark>
                                             <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showFicheStockByDate_Service_Vendable_cmup" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE/CMUP
                                         </v-btn>
                                     </span>
                                 </template>
@@ -468,6 +491,18 @@
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="exportToExcelFicheStockService" block color="  blue" dark>
                                             <v-icon>print</v-icon> FICHE STOCK/SERVICE/EXCEL.
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+                            <!-- exportToExcelFicheStockServiceSansPrix -->
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="exportToExcelFicheStockServiceSansPrix" block color="  blue" dark>
+                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/SANS PRIX/EXCEL.
                                         </v-btn>
                                     </span>
                                 </template>
@@ -1141,6 +1176,23 @@ export default {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
             }
         },
+        showFicheStockByDate_Service_Vendable_cmup() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                if(this.svData.idService!="" && this.svData.statut != "")
+                {
+                    window.open(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_by_vendable_cmup?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&statut="+this.svData.statut);
+                }else
+                {
+                    this.showError("Veillez selectionner le service svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
         showDetailSortieByDate_Produit() {
             var date1 =  this.dates[0] ;
             var date2 =  this.dates[1] ;
@@ -1468,6 +1520,52 @@ export default {
                 console.error("Erreur lors de l'exportation : ", error);
             }
         },
+        async exportToExcelFicheStockServiceSansPrix() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                    if(this.svData.idService!="")
+                    {
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_sans_prix_excel?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                        let users = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', users); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(users)) {
+                            // C'est déjà un tableau
+                        } else if (users.data && Array.isArray(users.data)) {
+                            users = users.data; // Accéder au tableau
+                        } else if (users.products && Array.isArray(users.products)) {
+                            users = users.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(users);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+                        XLSX.writeFile(workbook, 'fichestockServiceCategorie.xlsx');
+                    }
+                    else
+                    {
+                        this.showError("Veillez selectionner le servic et Categorie svp");
+                    }               
+
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
+            }
+        },
 
 
 
@@ -1581,6 +1679,54 @@ export default {
                
             } else {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        async exportToExcelDetailVenteService() {
+            try {
+                var date1 =  this.dates[0] ;
+                var date2 =  this.dates[1] ;
+
+                if (date1 <= date2) {
+
+                    if(this.svData.idService!="")
+                    {
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_detail_vente_service_excel?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                        let detail_vente_service = response.data; // Changez const en let
+
+                        console.log('Réponse de API:', detail_vente_service); // Vérifiez la structure des données
+
+                        // Adapter l'accès aux données en fonction de la structure
+                        if (Array.isArray(detail_vente_service)) {
+                            // C'est déjà un tableau
+                        } else if (detail_vente_service.data && Array.isArray(detail_vente_service.data)) {
+                            detail_vente_service = detail_vente_service.data; // Accéder au tableau
+                        } else if (detail_vente_service.products && Array.isArray(detail_vente_service.products)) {
+                            detail_vente_service = detail_vente_service.products; // Accéder au tableau
+                        } else {
+                            throw new Error('Les données récupérées ne sont pas un tableau');
+                        }
+
+                        const worksheet = XLSX.utils.json_to_sheet(detail_vente_service);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'detail_vente_service');
+
+                        XLSX.writeFile(workbook, 'RapportDetailVenteService.xlsx');                               
+
+                    }
+                    else
+                    {
+                        this.showError("Veillez selectionner le service svp");
+                    } 
+
+                        
+                } 
+                else {
+                  this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+
+            } 
+            catch (error) {
+                console.error("Erreur lors de l'exportation : ", error);
             }
         } ,
         showFicheSyntheseCompteByDate_Service_Approv() {

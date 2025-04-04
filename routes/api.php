@@ -861,8 +861,10 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("pdf_fiche_stock_vente_service_bycategorie_unite_excel", 'PdfVenteController@pdf_fiche_stock_vente_service_bycategorie_unite_excel');
     Route::get("pdf_fiche_stock_vente_service_unite_excel", 'PdfVenteController@pdf_fiche_stock_vente_service_unite_excel');
 
+    //pdf_fiche_stock_vente_service_sans_prix_excel
     Route::get("pdf_fiche_stock_vente_service_bycategorie_excel", 'PdfVenteController@pdf_fiche_stock_vente_service_bycategorie_excel');
     Route::get("pdf_fiche_stock_vente_service_excel", 'PdfVenteController@pdf_fiche_stock_vente_service_excel');
+    Route::get("pdf_fiche_stock_vente_service_sans_prix_excel", 'PdfVenteController@pdf_fiche_stock_vente_service_sans_prix_excel');
     Route::get("pdf_fiche_mouvement_produit", 'PdfVenteController@pdf_fiche_mouvement_produit');
     Route::get("pdf_fiche_stock_cout_vente_service", 'PdfVenteController@pdf_fiche_stock_cout_vente_service');
     Route::get("fetch_rapport_detailentree_date_fss_produit", 'PdfVenteController@fetch_rapport_detailentree_date_fss_produit'); 
@@ -872,10 +874,16 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_rapport_paiementfacture_date_banque", 'PdfVenteController@fetch_rapport_paiementfacture_date_banque'); 
     Route::get("fetch_rapport_detailentree_date_fss", 'PdfVenteController@fetch_rapport_detailentree_date_fss'); 
     Route::get("fetch_rapport_detailcmd_date_fss", 'PdfVenteController@fetch_rapport_detailcmd_date_fss'); 
-    Route::get("fetch_rapport_detailvente_date_service_byproduit", 'PdfVenteController@fetch_rapport_detailvente_date_service_byproduit'); 
+    Route::get("fetch_pdf_rapport_detail_vente_date_service", 'PdfVenteController@fetch_rapport_detailvente_date_service');
+    Route::get("fetch_pdf_rapport_detail_vente_date_service_byproduit", 'PdfVenteController@fetch_rapport_detailvente_date_service_byproduit'); 
+    Route::get("pdf_detail_vente_service_excel", 'PdfVenteController@pdf_detail_vente_service_excel'); 
     Route::get("fetch_rapport_detailusage_date_service_byproduit", 'PdfVenteController@fetch_rapport_detailusage_date_service_byproduit'); 
     Route::get("fetch_rapport_detailusage_date_service_bycategorie", 'PdfVenteController@fetch_rapport_detailusage_date_service_bycategorie'); 
  
+
+    //pdf_detail_vente_service_excel
+    //fetch_rapport_detailvente_date_service_byproduit
+
     Route::get("fetch_rapport_paiementfacture_commande_date", 'PdfVenteController@fetch_rapport_paiementfacture_commande_date'); 
     Route::get("fetch_rapport_paiementfacture_commande_date_banque", 'PdfVenteController@fetch_rapport_paiementfacture_commande_date_banque'); 
     Route::get("fetch_rapport_paiementfacture_commande_date_fournisseur", 'PdfVenteController@fetch_rapport_paiementfacture_commande_date_fournisseur'); 
