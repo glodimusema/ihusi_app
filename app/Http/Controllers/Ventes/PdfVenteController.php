@@ -25170,14 +25170,11 @@ function calculerCoutMoyen($articleIdStk, $date1, $date2) {
             DB::raw('SUM(CASE WHEN type_mouvement = "Entree" THEN qteMvt * qteBase * (puMvt / qteBase) ELSE 0 END) as valeur_totale')
         )
         ->where([
-            ['tvente_mouvement_stock.dateMvt','>=', $date1],
+            // ['tvente_mouvement_stock.dateMvt','>=', $date1],
             ['tvente_mouvement_stock.dateMvt','<=', $date2],
-            ['idStockService','=', $articleIdStk],
-            ['type_mouvement','=', 'Entree'],
-        ])
-        // ->where('idStockService', $articleIdStk)
-        // ->where('type_mouvement', 'Entree')
-        // ->whereBetween('tvente_mouvement_stock.dateMvt', [$date1, $date2])        
+            ['tvente_mouvement_stock.idStockService','=', $articleIdStk],
+            ['tvente_mouvement_stock.type_mouvement','=', 'Entree'],
+        ])       
         ->first();
 
     // Initialiser les variables
@@ -25187,7 +25184,8 @@ function calculerCoutMoyen($articleIdStk, $date1, $date2) {
 
     // Calculer le coût moyen si le stock final est supérieur à 0
     if ($stockFinal > 0) {
-        $coutMoyen = round($valeurTotale / $stockFinal, 2);
+        $coutMoyen = round(floatval($valeurTotale) / floatval($stockFinal), 3);
+        // $coutMoyen = $valeurTotale;
     }
 
     return $coutMoyen;
@@ -25249,7 +25247,7 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
     // Utilisez distinct() avant select()
     ->distinct()
     ->select(
-        "tvente_stock_service.id",
+        // "tvente_stock_service.id",
         'tvente_stock_service.refService',
         'tvente_stock_service.refProduit',
         "tvente_produit.designation as designation",
@@ -25265,7 +25263,8 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
         ['tvente_stock_service.refService', '=', $idService],
         ['tvente_produit.estvendable','=', $statut],
     ])
-    ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", 
+    // ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", 
+    ->groupBy("tvente_stock_service.refService", 
     "tvente_stock_service.refProduit", "designation", "refCategorie", "pu", "Categorie",
      "qte", "uniteBase")
     ->orderBy("tvente_produit.designation", "asc")
@@ -25288,7 +25287,7 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
             // Utilisez distinct() avant select()
             ->distinct()
             ->select(
-                "tvente_stock_service.id",
+                // "tvente_stock_service.id",
                 'tvente_stock_service.refService',
                 'tvente_stock_service.refProduit',
                 "tvente_produit.designation as designation",
@@ -25305,7 +25304,9 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
                 ['tvente_stock_service.refService', '=', $idService],
                 ['tvente_produit.estvendable','=', $statut],
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            // ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", 
+            ->groupBy("tvente_stock_service.refService", 
+            "tvente_stock_service.refProduit", 
             "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase",
             "tvente_stock_service.devise","tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
@@ -25328,7 +25329,7 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
             // Utilisez distinct() avant select()
             ->distinct()
             ->select(
-                "tvente_stock_service.id",
+                // "tvente_stock_service.id",
                 'tvente_stock_service.refService',
                 'tvente_stock_service.refProduit',
                 "tvente_produit.designation as designation",
@@ -25345,7 +25346,9 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
                 ['tvente_stock_service.refService', '=', $idService],
                 ['tvente_produit.estvendable','=', $statut],
             ])
-            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", "tvente_stock_service.refProduit", 
+            // ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", 
+            ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService",
+            "tvente_stock_service.refProduit", 
             "designation", "refCategorie", "pu", "Categorie", "qte", "uniteBase",
             "tvente_stock_service.devise","tvente_stock_service.taux")
             ->orderBy("tvente_produit.designation", "asc")
@@ -25431,13 +25434,16 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
     if ((count($data1) === count($data2)) && (count($data1) === count($data11)) 
     && (count($data1) === count($data22))) {
 
+        $cmup_data =0;
+
     for ($i = 0; $i < count($data1); $i++) {
         $row11 = $data11[$i];
         $row22 = $data22[$i];
         $row1 = $data1[$i];
         $row2 = $data2[$i];
 
-        $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
+        $cmup_data = floatval($this->calculerCoutMoyen($row11->id, $date1, $date2));
+        // $cmup_data = $row11->id;
         
         // Assurez-vous que toutes les variables nécessaires sont définies
         $totalEntree = isset($row11->totalEntree) ? floatval($row11->totalEntree) : 0;
@@ -27054,13 +27060,16 @@ function pdf_detail_vente_service_excel(Request $request)
                 'CATEGORIE' => $row1->Categorie,
                 'PRODUIT' => $row1->designation,
                 'UNITE' => $row1->uniteVente,
-                'QTE' => $row1->qteVente,
-                'PU' => $row1->puVente,
-                'PT' => $row1->PTVente,
+                'QTE_VENTE' => $row1->qteVente,
+                'PU_VENTE' => $row1->puVente,
+                'PT_VENTE' => $row1->PTVente,
                 'TVA' => $row1->montanttva,                
-                'PT_TVA' => $row1->PTVenteTVA,                
-                'DEVISE' => $row1->devise            
+                'PT_TVA' => $row1->PTVenteTVA, 
+                'CMUP' => $row1->cmupVente ,               
+                'DEVISE' => $row1->devise 
             ];
+
+            //cmupVente
 
         }
     } 
