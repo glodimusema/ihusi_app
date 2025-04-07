@@ -475,23 +475,6 @@ export default {
                 reject(err);
                 });
         },
-        async updateUnite(index) { 
-                try {
-                    // Fetch the unit detail for the specified reference
-                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_service_stock/${this.svData.detailData[index].idStockService}`);
-                    // Extract data from the response
-                    const donnees = response.data.data;
-                    // Assuming you want to get the first item
-                    if (donnees.length > 0) {
-                        this.svData.detailData[index].nom_unite = donnees[0].uniteBase; // Update price per unit
-                        this.svData.detailData[index].puEntree = donnees[0].cmup; // Update price per unit
-                        this.svData.detailData[index].qteDisponible = donnees[0].qte; // Update available quantity
-                    } else {
-                        console.warn('No data found for the specified unit.');
-                    }
-                } catch (error) {
-                } 
-        },
         async updateTVA(index)
             {
                 try {
@@ -779,6 +762,7 @@ export default {
                         // this.svData.detailData[index].puEntree = donnees[0].puUnite; // Update price per unit
                         this.svData.detailData[index].qteDisponible = donnees[0].Qtedispo; // Update available quantity
                         this.svData.detailData[index].refProduit = donnees[0].refProduit;
+                        this.svData.detailData[index].puEntree = donnees[0].cmupData;
                     } else {
                         console.warn('No data found for the specified unit.');
                     }
@@ -787,30 +771,6 @@ export default {
                     // Handle error appropriately, e.g., show a notification 
                 } 
         },
-        // fetchListDataCommande(code) {
-        //     // Appel à l'API pour récupérer les données de commande
-        //     this.editOrFetch(`${this.apiBaseURL}/fetch_data_commande/${code}`).then(
-        //         ({ data }) => {
-        //             // Vérifiez si les données existent
-        //             if (data && data.data) {
-        //                 const donnees = data.data;
-        //                 this.svData.detailData = donnees;
-
-        //                 // Parcourir les données récupérées
-        //                 donnees.forEach((item, index) => {
-        //                     // Appeler les méthodes de mise à jour pour chaque produit
-        //                     this.fetchListProduit();
-        //                     this.updateProduct(index);
-        //                     this.updateUnite(index);
-        //                 });
-        //             } else {
-        //                 console.error('Aucune donnée trouvée dans la réponse API.');
-        //             }
-        //         }
-        //     ).catch(error => {
-        //         console.error('Erreur lors de la récupération des données:', error);
-        //     });
-        // },
 
 
         // VISUALISATION DES DONNEES DES COMMANDES============================================================

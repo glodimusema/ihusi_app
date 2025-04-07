@@ -473,23 +473,6 @@ export default {
                 reject(err);
                 });
         },
-        async updateUnite(index) { 
-                try {
-                    // Fetch the unit detail for the specified reference
-                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_service_stock/${this.svData.detailData[index].idStockService}`);
-                    // Extract data from the response
-                    const donnees = response.data.data;
-                    // Assuming you want to get the first item
-                    if (donnees.length > 0) {
-                        this.svData.detailData[index].nom_unite = donnees[0].uniteBase; // Update price per unit
-                        this.svData.detailData[index].puEntree = donnees[0].cmup; // Update price per unit
-                        this.svData.detailData[index].qteDisponible = donnees[0].qte; // Update available quantity
-                    } else {
-                        console.warn('No data found for the specified unit.');
-                    }
-                } catch (error) {
-                } 
-        },
         async updateTVA(index)
             {
                 try {
@@ -779,6 +762,7 @@ export default {
                         // this.svData.detailData[index].puEntree = donnees[0].puUnite; // Update price per unit
                         this.svData.detailData[index].qteDisponible = donnees[0].Qtedispo; // Update available quantity
                         this.svData.detailData[index].refProduit = donnees[0].refProduit;
+                        this.svData.detailData[index].puEntree = donnees[0].cmupData;
                     } else {
                         console.warn('No data found for the specified unit.');
                     }

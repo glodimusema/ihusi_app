@@ -396,10 +396,12 @@ class tvente_detail_entreeController extends Controller
        {
           $puBase=  floatval($montants);
        }
-       $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
+
+
+       $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase) * (floatval($qteEntree) * floatval($qteBase))))/(floatval($SI) + (floatval($qteEntree)* floatval($qteBase))));
 
        
-        $montanttva=0;
+      $montanttva=0;
     
         //id_tva
 
@@ -631,8 +633,10 @@ class tvente_detail_entreeController extends Controller
         {
            $puBase=  floatval($montants);
         }
+
+        $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase) * (floatval($qteEntree) * floatval($qteBase))))/(floatval($SI) + (floatval($qteEntree)* floatval($qteBase))));
         
-        $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
+        // $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
  
         
          $montanttva=0;
@@ -959,8 +963,8 @@ class tvente_detail_entreeController extends Controller
            {
               $puBase=  floatval($montants);
            }
-           $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
-    
+           
+           $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase) * (floatval($qteEntree) * floatval($qteBase))))/(floatval($SI) + (floatval($qteEntree)* floatval($qteBase))));
            
           $montanttva=0;
      
@@ -1219,9 +1223,9 @@ class tvente_detail_entreeController extends Controller
 
            
            if ($SI != 0 || $qteEntree != 0) {
-                $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/(floatval($SI)+floatval($qteEntree)));
+                $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase) * (floatval($qteEntree) * floatval($qteBase))))/(floatval($SI) + (floatval($qteEntree)* floatval($qteBase))));
             } else {
-                $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase)*floatval($qteEntree)))/1);
+                $cmupVente = (((floatval($cmupTemp)*floatval($SI))+(floatval($puBase) * (floatval($qteEntree) * floatval($qteBase))))/1);
             }           
     
    

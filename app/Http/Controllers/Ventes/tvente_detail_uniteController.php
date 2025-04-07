@@ -285,16 +285,15 @@ class tvente_detail_uniteController extends Controller
             ->get(); 
             foreach ($data3 as $row) 
             {
-                $qteBase =  $row->qteBase;
-                     
+                $qteBase =  $row->qteBase;                     
             }
             // 'id','refService','refProduit','pu','qte','uniteBase','cmup','devise','taux','active','refUser','author'
             // tvente_stock_service
 
             $data = DB::select(
-                'select (qte / :qteBase) as Qtedispo,refProduit,cmup from tvente_stock_service  
+                'select ROUND((qte / :qteBase),3) as Qtedispo,refProduit,ROUND((cmup * :qteBases),3) as cmupData from tvente_stock_service  
                  where tvente_stock_service.id = :idPro',
-                 ['qteBase' => $qteBase,'idPro' => $request->idStockService]
+                 ['qteBase' => $qteBase,'qteBases' => $qteBase,'idPro' => $request->idStockService]
             );   
     
             return response()->json([
