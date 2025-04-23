@@ -41,7 +41,7 @@ class tvente_paiement_commandeController extends Controller
         ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
         ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
         ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
-        ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+        ->join('tfin_ssouscompte as comptebanque','comptebanque.id','=','tconf_banque.refSscompte')
 
         ->select('tvente_paiement_commande.id','tvente_entete_paiecommande.code','refEntetepaie','refCommande','refBanque',
         'montant_paie','tvente_paiement_commande.devise','tvente_paiement_commande.taux','date_paie',
@@ -60,10 +60,10 @@ class tvente_paiement_commandeController extends Controller
         'date_entete_paie',
         
         "tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque"
-        ,'compteBanque.refSousCompte as refSousCompteBanque',
-        'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque"
+        ,'comptebanque.refSousCompte as refSouscomptebanque',
+        'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement_commande.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement_commande.id) as codeRecu');
         if (!is_null($request->get('query'))) {
@@ -95,7 +95,7 @@ class tvente_paiement_commandeController extends Controller
         ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
         ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
         ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
-        ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+        ->join('tfin_ssouscompte as comptebanque','comptebanque.id','=','tconf_banque.refSscompte')
 
         ->select('tvente_paiement_commande.id','tvente_entete_paiecommande.code','refEntetepaie','refCommande','refBanque',
         'montant_paie','tvente_paiement_commande.devise','tvente_paiement_commande.taux','date_paie',
@@ -114,10 +114,10 @@ class tvente_paiement_commandeController extends Controller
         'date_entete_paie',
         
         "tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque"
-        ,'compteBanque.refSousCompte as refSousCompteBanque',
-        'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque"
+        ,'comptebanque.refSousCompte as refSouscomptebanque',
+        'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement_commande.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement_commande.id) as codeRecu')
         ->Where('refEntetepaie',$refEntete);
@@ -146,7 +146,7 @@ class tvente_paiement_commandeController extends Controller
         ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
         ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
         ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
-        ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+        ->join('tfin_ssouscompte as comptebanque','comptebanque.id','=','tconf_banque.refSscompte')
 
         ->select('tvente_paiement_commande.id','tvente_entete_paiecommande.code','refEntetepaie','refCommande','refBanque',
         'montant_paie','tvente_paiement_commande.devise','tvente_paiement_commande.taux','date_paie',
@@ -165,10 +165,10 @@ class tvente_paiement_commandeController extends Controller
         'date_entete_paie',
         
         "tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque"
-        ,'compteBanque.refSousCompte as refSousCompteBanque',
-        'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque"
+        ,'comptebanque.refSousCompte as refSouscomptebanque',
+        'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement_commande.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement_commande.id) as codeRecu')
         ->Where('refCommande',$refEntete);
@@ -196,7 +196,7 @@ class tvente_paiement_commandeController extends Controller
         ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
         ->join('tfin_ssouscompte as comptefss','comptefss.id','=','tvente_categorie_fournisseur.compte_fss_bl')
         ->join('tconf_banque' , 'tconf_banque.id','=','tvente_paiement_commande.refBanque')
-        ->join('tfin_ssouscompte as compteBanque','compteBanque.id','=','tconf_banque.refSscompte')
+        ->join('tfin_ssouscompte as comptebanque','comptebanque.id','=','tconf_banque.refSscompte')
 
         ->select('tvente_paiement_commande.id','tvente_entete_paiecommande.code','refEntetepaie','refCommande','refBanque',
         'montant_paie','tvente_paiement_commande.devise','tvente_paiement_commande.taux','date_paie',
@@ -215,10 +215,10 @@ class tvente_paiement_commandeController extends Controller
         'date_entete_paie',
         
         "tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque"
-        ,'compteBanque.refSousCompte as refSousCompteBanque',
-        'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque"
+        ,'comptebanque.refSousCompte as refSouscomptebanque',
+        'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement_commande.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement_commande.id) as codeRecu')
         ->where('tvente_paiement_commande.id', $id)

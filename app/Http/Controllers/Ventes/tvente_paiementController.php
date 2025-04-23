@@ -59,8 +59,8 @@ class tvente_paiementController extends Controller
         'compteclient.numero_ssouscompte as numero_ssouscompteClient'
 
         ,"tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque",'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque",'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement.id) as codeRecu');
         if (!is_null($request->get('query'))) {
@@ -113,8 +113,8 @@ class tvente_paiementController extends Controller
         'compteclient.numero_ssouscompte as numero_ssouscompteClient'
 
         ,"tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque",'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque",'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement.id) as codeRecu')
         ->Where('refEnteteVente',$refEntete);
@@ -167,8 +167,8 @@ class tvente_paiementController extends Controller
         'compteclient.numero_ssouscompte as numero_ssouscompteClient'
 
         ,"tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque",'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque",'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement.id) as codeRecu')
         ->Where('refEntetepaie',$refEntete);
@@ -219,8 +219,8 @@ class tvente_paiementController extends Controller
         'compteclient.numero_ssouscompte as numero_ssouscompteClient'
 
         ,"tconf_banque.nom_banque","tconf_banque.numerocompte",'tconf_banque.nom_mode',
-        "tconf_banque.refSscompte as refSscompteBanque",'compteBanque.nom_ssouscompte as nom_ssouscompteBanque',
-        'compteBanque.numero_ssouscompte as numero_ssouscompteBanque')
+        "tconf_banque.refSscompte as refSscomptebanque",'comptebanque.nom_ssouscompte as nom_ssouscomptebanque',
+        'comptebanque.numero_ssouscompte as numero_ssouscomptebanque')
         ->selectRaw('((montant_paie)/tvente_paiement.taux) as montant_paieFC')
         ->selectRaw('CONCAT("R",YEAR(date_paie),"",MONTH(date_paie),"00",tvente_paiement.id) as codeRecu')
         ->where('tvente_paiement.id', $id)

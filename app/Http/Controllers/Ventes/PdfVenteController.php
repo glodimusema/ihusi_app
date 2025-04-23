@@ -5852,8 +5852,8 @@ function printRapportDetailEntree($date1, $date2)
          $data2 =   DB::table('tvente_detail_entree')
          ->join('tvente_produit','tvente_produit.id','=','tvente_detail_entree.refProduit')
          ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
-         ->join('tlog_entete_entree','tlog_entete_entree.id','=','tvente_detail_entree.refEnteteEntree')
-         ->join('tvente_fournisseur','tvente_fournisseur.id','=','tlog_entete_entree.refFournisseur')
+         ->join('tvente_entete_entree','tvente_entete_entree.id','=','tvente_detail_entree.refEnteteEntree')
+         ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_entree.refFournisseur')
  
          ->select(DB::raw('ROUND(SUM(qteEntree*puEntree),0) as TotalFacture'))
          ->where([
