@@ -16,13 +16,6 @@ class CreateTgazMouvementStockServiceLotTable extends Migration
         Schema::create('tgaz_mouvement_stock_service_lot', function (Blueprint $table) {
             $table->id();
             $table->foreignId('idStockService')->constrained('tgaz_stock_service_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);                       
-            $table->foreignId('compte_vente')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
-            $table->foreignId('compte_variationstock')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
-            $table->foreignId('compte_perte')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
-            $table->foreignId('compte_produit')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
-            $table->foreignId('compte_destockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
-            $table->foreignId('compte_achat')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();            
-            $table->foreignId('compte_stockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
             $table->date('dateMvt'); 
             $table->string('type_mouvement')->default('Entree');
             $table->string('libelle_mouvement',50);

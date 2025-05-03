@@ -27,7 +27,7 @@ class tgaz_lotController extends Controller
     public function index(Request $request)
     {
         $data = DB::table("tgaz_lot")
-        ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','author','refUser',
+        ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte','author','refUser',
         "tgaz_lot.created_at");
 
         if (!is_null($request->get('query'))) {
@@ -48,7 +48,7 @@ class tgaz_lotController extends Controller
     function fetch_tgaz_lot_2()
     {
          $data = DB::table("tgaz_lot")
-         ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','author','refUser',
+         ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte','author','refUser',
          "tgaz_lot.created_at")
         ->get();
         
@@ -69,11 +69,12 @@ class tgaz_lotController extends Controller
         if ($request->id !='') 
         {
             # code...
-            // update  //'id','nom_lot','code_lot','unite_lot','author','refUser'
+            // update  //'id','nom_lot','code_lot','unite_lot','stock_alerte','author','refUser'
             $data = tgaz_lot::where("id", $request->id)->update([                
                 'nom_lot' =>  $request->nom_lot,
                 'code_lot' =>  $request->code_lot,
                 'unite_lot' =>  $request->unite_lot,
+                'stock_alerte' =>  $request->stock_alerte,
                 'author' =>  $request->author,
                 'refUser' =>  $request->refUser
             ]);
@@ -87,6 +88,7 @@ class tgaz_lotController extends Controller
                 'nom_lot' =>  $request->nom_lot,
                 'code_lot' =>  $request->code_lot,
                 'unite_lot' =>  $request->unite_lot,
+                'stock_alerte' =>  $request->stock_alerte,
                 'author' =>  $request->author,
                 'refUser' =>  $request->refUser
             ]);

@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class tgaz_lot extends Model
 {
-    protected $fillable=['id','nom_lot','code_lot','unite_lot','author','refUser'];
+    protected $fillable=['id','nom_lot','code_lot','unite_lot','stock_alerte','author','refUser'];
     protected $table = 'tgaz_lot';
 }

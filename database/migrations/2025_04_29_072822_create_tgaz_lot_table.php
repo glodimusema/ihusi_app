@@ -17,7 +17,8 @@ class CreateTgazLotTable extends Migration
             $table->id();
             $table->string('nom_lot',225); 
             $table->string('code_lot',225);
-            $table->string('unite_lot',225);            
+            $table->string('unite_lot',225);
+            $table->double('stock_alerte')->default(0);            
             $table->string('author',100);  
             $table->foreignId('refUser')->constrained('users')->restrictOnUpdate()->restrictOnDelete();
             $table->timestamps();
