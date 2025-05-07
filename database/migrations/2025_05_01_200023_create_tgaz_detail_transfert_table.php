@@ -13,11 +13,13 @@ class CreateTgazDetailTransfertTable extends Migration
      */
     public function up()
     {
+        //refProduit
         Schema::create('tgaz_detail_transfert', function (Blueprint $table) {
             $table->id();
             $table->foreignId('refEnteteTransfert')->constrained('tgaz_entete_transfert')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('refDestination')->constrained('tvente_services')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('idStockService')->constrained('tgaz_stock_service_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
+            $table->foreignId('refLot')->constrained('tgaz_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
             $table->double('puTransfert');
             $table->double('qteTransfert');
             $table->string('uniteTransfert'); 
