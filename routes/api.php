@@ -676,6 +676,118 @@ Route::group(['namespace'   =>  "Logistique"], function(){
        
 });
 
+Route::group(['namespace'   =>  "Gaz"], function(){
+
+    Route::get("fetch_gaz_paiement", 'tgaz_detail_paiement_venteController@all');
+    Route::get("fetch_gaz_paiement_byentete/{refEntete}", 'tgaz_detail_paiement_venteController@fetch_data_entete');
+    Route::get("fetch_gaz_paiement_byentetepaie/{refEntete}", 'tgaz_detail_paiement_venteController@fetch_data_entete_paie');
+    Route::get("fetch_single_gaz_paiement/{id}", 'tgaz_detail_paiement_venteController@fetch_single_data');    
+    Route::post("insert_gaz_paiement", 'tgaz_detail_paiement_venteController@insert_data');
+    Route::post("insert_gaz_paiement2", 'tgaz_detail_paiement_venteController@insert_data2');
+    Route::post("update_gaz_paiement/{id}", 'tgaz_detail_paiement_venteController@update_data');
+    Route::get("delete_gaz_paiement/{id}", 'tgaz_detail_paiement_venteController@delete_data');
+
+    Route::get("fetch_gaz_entete_paiement", 'tgaz_entete_paiement_venteController@all');
+    Route::get("fetch_gaz_entete_paiement_entete/{refEntete}", 'tgaz_entete_paiement_venteController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_paiement/{id}", 'tgaz_entete_paiement_venteController@fetch_single_data');    
+    Route::post("insert_gaz_entete_paiement", 'tgaz_entete_paiement_venteController@insert_data');
+    Route::post("update_gaz_entete_paiement/{id}", 'tgaz_entete_paiement_venteController@update_data');
+    Route::get("delete_gaz_entete_paiement/{id}", 'tgaz_entete_paiement_venteController@delete_data');
+
+
+    Route::get("fetch_gaz_entete_transfert", 'tgaz_entete_transfertController@all');
+    Route::get("fetch_gaz_entete_transfert/{refEntete}", 'tgaz_entete_transfertController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_transfert/{id}", 'tgaz_entete_transfertController@fetch_single_data');    
+    Route::post("insert_gaz_entete_transfert", 'tgaz_entete_transfertController@insert_data');
+    Route::post("update_gaz_entete_transfert/{id}", 'tgaz_entete_transfertController@update_data');
+    Route::get("delete_gaz_entete_transfert/{id}", 'tgaz_entete_transfertController@delete_data');
+
+    Route::get("fetch_gaz_detail_transfert", 'tgaz_detail_transfertController@all');
+    Route::get("fetch_gaz_detail_transfert/{refEntete}", 'tgaz_detail_transfertController@fetch_data_entete');
+    Route::get("fetch_single_gaz_detail_transfert/{id}", 'tgaz_detail_transfertController@fetch_single_data');    
+    Route::post("insert_gaz_detail_transfert", 'tgaz_detail_transfertController@insert_data');
+    Route::post("insert_gaz_global_transfert", 'tgaz_detail_transfertController@insert_dataGlobal');
+    Route::post("insert_gaz_data_transfert", 'tgaz_detail_transfertController@insert_dataTransfert');
+    Route::post("update_gaz_detail_transfert/{id}", 'tgaz_detail_transfertController@update_data');
+    Route::get("delete_gaz_detail_transfert/{id}", 'tgaz_detail_transfertController@delete_data');
+
+
+    Route::get("fetch_gaz_entete_production", 'tgaz_entete_productionController@all');
+    Route::get("fetch_gaz_entete_production/{refEntete}", 'tgaz_entete_productionController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_production/{id}", 'tgaz_entete_productionController@fetch_single_data');    
+    Route::post("insert_gaz_entete_production", 'tgaz_entete_productionController@insert_data');
+    Route::post("update_gaz_entete_production/{id}", 'tgaz_entete_productionController@update_data');
+    Route::get("delete_gaz_entete_production/{id}", 'tgaz_entete_productionController@delete_data');
+
+    Route::get("fetch_gaz_detail_production", 'tgaz_detail_productionController@all');
+    Route::get("fetch_gaz_detail_production/{refEntete}", 'tgaz_detail_productionController@fetch_data_entete');
+    Route::get("fetch_single_gaz_detail_production/{id}", 'tgaz_detail_productionController@fetch_single_data');    
+    Route::post("insert_gaz_detail_production", 'tgaz_detail_productionController@insert_data');
+    Route::post("insert_gaz_globale_production", 'tgaz_detail_productionController@insert_dataGlobal');
+    Route::get('/fetch_detail_production/{id}', 'tgaz_detail_productionController@fetch_detail_facture');
+    Route::post("update_gaz_detail_production/{id}", 'tgaz_detail_productionController@update_data');
+    Route::get("delete_gaz_detail_production/{id}", 'tgaz_detail_productionController@delete_data');
+
+
+    Route::get("fetch_gaz_entete_vente", 'tgaz_entete_venteController@all');
+    Route::get("fetch_gaz_entete_vente_encours", 'tgaz_entete_venteController@fetch_data_encours');
+    Route::get("fetch_data_gaz_entete_vente_search", 'tgaz_entete_venteController@fetch_data_entete_vente_search');
+    Route::get("fetch_gaz_entete_vente/{refEntete}", 'tgaz_entete_venteController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_vente/{id}", 'tgaz_entete_venteController@fetch_single_data');    
+    Route::post("insert_gaz_entete_vente", 'tgaz_entete_venteController@insert_data');
+    Route::post("update_gaz_entete_vente/{id}", 'tgaz_entete_venteController@update_data');
+    Route::post("update_gaz_vente_nombre_print/{id}", 'tgaz_entete_venteController@update_nombre_print');
+    Route::get("delete_gaz_entete_vente/{id}", 'tgaz_entete_venteController@delete_data')
+    
+    ;
+    Route::get("fetch_gaz_detail_vente", 'tgaz_detail_venteController@all');
+    Route::get("fetch_gaz_detail_vente/{refEntete}", 'tgaz_detail_venteController@fetch_data_entete');
+    Route::get("fetch_single_gaz_detail_vente/{id}", 'tgaz_detail_venteController@fetch_single_data');    
+    Route::post("insert_gaz_detail_vente", 'tgaz_detail_venteController@insert_data');
+    Route::post("insert_gaz_globale_vente", 'tgaz_detail_venteController@insert_dataGlobal');
+    Route::post("insert_gaz_cash_vente/{id}", 'tgaz_detail_venteController@insert_paiement_cash');
+    Route::post("insert_gaz_globale_vente_cash", 'tgaz_detail_venteController@insert_dataGlobalCash');
+    Route::get('/fetch_gaz_detail_facture/{id}', 'tgaz_detail_venteController@fetch_detail_facture');
+    Route::get('/fetch_gaz_detail_facture_chambre/{id}', 'tgaz_detail_venteController@fetch_detail_facture_chambre');
+    Route::post("update_gaz_detail_vente/{id}", 'tgaz_detail_venteController@update_data');
+    Route::get("delete_gaz_detail_vente/{id}", 'tgaz_detail_venteController@delete_data');
+
+    Route::get("fetch_gaz_lot", 'tgaz_lotController@index');
+    Route::get("fetch_single_gaz_lot/{id}", 'tgaz_lotController@edit');
+    Route::get("delete_gaz_lot/{id}", 'tgaz_lotController@destroy');
+    Route::post("insert_gaz_lot", 'tgaz_lotController@store');
+    Route::get("fetch_gaz_lot_2", 'tgaz_lotController@fetch_tgaz_lot_2');
+
+    Route::get("fetch_gaz_parametre_lots", 'tgaz_parametre_lotController@all');
+    Route::get("fetch_gaz_parametre_lot/{refEntete}", 'tgaz_parametre_lotController@fetch_data_entete');
+    Route::get("fetch_single_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@fetch_single_data');
+    Route::get("fetch_single_gaz_parametre_byLot/{refFlot}", 'tgaz_parametre_lotController@fetch_parametre_lot');        
+    Route::post("insert_gaz_parametre_lot", 'tgaz_parametre_lotController@insert_data');
+    Route::post("update_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@update_data');
+    Route::get("delete_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@delete_data');
+
+    Route::get("fetch_gaz_service_stock", 'tgaz_stock_service_lotController@all');
+    Route::get("fetch_gaz_stock_fiche_byservice/{refService}", 'tgaz_stock_service_lotController@getStockFinal');
+    Route::get("fetch_gaz_stock_data_byservice/{refService}", 'tgaz_stock_service_lotController@fetch_stock_data_byservice');
+    Route::get("fetch_gaz_data_stock_service_filter", 'tgaz_stock_service_lotController@fetch_data_stock_service_filter');
+    Route::get("fetch_gaz_service_stock_byservice/{refEntete}", 'tgaz_stock_service_lotController@fetch_data_entete_service');
+    Route::get("fetch_gaz_service_stock_byproduct/{refEntete}", 'tgaz_stock_service_lotController@fetch_data_entete_produit');
+    Route::get("fetch_single_gaz_service_stock/{id}", 'tgaz_stock_service_lotController@fetch_single_data');    
+    Route::post("insert_gaz_service_stock", 'tgaz_stock_service_lotController@insert_data');
+    Route::post("update_gaz_service_stock/{id}", 'tgaz_stock_service_lotController@update_data');
+    Route::get("delete_gaz_service_stock/{id}", 'tgaz_stock_service_lotController@delete_data');
+
+    Route::get("fetch_gaz_mouvement_stocks", 'tgaz_mouvement_stock_service_lotController@all');
+    Route::get("fetch_gaz_mouvement_stock/{refEntete}", 'tgaz_mouvement_stock_service_lotController@fetch_data_entete');
+    Route::get("fetch_single_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@fetch_single_data');    
+    Route::post("insert_gaz_mouvement_stock", 'tgaz_mouvement_stock_service_lotController@insert_data');
+    Route::post("update_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@update_data');
+    Route::get("delete_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@delete_data');
+
+
+
+});
+
 
 Route::group(['namespace'   =>  "Ventes"], function(){
 
@@ -971,7 +1083,7 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_paiecommande/{id}", 'tvente_paiement_commandeController@delete_data');
 
     //insert_data_one
-//fetch_data_entete_cmd
+
     Route::get("fetch_vente_autorisation", 'tvente_autorisationController@index');
     Route::get("fetch_single_vente_autorisation/{id}", 'tvente_autorisationController@edit');
     Route::get("delete_vente_autorisation/{id}", 'tvente_autorisationController@destroy');

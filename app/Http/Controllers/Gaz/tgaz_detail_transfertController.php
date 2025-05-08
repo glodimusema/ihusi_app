@@ -8,10 +8,6 @@ use App\Models\Ventes\tgaz_detail_transfert;
 use App\Models\Ventes\tgaz_entete_transfert;
 use App\Models\Ventes\tgaz_mouvement_stock_service_lot;
 
-use App\Models\Ventes\tvente_entete_entree;
-use App\Models\Ventes\tvente_entete_utilisation;
-use App\Models\Ventes\tvente_detail_utilisation;
-
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 use Carbon\Carbon;

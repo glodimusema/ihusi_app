@@ -274,19 +274,18 @@ class tgaz_entete_venteController extends Controller
         //'id','code','refClient','refService','module_id','serveur_id','etat_facture',
         // 'dateVente','libelle','montant','reduction','totaltva','paie','date_paie_current',
         // 'nombre_print','author','refUser'
+
         $module_id = 13;
         $code = $this->GetCodeData('tvente_param_systeme','module_id',$module_id);
         $data = tgaz_entete_vente::create([
             'code'       =>  $code,
             'refClient'       =>  $request->refClient,
-            'refService'       =>  $request->refService,  
-            'refReservation'       =>  0,            
+            'refService'       =>  $request->refService, 
             'module_id'       =>  $module_id,
-            'dateVente'    =>  $request->dateVente,
-            'libelle'    =>  $request->libelle,
             'serveur_id'    =>  $request->serveur_id,
-            'table_id'    =>  $request->table_id,
             'etat_facture'    =>  $request->etat_facture,
+            'dateVente'    =>  $request->dateVente,
+            'libelle'    =>  $request->libelle, 
             'author'       =>  $request->author,
             'refUser'       =>  $request->refUser
         ]);
@@ -299,15 +298,14 @@ class tgaz_entete_venteController extends Controller
     {
         //'date_paie_current','nombre_print'
         $data = tgaz_entete_vente::where('id', $id)->update([
+            'code'       =>  $code,
             'refClient'       =>  $request->refClient,
-            'refService'       =>  $request->refService,
-            'refReservation'       =>  $request->refReservation,
-            'module_id'       =>  $request->module_id,
-            'dateVente'    =>  $request->dateVente,
-            'libelle'    =>  $request->libelle,
+            'refService'       =>  $request->refService, 
+            'module_id'       =>  $module_id,
             'serveur_id'    =>  $request->serveur_id,
-            'table_id'    =>  $request->table_id,
             'etat_facture'    =>  $request->etat_facture,
+            'dateVente'    =>  $request->dateVente,
+            'libelle'    =>  $request->libelle, 
             'author'       =>  $request->author,
             'refUser'       =>  $request->refUser
         ]);
@@ -351,7 +349,7 @@ class tgaz_entete_venteController extends Controller
 
    
             $data2 = DB::update(
-                'update tvente_stock_service set qte = qte + :qteVente where refProduit = :id',
+                'update tvente_stock_service set qte_lot = qte_lot + :qteVente where refProduit = :id',
                 ['qteVente' => $qte,'id' => $idStockService]
             );     
             $data3 = DB::update(
@@ -362,7 +360,7 @@ class tgaz_entete_venteController extends Controller
             $nom_table = 'tgaz_detail_vente';
 
             $data4 = DB::update(
-                'delete from tvente_mouvement_stock where tvente_mouvement_stock.id_data = :id and nom_table=:nom_table',
+                'delete from tgaz_mouvement_stock_service_lot where tgaz_mouvement_stock_service_lot.id_data = :id and nom_table=:nom_table',
                 ['id' => $idDetail, 'nom_table' => $nom_table]
             );
     
