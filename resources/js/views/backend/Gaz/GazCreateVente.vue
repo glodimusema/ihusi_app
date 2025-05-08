@@ -150,6 +150,7 @@
             <v-simple-table>
                 <thead>
                     <tr>
+                        <th>N°</th>
                         <th>Produit</th>
                         <th>Unité</th>
                         <th>Qté Dispo</th>
@@ -164,29 +165,30 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td class="short-cell">
+                            <v-text-field v-model="svData.qte_kit" label="Quantité"></v-text-field>
+                        </td>
                         <td class="long-cell">
-                            <v-autocomplete v-model="item.idStockService" :items="kitList"
+                            <v-autocomplete v-model="svData.idStockService" :items="kitList"
                                 label="Selectionnez le Kit" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="nom_lot" item-value="id"
-                                @change="updateUnite(index)"></v-autocomplete>
+                                @change="fetchListDataKit(svData.idStockService, svData.qte_kit)"></v-autocomplete>
                         </td>
                         <td class="short-cell">
-                            <v-text-field v-model="item.nom_unite" label="Unité" readonly></v-text-field>
+                            <v-text-field v-model="svData.qteDisponible" label="Qté Dispo" readonly></v-text-field>
                         </td>
+                        
                     </tr>
                     <tr v-for="(item, index) in svData.detailData" :key="index">
+                        <td class="short-cell">
+                            <v-text-field v-model="item.idParamLot" label="Id" readonly></v-text-field>
+                        </td>
                         <td class="long-cell">
-                            <v-autocomplete v-model="item.idStockService" :items="lotList"
-                                label="Selectionnez le Produit" :rules="[(v) => !!v || 'Ce champ est requis']"
-                                hide-no-data hide-selected item-text="nom_lot" item-value="id"
-                                @change="updateUnite(index)"></v-autocomplete>
+                            <v-text-field v-model="item.produit_param" label="Produit" readonly></v-text-field>
                         </td>
                         <td class="short-cell">
                             <v-text-field v-model="item.nom_unite" label="Unité" readonly></v-text-field>
-                        </td>
-                        <td class="short-cell">
-                            <v-text-field v-model="item.qteDisponible" label="Qté Dispo" readonly></v-text-field>
-                        </td>
+                        </td>                       
                         <td class="short-cell">
                             <v-text-field v-model="item.qteVente" type="number" label="Qté" :rules="[rules.required]"
                                 required></v-text-field>
@@ -431,11 +433,11 @@ export default {
                 serveur_id : 0,
                 etat_facture : "",
 
+                qteDisponible : 0,
                 id_kit : 0,
                 qte_kit : 0,
 
-                detailData: [{
-                    qteDisponible: 0,
+                detailData: [{                    
                     qteVente: 0,
                     puVente: 0,                    
                     montantreduction: 0,
@@ -444,6 +446,10 @@ export default {
                     montant_tva:0,
                     idStockService : 0,
                     nom_unite : '',
+
+                    idParamLot : 0,
+                    produit_param : "",
+                    
                     
                     uniteList: [],
                     tvaList: [],
@@ -497,6 +503,8 @@ export default {
                 montant_tva:0,
                 id_tva:0,
                 nom_unite : '',
+                idParamLot : 0,
+                produit_param : "",
 
                 uniteList: [],
                 tvaList: [],
@@ -516,8 +524,10 @@ export default {
                 var chart = res.data.data;
                 if (chart) {
                     this.lotList = chart;
+                    this.kitList = chart;
                 } else {
                     this.lotList = [];
+                    this.kitList = [];
                 }
                 this.isLoading(false);
                 })
@@ -613,6 +623,8 @@ export default {
                     montant_tva:0,
                     idStockService : 0,
                     nom_unite : '',
+                    idParamLot : 0,
+                    produit_param : "",
             }];
             this.$refs.form.reset(); // Reset the form validation state            
             this.fetchListTVA();
@@ -907,9 +919,9 @@ export default {
             "Un nouveau Client";
 
         },
-        async fetchListDataKit(idLot) {
+        async fetchListDataKit(idStockService, qte_kit) {
             try {
-                const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLot/${idLot}`);
+                const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
                 const { data } = response;
 
                 // Vérifiez si les données existent
@@ -921,17 +933,19 @@ export default {
                         
                         return {
                             ...item,
-                            qteDisponible: item.refProduit,
-                            qteVente: item.refProduit,
-                            puVente: item.refProduit,
-                            devise: "",
-                            montantreduction: item.refProduit,
-                            idStockService : item.refProduit,
-                            pt : item.refProduit,
-                            tva : item.refProduit,
-                            montant_tva : item.refProduit,
-                            id_tva : item.refProduit,
-                            nom_unite : item.refProduit,
+                            qteDisponible: item.qte_param,
+                            qteVente: (item.qte_param * qte_kit),
+                            puVente: item.pu_param,
+                            devise: item.devise,
+                            montantreduction: 0,
+                            idStockService : idStockService,
+                            pt : ((item.qte_param * qte_kit) * item.pu_param),
+                            tva : 0,
+                            montant_tva : 0,
+                            id_tva : 1,
+                            nom_unite : item.uniteBase,
+                            idParamLot : item.id,
+                            produit_param : item.designation
                         };
                     });
                 } else {

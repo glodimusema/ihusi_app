@@ -776,8 +776,6 @@ class tgaz_detail_productionController extends Controller
             $compte_destockage=0;
             $compte_stockage=0;
             $cmupVente=0;
-    
-    
            
             $montanttva=0;
             $pourtageTVA=0;

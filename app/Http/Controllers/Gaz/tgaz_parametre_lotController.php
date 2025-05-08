@@ -124,6 +124,39 @@ class tgaz_parametre_lotController extends Controller
     }
 
 
+    function fetch_parametre_lot_stock_service($idStockService)
+    { 
+
+        $id_flot = 0;
+        $stockservice = DB::table('tgaz_stock_service_lot')       
+        ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
+        'devise','taux','active','refUser','author')
+        ->where([
+           ['tgaz_stock_service_lot.id','=',  $idStockService]
+        ])
+        ->first();
+        if ($stockservice) {
+            $id_flot = $stockservice->refLot;
+        }
+
+        $data = DB::table('tgaz_parametre_lot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
+        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
+        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','pu','qte',
+        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable','uniteBase',
+        "tvente_categorie_produit.designation as Categorie")                     
+        ->Where('refFlot',$id_flot)
+        ->get();
+
+        return response()->json([
+            'data'  => $data
+        ]);
+    }
+
+
    //'id','refProduit','refFlot','pu_param','qte_param','autre_detail','author','refUser'
     function insert_data(Request $request)
     {       

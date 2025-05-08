@@ -13,6 +13,7 @@
             </v-card-title>
             <v-card-text>
               <!-- layout -->
+              <MouvementStockGaz ref="MouvementStockGaz" />
     
               <div>
     
@@ -170,6 +171,15 @@
                                       </template>
                                       <span>Suppression</span>
                                     </v-tooltip>
+
+                                    <v-tooltip top color="black">
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on">
+                                          <v-btn @click="showMouvementStockGaz(item.id, item.nom_lot)" fab small><v-icon color="blue">mdi-file-cog</v-icon></v-btn>
+                                        </span>
+                                      </template>
+                                      <span>Detail Mouvement Stock Service</span>
+                                    </v-tooltip>
     
                                     <v-tooltip  top color="black">
                                       <template v-slot:activator="{ on, attrs }">
@@ -216,7 +226,12 @@
     </template>
     <script>
     import { mapGetters, mapActions } from "vuex";
+    import MouvementStockGaz from "./MouvementStockGaz.vue";
+
     export default {
+      components : {
+        MouvementStockGaz
+      },
       data() {
         return {
     
@@ -229,6 +244,7 @@
           titleComponent: '',
          // 'id','refService','refLot','pu_lot','qte_lot','cmup_lot','devise','taux','active','refUser','author'
           refLot: 0,
+
           svData: {
             id: '',
             refLot: 0,
@@ -359,7 +375,23 @@
               this.deviseList = donnees;
             }
           );
-        }
+        },
+      showMouvementStockGaz(idStockService, name) {
+        //StockServiceGaz
+        if (idStockService != '') {  
+          this.$refs.MouvementStockGaz.$data.etatModal = true;
+          this.$refs.MouvementStockGaz.$data.idStockService = idStockService;
+          this.$refs.MouvementStockGaz.$data.svData.idStockService = idStockService;
+          this.$refs.MouvementStockGaz.fetchDataList();
+          this.$refs.MouvementStockGaz.fetchListProduit();
+          this.onPageChange();  
+          this.$refs.MouvementStockGaz.$data.titleComponent =
+            "Mouvement Stock pour " + name;
+  
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }  
+      }
     
     
       },

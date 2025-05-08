@@ -175,8 +175,33 @@
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
-      </v-list-group>
-      <!-- fin liste groupe -->
+     </v-list-group>
+     <!-- fin liste groupe -->
+
+
+     <!-- liste groupe -->
+     <v-list-group v-for="list in linkAdmin.listGaz" :key="list.id" :value="false" no-action group
+      >
+        <template v-slot:activator>
+          <v-list-item-icon>
+            <v-icon>{{ list.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-title>{{ list.text }}</v-list-item-title>
+        </template>
+
+        <v-list-item-group>
+          <v-list-item v-for="submenu in list.items" :key="submenu.id" :to="submenu.href">
+            <v-list-item-icon>
+              <v-icon></v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              <span>{{ submenu.text }}</span>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+     </v-list-group>
+     <!-- fin liste groupe -->
 
 
       <!-- liste groupe -->

@@ -3,7 +3,10 @@
       <v-flex md2></v-flex>
       <v-flex md8>
         <v-flex md12>
-          <!-- modal -->
+
+          <ParametreLot ref="ParametreLot" />
+          <StockServiceGaz ref="StockServiceGaz" />
+          <!-- modal --> 
           <v-dialog v-model="dialog" max-width="400px" scrollable transition="dialog-bottom-transition">
             <v-card :loading="loading">
               <v-form ref="form" lazy-validation>
@@ -125,7 +128,26 @@
                           </template>
                           <span>Modifier</span>
                         </v-tooltip>
+
+                        <v-tooltip top color="black">
+                          <template v-slot:activator="{ on, attrs }">
+                            <span v-bind="attrs" v-on="on">
+                              <v-btn @click="showParametreLot(item.id, item.nom_lot)" fab small><v-icon color="blue">mdi-file-cog</v-icon></v-btn>
+                            </span>
+                          </template>
+                          <span>Parametre Kit</span>
+                        </v-tooltip>
+
+                        <v-tooltip top color="black">
+                          <template v-slot:activator="{ on, attrs }">
+                            <span v-bind="attrs" v-on="on">
+                              <v-btn @click="showStockServiceGaz(item.id, item.nom_lot)" fab small><v-icon color="blue">mdi-file-cog</v-icon></v-btn>
+                            </span>
+                          </template>
+                          <span>Detail Stock Service</span>
+                        </v-tooltip>
   
+                        <!-- StockServiceGaz -->
                         <!-- <v-tooltip top   color="black">
                             <template v-slot:activator="{ on, attrs }">
                               <span v-bind="attrs" v-on="on">
@@ -156,8 +178,15 @@
   </template>
   <script>
   import { mapGetters, mapActions } from "vuex";
+  import ParametreLot from "./ParametreLot.vue";
+  import StockServiceGaz from "./StockServiceGaz.vue";
+  
+
   export default {
-    components: {},
+    components: {
+      ParametreLot,
+      StockServiceGaz
+    },
     data() {
       return {
         title: "Categorie component",
@@ -260,6 +289,38 @@
             }
           );
         });
+      },
+      showParametreLot(refLot, name) {
+        //StockServiceGaz
+        if (refLot != '') {  
+          this.$refs.ParametreLot.$data.etatModal = true;
+          this.$refs.ParametreLot.$data.refLot = refLot;
+          this.$refs.ParametreLot.$data.svData.refLot = refLot;
+          this.$refs.ParametreLot.fetchDataList();
+          this.$refs.ParametreLot.fetchListProduit();
+          this.onPageChange();  
+          this.$refs.ParametreLot.$data.titleComponent =
+            "Parametre pour " + name;
+  
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }  
+      },
+      showStockServiceGaz(refLot, name) {
+        //StockServiceGaz
+        if (refLot != '') {  
+          this.$refs.StockServiceGaz.$data.etatModal = true;
+          this.$refs.StockServiceGaz.$data.refLot = refLot;
+          this.$refs.StockServiceGaz.$data.svData.refLot = refLot;
+          this.$refs.StockServiceGaz.fetchDataList();
+          this.$refs.StockServiceGaz.fetchListProduit();
+          this.onPageChange();  
+          this.$refs.StockServiceGaz.$data.titleComponent =
+            "Detail Stock pour " + name;
+  
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }  
       },
   
   

@@ -761,7 +761,8 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::get("fetch_gaz_parametre_lots", 'tgaz_parametre_lotController@all');
     Route::get("fetch_gaz_parametre_lot/{refEntete}", 'tgaz_parametre_lotController@fetch_data_entete');
     Route::get("fetch_single_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@fetch_single_data');
-    Route::get("fetch_data_gaz_parametre_byLot/{refFlot}", 'tgaz_parametre_lotController@fetch_parametre_lot');        
+    Route::get("fetch_data_gaz_parametre_byLot/{refFlot}", 'tgaz_parametre_lotController@fetch_parametre_lot');    
+    Route::get("fetch_data_gaz_parametre_byLotStockService/{idStockService}", 'tgaz_parametre_lotController@fetch_parametre_lot_stock_service');     
     Route::post("insert_gaz_parametre_lot", 'tgaz_parametre_lotController@insert_data');
     Route::post("update_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@update_data');
     Route::get("delete_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@delete_data');

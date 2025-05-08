@@ -135,6 +135,20 @@
                           <span>Voir Stock des Services</span>
                       </v-tooltip>
 
+
+                      <v-tooltip  top color="black">
+                          <template v-slot:activator="{ on, attrs }">
+                                <span v-bind="attrs" v-on="on">
+                                  <v-btn @click="showStockServiceGazByService(item.id, item.nom_service)" fab small>
+                                    <v-icon color="blue">mdi-cart-plus</v-icon>
+                                  </v-btn>
+                                </span>
+                          </template>
+                          <span>Voir Stock Gaz/Services</span>
+                      </v-tooltip>
+
+
+
                       <!-- <v-tooltip top   color="black">
                           <template v-slot:activator="{ on, attrs }">
                             <span v-bind="attrs" v-on="on">
@@ -166,11 +180,15 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import VenteServiceStockByService from './VenteServiceStockByService.vue';
+import StockServiceGazByService from "../Gaz/StockServiceGazByService.vue";
 
 
 
 export default {
-  components: {VenteServiceStockByService},
+  components: {
+    VenteServiceStockByService,
+    StockServiceGazByService
+  },
   data() {
     return {
       title: "Categorie component",
@@ -278,7 +296,7 @@ export default {
       });
     },
       showVenteServiceStockByService(refService, name) {
-  
+        //StockServiceGazByService
         if (refService != '') {
   
           this.$refs.VenteServiceStockByService.$data.etatModal = true;
@@ -290,6 +308,26 @@ export default {
           this.onPageChange();
   
           this.$refs.VenteServiceStockByService.$data.titleComponent =
+            "Stock Service pour " + name;
+  
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }
+  
+      },
+      showStockServiceGazByService(refService, name) {
+        //StockServiceGazByService
+        if (refService != '') {
+  
+          this.$refs.StockServiceGazByService.$data.etatModal = true;
+          this.$refs.StockServiceGazByService.$data.refService = refService;
+          this.$refs.StockServiceGazByService.$data.svData.refService = refService;
+          this.$refs.StockServiceGazByService.fetchDataList();
+          this.$refs.StockServiceGazByService.fetchListLot();
+          this.$refs.StockServiceGazByService.fetchListDevise();
+          this.onPageChange();
+  
+          this.$refs.StockServiceGazByService.$data.titleComponent =
             "Stock Service pour " + name;
   
         } else {

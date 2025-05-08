@@ -933,6 +933,51 @@ export default {
               ],
             },
           ],
+          listGaz: [
+            {
+              text: "Kit Gaz",
+              icon: "mdi-cards",
+              items: [
+                {
+                  text: "Création Vente",
+                  href: "/admin/GazCreateVente",
+                },
+                {
+                  text: "Liste des Ventes",
+                  href: "/admin/GazEnteteVente",
+                },
+                {
+                  text: "Paiement Vente",
+                  href: "/admin/GazEntetepaiementVente",
+                },
+                {
+                  text: "Création Production",
+                  href: "/admin/GazCreateVente",
+                },
+                {
+                  text: "Liste des Productions",
+                  href: "/admin/GazEnteteVente",
+                },
+                {
+                  text: "Création Transfert",
+                  href: "/admin/GazTransfertStock",
+                },
+                {
+                  text: "Liste des Transferts",
+                  href: "/admin/GazEnteteTransfert",
+                },
+                {
+                  text: "Parametre Kit",
+                  href: "/admin/Lot",
+                },
+                {
+                  icon: "store",
+                  text: "Rapports",
+                  href: "/admin/RapportsJour_Reservation",
+                },
+              ],
+            },
+          ],
           listUsage: [
             {
               text: "Sortie Produit",
