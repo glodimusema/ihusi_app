@@ -19,7 +19,8 @@ class CreateTgazStockServiceLotTable extends Migration
             $table->foreignId('refLot')->constrained('tgaz_lot')->restrictOnUpdate()->restrictOnDelete();
             $table->double('pu_lot');
             $table->double('qte_lot');
-            $table->double('cmup_lot');            
+            $table->double('cmup_lot');  
+            $table->double('stock_alerte')->default(0);            
             $table->string('devise');
             $table->string('taux');
             $table->string('active')->default('OUI');

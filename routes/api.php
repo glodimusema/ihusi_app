@@ -695,7 +695,7 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::get("delete_gaz_entete_paiement/{id}", 'tgaz_entete_paiement_venteController@delete_data');
 
 
-    Route::get("fetch_gaz_entete_transfert", 'tgaz_entete_transfertController@all');
+    Route::get("fetch_gaz_entete_transferts", 'tgaz_entete_transfertController@all');
     Route::get("fetch_gaz_entete_transfert/{refEntete}", 'tgaz_entete_transfertController@fetch_data_entete');
     Route::get("fetch_single_gaz_entete_transfert/{id}", 'tgaz_entete_transfertController@fetch_single_data');    
     Route::post("insert_gaz_entete_transfert", 'tgaz_entete_transfertController@insert_data');
@@ -761,7 +761,7 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::get("fetch_gaz_parametre_lots", 'tgaz_parametre_lotController@all');
     Route::get("fetch_gaz_parametre_lot/{refEntete}", 'tgaz_parametre_lotController@fetch_data_entete');
     Route::get("fetch_single_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@fetch_single_data');
-    Route::get("fetch_single_gaz_parametre_byLot/{refFlot}", 'tgaz_parametre_lotController@fetch_parametre_lot');        
+    Route::get("fetch_data_gaz_parametre_byLot/{refFlot}", 'tgaz_parametre_lotController@fetch_parametre_lot');        
     Route::post("insert_gaz_parametre_lot", 'tgaz_parametre_lotController@insert_data');
     Route::post("update_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@update_data');
     Route::get("delete_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@delete_data');

@@ -68,7 +68,7 @@ class tgaz_stock_service_lotController extends Controller
         'tgaz_stock_service_lot.author' ,"tvente_services.nom_service","stock_alerte",
         "tgaz_stock_service_lot.created_at"  
         
-         ,'nom_lot','code_lot','unite_lot','stock_alerte')
+         ,'nom_lot','code_lot','unite_lot')
         ->Where('refService',$refEntete);
         if (!is_null($request->get('query'))) {
             # code...
