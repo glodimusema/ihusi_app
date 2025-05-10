@@ -13,7 +13,7 @@ class tgaz_parametre_lotController extends Controller
 
     use GlobalMethod, Slug;
 
-// 'id','refProduit','refFlot','pu_param','qte_param','autre_detail','author','refUser'
+// 'id','refProduit','refLot','pu_param','qte_param','autre_detail','author','refUser'
 // tgaz_parametre_lot
     public function index()
     {
@@ -31,12 +31,12 @@ class tgaz_parametre_lotController extends Controller
     { 
 
         $data = DB::table('tgaz_parametre_lot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
-        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
-        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        ,"tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie");
         if (!is_null($request->get('query'))) {
@@ -59,15 +59,15 @@ class tgaz_parametre_lotController extends Controller
     public function fetch_data_entete(Request $request,$refEntete)
     { 
         $data = DB::table('tgaz_parametre_lot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
-        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
-        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        ,"tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie")
-        ->Where('tgaz_parametre_lot.refFlot',$refEntete);
+        ->Where('tgaz_parametre_lot.refLot',$refEntete);
         if (!is_null($request->get('query'))) {
             # code...
             $query = $this->Gquery($request);
@@ -86,12 +86,12 @@ class tgaz_parametre_lotController extends Controller
     function fetch_single_data($id)
     {
         $data = DB::table('tgaz_parametre_lot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
-        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
-        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        ,"tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie")
         ->where('tgaz_parametre_lot.id', $id)
@@ -103,19 +103,19 @@ class tgaz_parametre_lotController extends Controller
     }
 
 
-    function fetch_parametre_lot($refFlot)
+    function fetch_parametre_lot($refLot)
     {
 
         $data = DB::table('tgaz_parametre_lot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
-        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
-        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        ,"tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie")                     
-        ->Where('refFlot',$refFlot)
+        ->Where('refLot',$refLot)
         ->get();
 
         return response()->json([
@@ -140,15 +140,15 @@ class tgaz_parametre_lotController extends Controller
         }
 
         $data = DB::table('tgaz_parametre_lot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
-        ->select('tgaz_parametre_lot.id','refProduit','refFlot','pu_param','qte_param','autre_detail',
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
-        ,"tvente_produit.designation as designation",'refCategorie','refFlotBase','pu','qte',
+        ,"tvente_produit.designation as designation",'refCategorie','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable','uniteBase',
         "tvente_categorie_produit.designation as Categorie")                     
-        ->Where('refFlot',$id_flot)
+        ->Where('refLot',$id_flot)
         ->get();
 
         return response()->json([
@@ -157,12 +157,12 @@ class tgaz_parametre_lotController extends Controller
     }
 
 
-   //'id','refProduit','refFlot','pu_param','qte_param','autre_detail','author','refUser'
+   //'id','refProduit','refLot','pu_param','qte_param','autre_detail','author','refUser'
     function insert_data(Request $request)
     {       
         $data = tgaz_parametre_lot::create([
             'refProduit'       =>  $request->refProduit,
-            'refFlot'    =>  $request->refFlot,
+            'refLot'    =>  $request->refLot,
             'pu_param'    =>  $request->pu_param,
             'qte_param'    =>  $request->qte_param,
             'autre_detail'    =>  $request->autre_detail,
@@ -178,7 +178,7 @@ class tgaz_parametre_lotController extends Controller
     {
         $data = tgaz_parametre_lot::where('id', $id)->update([
             'refProduit'       =>  $request->refProduit,
-            'refFlot'    =>  $request->refFlot,
+            'refLot'    =>  $request->refLot,
             'pu_param'    =>  $request->pu_param,
             'qte_param'    =>  $request->qte_param,
             'autre_detail'    =>  $request->autre_detail,

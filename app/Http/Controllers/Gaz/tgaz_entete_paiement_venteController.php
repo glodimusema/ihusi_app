@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_entete_paiement_vente;
-use App\Models\Ventes\tgaz_detail_paiement_vente;
+use App\Models\Gaz\tgaz_entete_paiement_vente;
+use App\Models\Gaz\tgaz_detail_paiement_vente;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 use Carbon\Carbon;

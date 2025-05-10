@@ -952,11 +952,11 @@ export default {
                 },
                 {
                   text: "Création Production",
-                  href: "/admin/GazCreateVente",
+                  href: "/admin/GazCreateProduction",
                 },
                 {
                   text: "Liste des Productions",
-                  href: "/admin/GazEnteteVente",
+                  href: "/admin/GazEnteteProduction",
                 },
                 {
                   text: "Création Transfert",

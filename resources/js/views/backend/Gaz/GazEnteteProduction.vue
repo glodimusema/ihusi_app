@@ -194,7 +194,7 @@
     data() {
       return {
   
-        title: "Liste des Ventes",
+        title: "Liste des Productions",
         dialog: false,
         dialog2: false,
         edit: false,
@@ -278,7 +278,7 @@
       },
       fetchListService() {
           //deviseList
-          this.editOrFetch(`${this.apiBaseURL}/fetch_service_pointvente_user_by_user/${this.userData.id}`).then(
+          this.editOrFetch(`${this.apiBaseURL}/fetch_service_magasin_user_by_user/${this.userData.id}`).then(
               ({ data }) => {
                   var donnees = data.data;
                   this.serviceList = donnees;

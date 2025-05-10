@@ -1,7 +1,7 @@
 <template>
     <v-layout>
-      <v-flex md2></v-flex>
-      <v-flex md8>
+      <!-- <v-flex md2></v-flex> -->
+      <v-flex md12>
         <v-flex md12>
 
           <ParametreLot ref="ParametreLot" />
@@ -120,44 +120,51 @@
                       </td>
   
                       <td>
-                        <v-tooltip top color="black">
-                          <template v-slot:activator="{ on, attrs }">
-                            <span v-bind="attrs" v-on="on">
-                              <v-btn @click="editData(item.id)" fab small><v-icon color="  blue">edit</v-icon></v-btn>
-                            </span>
-                          </template>
-                          <span>Modifier</span>
-                        </v-tooltip>
 
-                        <v-tooltip top color="black">
-                          <template v-slot:activator="{ on, attrs }">
-                            <span v-bind="attrs" v-on="on">
-                              <v-btn @click="showParametreLot(item.id, item.nom_lot)" fab small><v-icon color="blue">mdi-file-cog</v-icon></v-btn>
-                            </span>
-                          </template>
-                          <span>Parametre Kit</span>
-                        </v-tooltip>
-
-                        <v-tooltip top color="black">
-                          <template v-slot:activator="{ on, attrs }">
-                            <span v-bind="attrs" v-on="on">
-                              <v-btn @click="showStockServiceGaz(item.id, item.nom_lot)" fab small><v-icon color="blue">mdi-file-cog</v-icon></v-btn>
-                            </span>
-                          </template>
-                          <span>Detail Stock Service</span>
-                        </v-tooltip>
-  
-                        <!-- StockServiceGaz -->
-                        <!-- <v-tooltip top   color="black">
-                            <template v-slot:activator="{ on, attrs }">
-                              <span v-bind="attrs" v-on="on">
-                                <v-btn @click="clearP(item.id)" fab small
-                                  ><v-icon color="  red">delete</v-icon></v-btn
-                                >
-                              </span>
+                        <v-menu bottom rounded offset-y transition="scale-transition">
+                            <template v-slot:activator="{ on }">
+                              <v-btn icon v-on="on" small fab depressed text>
+                                <v-icon>more_vert</v-icon>
+                              </v-btn>
                             </template>
-                            <span>Supprimer</span>
-                          </v-tooltip> -->
+  
+                            <v-list dense width="">
+  
+                              <v-list-item link @click="showParametreLot(item.id, item.nom_lot)">
+                                <v-list-item-icon>
+                                  <v-icon>mdi-file-cog</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title style="margin-left: -20px">Parametre Kit
+                                </v-list-item-title>
+                              </v-list-item>
+
+                              <v-list-item link @click="showStockServiceGaz(item.id, item.nom_lot)">
+                                <v-list-item-icon>
+                                  <v-icon>mdi-cart-outline</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title style="margin-left: -20px">Detail Stock Service
+                                </v-list-item-title>
+                              </v-list-item>
+  
+                              <v-list-item link @click="editData(item.id)">
+                                <v-list-item-icon>
+                                  <v-icon color="  blue">edit</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title style="margin-left: -20px">Modifier
+                                </v-list-item-title>
+                              </v-list-item>
+  
+                              <!-- <v-list-item   link @click="deleteData(item.id)">
+                                <v-list-item-icon>
+                                  <v-icon color="  red">delete</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title style="margin-left: -20px">Suppression
+                                </v-list-item-title>
+                              </v-list-item> -->
+  
+                            </v-list>
+                          </v-menu>        
+
                       </td>
                     </tr>
                   </tbody>
@@ -173,7 +180,7 @@
           <!-- fin component -->
         </v-flex>
       </v-flex>
-      <v-flex md2></v-flex>
+      <!-- <v-flex md2></v-flex> -->
     </v-layout>
   </template>
   <script>
@@ -245,7 +252,7 @@
           this.isLoading(true);
   
           this.svData.author = this.userData.name;
-  
+          this.svData.refUser = this.userData.id;
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_gaz_lot`,
             JSON.stringify(this.svData)
@@ -313,7 +320,7 @@
           this.$refs.StockServiceGaz.$data.refLot = refLot;
           this.$refs.StockServiceGaz.$data.svData.refLot = refLot;
           this.$refs.StockServiceGaz.fetchDataList();
-          this.$refs.StockServiceGaz.fetchListProduit();
+          this.$refs.StockServiceGaz.fetchListService();
           this.onPageChange();  
           this.$refs.StockServiceGaz.$data.titleComponent =
             "Detail Stock pour " + name;

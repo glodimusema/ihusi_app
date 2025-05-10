@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_detail_vente;
-use App\Models\Ventes\tgaz_mouvement_stock_service_lot;
-use App\Models\Ventes\tgaz_entete_vente;
-use App\Models\Ventes\tgaz_detail_paiement_vente;
-use App\Models\Ventes\tgaz_entete_paiement_vente;
+use App\Models\Gaz\tgaz_detail_vente;
+use App\Models\Gaz\tgaz_mouvement_stock_service_lot;
+use App\Models\Gaz\tgaz_entete_vente;
+use App\Models\Gaz\tgaz_detail_paiement_vente;
+use App\Models\Gaz\tgaz_entete_paiement_vente;
 
 
 use App\Models\Hotel\thotel_reservation_chambre;
@@ -41,7 +41,7 @@ class tgaz_detail_venteController extends Controller
         ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
         
@@ -62,9 +62,9 @@ class tgaz_detail_venteController extends Controller
         //Stock service
         'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
         //Parametre flot
-        'refProduit','refFlot','pu_param','qte_param','autre_detail',
+        'refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
-        "tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
@@ -108,7 +108,7 @@ class tgaz_detail_venteController extends Controller
         ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
         
@@ -129,9 +129,9 @@ class tgaz_detail_venteController extends Controller
         //Stock service
         'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
         //Parametre flot
-        'refProduit','refFlot','pu_param','qte_param','autre_detail',
+        'refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
-        "tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
@@ -172,7 +172,7 @@ class tgaz_detail_venteController extends Controller
         ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
         
@@ -193,9 +193,9 @@ class tgaz_detail_venteController extends Controller
         //Stock service
         'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
         //Parametre flot
-        'refProduit','refFlot','pu_param','qte_param','autre_detail',
+        'refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
-        "tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
@@ -231,7 +231,7 @@ class tgaz_detail_venteController extends Controller
         ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
-        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refFlot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
         ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
         ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')
         
@@ -252,9 +252,9 @@ class tgaz_detail_venteController extends Controller
         //Stock service
         'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
         //Parametre flot
-        'refProduit','refFlot','pu_param','qte_param','autre_detail',
+        'refProduit','refLot','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
-        "tvente_produit.designation as designation",'refCategorie','refFlotBase','uniteBase','pu','qte',
+        "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
         'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
@@ -315,7 +315,7 @@ class tgaz_detail_venteController extends Controller
 
 
             $cmup_data = 0;
-            $refFlot=0;
+            $refLot=0;
             $cmupVente=0;
             $data99=DB::table('tgaz_stock_service_lot') 
             ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
@@ -326,7 +326,7 @@ class tgaz_detail_venteController extends Controller
             ->first();
             if ($data99) 
             {
-                $refFlot =  $data99->refLot; 
+                $refLot =  $data99->refLot; 
                 $cmup_data =  $data99->cmup_lot;     
                 $cmupVente = $data99->cmup_lot;;      
             }
@@ -334,7 +334,7 @@ class tgaz_detail_venteController extends Controller
 
 
             $qte=$request->qteVente;
-            $idDetail=$refFlot;
+            $idDetail=$refLot;
             $idFacture=$request->refEnteteVente;
 
           
@@ -497,7 +497,7 @@ class tgaz_detail_venteController extends Controller
 
 
         $cmup_data = 0;
-        $refFlot=0;
+        $refLot=0;
         $data99=DB::table('tgaz_stock_service_lot') 
         ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
         'devise','taux','active','refUser','author')
@@ -507,14 +507,14 @@ class tgaz_detail_venteController extends Controller
         ->first();
         if ($data99) 
         {
-            $refFlot =  $data99->refProduit; 
+            $refLot =  $data99->refProduit; 
             $cmup_data =  $data99->cmup_lot;           
         }
 
 
 
             $qte=$request->qteVente;
-            $idDetail=$refFlot;
+            $idDetail=$refLot;
             $idFacture=$request->refEnteteVente;
 
             $compte_achat = 0;
@@ -740,7 +740,7 @@ class tgaz_detail_venteController extends Controller
             }  
 
          $cmup_data = 0;
-         $refFlot=0;
+         $refLot=0;
          $cmupVente=0;
          $data99=DB::table('tgaz_stock_service_lot') 
          ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
@@ -751,13 +751,13 @@ class tgaz_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refFlot =  $row->refLot;
+             $refLot =  $row->refLot;
              $cmup_data =  $row->cmup_lot;  
              $cmupVente = $row->cmup_lot;         
          }
 
          $qte=$data['qteVente'];
-         $idDetail=$refFlot;
+         $idDetail=$refLot;
          $idFacture=$idmax;
  
          $compte_achat = 0;
@@ -793,7 +793,7 @@ class tgaz_detail_venteController extends Controller
     
             $data12 = tgaz_detail_vente::create([
                 'refEnteteVente'       =>  $idmax,
-                'refProduit'    =>  $refFlot,
+                'refProduit'    =>  $refLot,
                 'qteVente'    =>  $data['qteVente'],            
                 'montantreduction'    =>  $data['montantreduction'],  
                 'idStockService'    =>  $data['idStockService'],
@@ -936,7 +936,7 @@ class tgaz_detail_venteController extends Controller
             }  
 
          $cmup_data = 0;
-         $refFlot=0;
+         $refLot=0;
          $cmupVente=0;
          $data99=DB::table('tgaz_stock_service_lot') 
          ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
@@ -947,13 +947,13 @@ class tgaz_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refFlot =  $row->refLot;
+             $refLot =  $row->refLot;
              $cmup_data =  $row->cmup_lot;  
              $cmupVente = $row->cmup_lot;         
          }
 
          $qte=$data['qteVente'];
-         $idDetail=$refFlot;
+         $idDetail=$refLot;
          $idFacture=$idmax;
  
          $compte_achat = 0;
@@ -989,7 +989,7 @@ class tgaz_detail_venteController extends Controller
     
             $data12 = tgaz_detail_vente::create([
                 'refEnteteVente'       =>  $idmax,
-                'refProduit'    =>  $refFlot,
+                'refProduit'    =>  $refLot,
                 'qteVente'    =>  $data['qteVente'],            
                 'montantreduction'    =>  $data['montantreduction'],  
                 'idStockService'    =>  $data['idStockService'],
@@ -1068,10 +1068,10 @@ class tgaz_detail_venteController extends Controller
 
         
         $montants=0;
-        $ventes = DB::table('tgaz_entete_vente')
+        $Gaz = DB::table('tgaz_entete_vente')
         ->selectRaw('(tgaz_entete_vente.montant - tgaz_entete_vente.reduction + tgaz_entete_vente.totaltva) as montant')
         ->Where('id',$idmax)->get(); 
-        foreach ($ventes as $vente) {
+        foreach ($Gaz as $vente) {
             $montants = $vente->montant;
         }
 
@@ -1195,13 +1195,13 @@ class tgaz_detail_venteController extends Controller
         //PAIEMENT DE LA FACTURE ===================================================================
         
         $montants=0;
-        $ventes = DB::table('tgaz_entete_vente')
+        $Gaz = DB::table('tgaz_entete_vente')
         ->select('id','code','refClient','refService','module_id',
         'dateVente','libelle','serveur_id','etat_facture','montant','paie','reduction',
         'totaltva','author','refUser')
         ->selectRaw('(tgaz_entete_vente.montant - tgaz_entete_vente.reduction + tgaz_entete_vente.totaltva) as montant')
         ->Where('id',$idmax)->get(); 
-        foreach ($ventes as $vente) {
+        foreach ($Gaz as $vente) {
             $montants = $vente->montant;
             $refService = $vente->refService;
         } 

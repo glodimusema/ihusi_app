@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_entete_production;
-use App\Models\Ventes\tgaz_detail_production;
+use App\Models\Gaz\tgaz_entete_production;
+use App\Models\Gaz\tgaz_detail_production;
 use App\Models\Facture;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
@@ -189,8 +189,8 @@ class tgaz_entete_productionController extends Controller
 
             $idProduit=0; 
             $qte_param = 0;
-            $refFlot = DB::table("tgaz_stock_service_lot")->Where('id',$idStockService)->pluck('refLot')->first();
-            $deleted_prod = DB::table('tgaz_parametre_lot')->Where('refFlot',$refFlot)->get(); 
+            $refLot = DB::table("tgaz_stock_service_lot")->Where('id',$idStockService)->pluck('refLot')->first();
+            $deleted_prod = DB::table('tgaz_parametre_lot')->Where('refLot',$refLot)->get(); 
             foreach ($deleted_prod as $delete_data) {
                 $idProduit = $delete_data->refProduit;
                 $qte_param = $delete_data->qte_param;
@@ -198,7 +198,7 @@ class tgaz_entete_productionController extends Controller
                 $qte_total = floatval($qte_param) * floatval($qte);
 
                 $data_stock = DB::update(
-                    'update tvente_stock_service set qte = qte + :qteVente where refProduit = :refProduit and refService = :refService',
+                    'update tgaz_stock_service_lot set qte = qte + :qteVente where refProduit = :refProduit and refService = :refService',
                     ['qteVente' => $qte_total,'refProduit' => $idProduit,'refService' => $refService]
                 );
         

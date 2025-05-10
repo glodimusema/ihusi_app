@@ -136,7 +136,7 @@
                               </thead>
                               <tbody>
                                 <tr v-for="item in fetchData" :key="item.id">
-                                  <td>{{ item.designation }}</td>
+                                  <td>{{ item.nom_lot }}</td>
                                   <td>{{ item.qteMvt }}</td>
                                   <td>{{ item.puMvt }}$</td>
                                   <td>{{ item.PTMvt }}$</td>
@@ -222,9 +222,6 @@
         etatModal: false,
         titleComponent: '',
         idStockService: 0,
-
-        // 'id','idStockService','dateMvt','type_mouvement','libelle_mouvement',
-    // 'nom_table','id_data','puMvt','qteMvt','uniteMvt','cmupMvt','devise','taux','author','refUser'
 
         svData: {
           id: '',

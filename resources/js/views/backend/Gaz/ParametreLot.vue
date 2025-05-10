@@ -38,7 +38,7 @@
     
                           <v-autocomplete label="Selectionnez le Produit(Article)" prepend-inner-icon="mdi-map"
                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="produitList" item-text="designation"
-                            item-value="id" dense outlined v-model="svData.refLot" chips clearable>
+                            item-value="id" dense outlined v-model="svData.refProduit" chips clearable>
                           </v-autocomplete>
                            
                           <v-text-field type="number" label="Quantité " prepend-inner-icon="event" dense

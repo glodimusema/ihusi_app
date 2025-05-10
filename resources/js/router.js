@@ -237,8 +237,15 @@ import CreateInventaire from './views/backend/Ventes/CreateInventaire.vue'
 import VenteEnteteInventaire from './views/backend/Ventes/VenteEnteteInventaire.vue'
 import VenteEnteteCuisine from './views/backend/Ventes/VenteEnteteCuisine.vue'
 import CreateCommandeCuisine from './views/backend/Ventes/CreateCommandeCuisine.vue'
-//VenteEnteteCuisine
-//CreateCommandeCuisine
+
+import GazCreateVente from './views/backend/Gaz/GazCreateVente.vue' 
+import GazEnteteVente from './views/backend/Gaz/GazEnteteVente.vue'
+import GazEntetepaiementVente from './views/backend/Gaz/GazEntetepaiementVente.vue'
+import GazCreateProduction from './views/backend/Gaz/GazCreateProduction.vue'
+import GazEnteteProduction from './views/backend/Gaz/GazEnteteProduction.vue'
+import GazTransfertStock from './views/backend/Gaz/GazTransfertStock.vue'
+import GazEnteteTransfert from './views/backend/Gaz/GazEnteteTransfert.vue'
+import Lot from './views/backend/Gaz/Lot.vue'
 
 import VenteEnteteUse from './views/backend/Ventes/VenteEnteteUse.vue'
 import CreateUsage from './views/backend/Ventes/CreateUsage.vue'
@@ -1675,8 +1682,48 @@ const Router = new VueRouter({
         name: 'HistoriqueData',
         component: HistoriqueData,
     },
+    {        
+        path: '/admin/GazCreateVente',
+        name: 'GazCreateVente',
+        component: GazCreateVente,
+    },
+    {        
+        path: '/admin/GazEnteteVente',
+        name: 'GazEnteteVente',
+        component: GazEnteteVente,
+    },
+    {        
+        path: '/admin/GazEntetepaiementVente',
+        name: 'GazEntetepaiementVente',
+        component: GazEntetepaiementVente,
+    },
+    {        
+        path: '/admin/GazCreateProduction',
+        name: 'GazCreateProduction',
+        component: GazCreateProduction,
+    },
+    {        
+        path: '/admin/GazEnteteProduction',
+        name: 'GazEnteteProduction',
+        component: GazEnteteProduction,
+    },
+    {        
+        path: '/admin/GazTransfertStock',
+        name: 'GazTransfertStock',
+        component: GazTransfertStock,
+    },
+    {        
+        path: '/admin/GazEnteteTransfert',
+        name: 'GazEnteteTransfert',
+        component: GazEnteteTransfert,
+    },
+    {        
+        path: '/admin/Lot',
+        name: 'Lot',
+        component: Lot,
+    },
 
-// HistoriqueData
+// HistoriqueData 
 
     
    

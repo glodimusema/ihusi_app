@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_entete_transfert;
-use App\Models\Ventes\tgaz_detail_transfert;
+use App\Models\Gaz\tgaz_entete_transfert;
+use App\Models\Gaz\tgaz_detail_transfert;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 

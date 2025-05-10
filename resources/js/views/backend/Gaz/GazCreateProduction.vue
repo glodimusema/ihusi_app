@@ -3,89 +3,12 @@
     <v-layout>
         <v-flex md12>
 
-            <VenteDetailVente ref="VenteDetailVente" />
-            <VentePaiement ref="VentePaiement" />
-            <FactureVente ref="FactureVente" />
-            <ModelClient ref="ModelClient" />
-
-            <v-dialog v-model="dialog2" max-width="600px" persistent>
-                <v-card :loading="loading">
-                <v-form ref="form" lazy-validation>
-                    <v-card-title>
-                    La Reservation de la Chambre <v-spacer></v-spacer>
-                    <v-tooltip bottom color="black">
-                        <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
-                            <v-btn @click="dialog2 = false" text fab depressed>
-                            <v-icon>close</v-icon>
-                            </v-btn>
-                        </span>
-                        </template>
-                        <span>Fermer</span>
-                    </v-tooltip>
-                    </v-card-title>
-                    <v-card-text>
-
-                    <v-autocomplete label="Selectionnez la Resérvation de la Chambre" prepend-inner-icon="mdi-map"
-                        :rules="[(v) => !!v || 'Ce champ est requis']" :items="chambreList" item-text="designationReservation"
-                        item-value="id" dense outlined v-model="svData.refReservation" chips clearable>
-                    </v-autocomplete>
-
-                    </v-card-text>
-                    <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn depressed text @click="dialog2 = false"> Fermer </v-btn>
-                    <v-btn color="  blue" dark :loading="loading" @click="validateRes">
-                        {{ edit ? "Modifier" : "Ajouter" }}
-                    </v-btn>
-                    </v-card-actions>
-                </v-form>
-                </v-card>
-            </v-dialog>
+            <GazDetailProduction ref="GazDetailProduction" />
 
             <v-form ref="form" v-model="valid" lazy-validation>
 
             <v-layout row wrap>                
-                <v-flex xs12 sm12 md4 lg4>
-                    <div class="mr-1">
-                        <v-autocomplete label="Selectionnez le Client" prepend-inner-icon="mdi-map"
-                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="clientList" item-text="noms"
-                            item-value="id" outlined dense v-model="svData.refClient">
-                        </v-autocomplete>
-                    </div>
-                </v-flex>
-                <v-flex xs1 sm1 md1 lg1>
-                    <div class="mr-1">
-                        <v-tooltip bottom color="black">
-                            <template v-slot:activator="{ on, attrs }">
-                                <span v-bind="attrs" v-on="on">
-                                    <v-btn @click="refreshData()" color="primary" :loading="loading"
-                                        dark x-small fab depressed>
-                                        <v-icon dark>refresh</v-icon>
-                                    </v-btn>
-                                </span>
-                            </template>
-                            <span>Recharger la liste</span>
-                        </v-tooltip>
-
-                    </div>
-              </v-flex>
-              <v-flex xs1 sm1 md1 lg1>
-                    <div class="mr-1">
-                        <v-tooltip bottom color="black">
-                            <template v-slot:activator="{ on, attrs }">
-                                <span v-bind="attrs" v-on="on">
-                                    <v-btn @click="
-                                        showClient()
-                                        " fab x-small color="primary" dark>
-                                        <v-icon>add</v-icon>
-                                    </v-btn>
-                                </span>
-                            </template>
-                            <span>Ajouter une Client</span>
-                        </v-tooltip>
-                    </div>
-              </v-flex> 
+    
                 <v-flex xs12 sm12 md6 lg6>
                     <div class="mr-1">
                         <v-autocomplete label="Selectionnez le Service" prepend-inner-icon="mdi-map"
@@ -99,7 +22,7 @@
 
                 <v-flex xs12 sm12 md6 lg6>
                     <div class="mr-1">
-                        <v-text-field type="date" label="Date Vente" prepend-inner-icon="event" dense
+                        <v-text-field type="date" label="Date Production" prepend-inner-icon="event" dense
                             :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.dateProduction">
                         </v-text-field>
                     </div>
@@ -107,7 +30,7 @@
                 <v-flex xs12 sm12 md6 lg6>
                     <div class="mr-1">
                         <v-text-field label="Libellé" prepend-inner-icon="event" dense
-                            :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.libelle">
+                            :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.libelle_production">
                         </v-text-field>
                     </div>
                 </v-flex>
@@ -120,37 +43,7 @@
                         </v-autocomplete>
                     </div>
                 </v-flex>
-                <v-flex xs12 sm12 md6 lg6>
-                    <div class="mr-1">
-                        <v-autocomplete label="Selectionnez le Serveur" prepend-inner-icon="mdi-map"
-                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="serveurList" item-text="noms_agent"
-                            item-value="id" dense outlined v-model="svData.serveur_id" chips clearable>
-                        </v-autocomplete>
-                    </div>
-                </v-flex>
-
-
-                <v-flex xs12 sm12 md6 lg6>
-                    <div class="mr-1">
-                        <v-autocomplete label="Selectionnez la Table" prepend-inner-icon="mdi-map"
-                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="tableList" item-text="nom_table"
-                            item-value="id" dense outlined v-model="svData.table_id" chips clearable>
-                        </v-autocomplete>
-                    </div>
-                </v-flex>
-                <v-flex xs12 sm12 md6 lg6>
-                    <div class="mr-1">
-                        <v-select label="Etat de Facture" :items="[
-                            { designation: 'Cash' },
-                            // { designation: 'Compte Maison' },
-                            // { designation: 'Chambre' },
-                            // { designation: 'Crédit' },
-                            // { designation: 'Location' }
-                            ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
-                            item-text="designation" item-value="designation" v-model="svData.etat_facture">
-                        </v-select>
-                    </div>
-                </v-flex>
+                
                 
 
             </v-layout>
@@ -173,9 +66,9 @@
                 <tbody>
                     <tr v-for="(item, index) in svData.detailData" :key="index">
                         <td class="long-cell">
-                            <v-autocomplete v-model="item.idStockService" :items="produitList"
+                            <v-autocomplete v-model="item.idStockService" :items="lotList"
                                 label="Selectionnez le Produit" :rules="[(v) => !!v || 'Ce champ est requis']"
-                                hide-no-data hide-selected item-text="designation" item-value="id"
+                                hide-no-data hide-selected item-text="nom_lot" item-value="id"
                                 @change="updateUnite(index)"></v-autocomplete>
                         </td>
                         <td class="short-cell">
@@ -185,11 +78,11 @@
                             <v-text-field v-model="item.qteDisponible" label="Qté Dispo" readonly></v-text-field>
                         </td>
                         <td class="short-cell">
-                            <v-text-field v-model="item.qteVente" type="number" label="Qté" :rules="[rules.required]"
+                            <v-text-field v-model="item.qteProduction" type="number" label="Qté" :rules="[rules.required]"
                                 required></v-text-field>
                         </td>
                         <td class="short-cell">
-                            <v-text-field v-model="item.puVente" type="number" label="PU" :rules="[rules.required]"
+                            <v-text-field v-model="item.puProduction" type="number" label="PU" :rules="[rules.required]"
                                 required ></v-text-field>
                         </td>                      
                         <td class="short-cell">
@@ -221,12 +114,8 @@
             <table>
                 <tr>
                     <td>
-                        <!-- <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div> -->
-                        <!-- <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear> -->
-                    </td>
-                    <td>
-                        <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate2" color="success">Payer Cash</v-btn></div>  
-                        <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear>                     
+                        <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div>
+                        <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear>
                     </td>
                 </tr>
             </table>
@@ -264,17 +153,15 @@
                         <thead>
                             <tr>
                             <th class="text-left">Action</th>
-                            <th class="text-left">N°FAC</th>
-                            <th class="text-left">dateProduction</th>
+                            <th class="text-left">N°Prod</th>
+                            <th class="text-left">DateProduction</th>
                             <th class="text-left">Service</th>
-                            <th class="text-left">Client</th>
                             <th class="text-left">Téléphone</th>
                             <th class="text-left">Libellé</th>
                             <th class="text-left">Solde</th>
-                            <th class="text-left">Etat</th>
                             <th class="text-left">Author</th>
                             <th class="text-left">Created_at</th>  
-                            <th class="text-left">Facture</th>                        
+                   
                             </tr>
                         </thead>
                         <tbody>
@@ -290,43 +177,11 @@
 
                             <v-list dense width="">                               
 
-                                <v-list-item link @click="showDetailVente(item.id, item.noms,item.refService)">
+                                <v-list-item link @click="showGazDetailProduction(item.id, item.noms,item.refService)">
                                 <v-list-item-icon>
                                     <v-icon>mdi-cart-outline</v-icon>
                                 </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Detail Vente
-                                </v-list-item-title>
-                                </v-list-item>
-
-                                <v-list-item link @click="payer_cash(item.id, item.dateProduction)">
-                                <v-list-item-icon>
-                                    <v-icon>mdi-cards</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Payer Cash
-                                </v-list-item-title>
-                                </v-list-item>
-
-                                <v-list-item link @click="showVentePaiement(item.id, item.noms,item.totalFacture,item.totalPaie,item.RestePaie)">
-                                <v-list-item-icon>
-                                    <v-icon>mdi-cart-outline</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Paiement Facture
-                                </v-list-item-title>
-                                </v-list-item>
-
-                                <v-list-item link @click="showFacture(item.id,item.noms,'Ventes')">
-                                <v-list-item-icon>
-                                    <v-icon color="blue">print</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Imprimer la Facture
-                                </v-list-item-title>
-                                </v-list-item> 
-                                
-                                <v-list-item link @click="editDataRes(item.id)">
-                                <v-list-item-icon>
-                                    <v-icon color="blue">edit</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Affecter Reservation Chambre
+                                <v-list-item-title style="margin-left: -20px">Detail Production
                                 </v-list-item-title>
                                 </v-list-item>
 
@@ -353,27 +208,16 @@
                             <td>{{ item.id }}</td>
                             <td>{{ item.dateProduction | formatDate }}</td>
                             <td>{{ item.nom_service }}</td>
-                            <td>{{ item.noms }}</td>
                             <td>{{ item.contact }}</td>
-                            <td>{{ item.libelle }}</td>
-                            <td>{{ item.RestePaie }}$</td>
-                            <td>{{ item.etat_facture }}</td>
+                            <td>{{ item.libelle_production }}</td>
+                            <td>{{ item.montant }}$</td>
+
                             <td>{{ item.author }}</td>
                             <td>
                                     {{ item.created_at | formatDate }}
                                     {{ item.created_at | formatHour }}
                             </td>  
-                            <td>
-                                <v-tooltip top color="black">
-                                      <template v-slot:activator="{ on, attrs }">
-                                        <span v-bind="attrs" v-on="on">
-                                          <v-btn @click="showFacture(item.id,item.noms,'Ventes')" fab small><v-icon
-                                              color="blue">print</v-icon></v-btn>
-                                        </span>
-                                      </template>
-                                      <span>Imprimer Bon</span>
-                                    </v-tooltip>
-                            </td>                         
+                                                     
                             </tr>
                         </tbody>
                         </template>
@@ -393,22 +237,16 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import FactureVente from '../Rapports/Finances/FactureVente.vue';
-import VenteDetailVente from './VenteDetailVente.vue';
-import VentePaiement from './VentePaiement.vue';
-import ModelClient from './ModelClient.vue'
+import GazDetailProduction from './GazDetailProduction.vue';
 
 export default {
     components:{
-    VenteDetailVente,
-    VentePaiement,
-    FactureVente,
-    ModelClient
+    GazDetailProduction
   },
     data() {
         return {
 
-            title: "Liste des Requisitions",
+            title: "Liste des Productions",
             dialog: false,
             dialog2: false,
             edit: false,
@@ -417,13 +255,15 @@ export default {
 
             loadings: false,
             progress: 0,
-            //'id','code','module_id','refService','dateProduction','libelle_production','montant','author','refUser'
+            //'id','code','module_id','refService','dateProduction','libelle_production',
+            // 'montant','author','refUser'
+
+    
             svData: {
                 id: '',
-                refClient: 0,
                 refService: 0,
                 dateProduction: "",
-                libelle: "Production des Kits",
+                libelle_production: "Production des Kits",
                 author: "",
                 refUser: 0,
                 totalInvoice:0,
@@ -431,16 +271,15 @@ export default {
                 totalTTC:0,
                 indexEncours:0,
                 devise: "",
-                serveur_id : 0,
-                table_id : 0,
-                etat_facture : "",
- 
-                refReservation:0,
+
+                // 'id','refEnteteProduction','idStockService','puProduction','qteProduction',
+    // 'uniteProduction','cmupProduction','devise','taux','montanttva','montantreduction',
+    // 'active','author','refUser'
 
                 detailData: [{
                     qteDisponible: 0,
-                    qteVente: 0,
-                    puVente: 0,                    
+                    qteProduction: 0,
+                    puProduction: 0,                    
                     montantreduction: 0,
                     pt:0,
                     tva:0,
@@ -453,15 +292,13 @@ export default {
                 }],                
             },
             fetchData: [],
-            produitList: [],
-            clientList: [],
-            moduleList: [],
+            lotList: [],
+
             serviceList: [],
             CmdList: [],  
             deviseList: [],
-            serveurList: [],
-            chambreList: [],
-            tableList: [],          
+
+         
 
             query: "",
 
@@ -475,14 +312,10 @@ export default {
     },
     created() {
         this.fetchDataList();
-        this.fetchListClient();
-        this.fetchListModule();
         this.fetchListService();
         this.fetchListDevise();
         this.fetchListTVA();
-        this.fetchListServeur();
-        this.fetchListTable();
-        this.fetchListChambre();
+
     },
     computed: {
         ...mapGetters(["categoryList", "isloading"]),   
@@ -492,8 +325,8 @@ export default {
             this.updateTotal();         
             this.svData.detailData.push({                
                 qteDisponible: 0,
-                qteVente: 0,
-                puVente: 0,
+                qteProduction: 0,
+                puProduction: 0,
                 devise: "",
                 montantreduction: 0,
                 idStockService : 0,
@@ -510,19 +343,18 @@ export default {
         },
        refreshData()
         {
-            this.fetchListClient();
             this.get_produit_for_service(this.svData.refService);
         },
         async get_produit_for_service(refService) {
           this.isLoading(true);
             await axios
-                .get(`${this.apiBaseURL}/fetch_stock_data_byservice/${refService}`)
+                .get(`${this.apiBaseURL}/fetch_gaz_service_stock_byservice/${refService}`)
                 .then((res) => {
                 var chart = res.data.data;
                 if (chart) {
-                    this.produitList = chart;
+                    this.lotList = chart;
                 } else {
-                    this.produitList = [];
+                    this.lotList = [];
                 }
                 this.isLoading(false);
                 })
@@ -535,14 +367,14 @@ export default {
         async updateUnite(index) { 
                 try {
                     // Fetch the unit detail for the specified reference
-                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_service_stock/${this.svData.detailData[index].idStockService}`);
+                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_service_stock/${this.svData.detailData[index].idStockService}`);
                     // Extract data from the response
                     const donnees = response.data.data;
                     // Assuming you want to get the first item
                     if (donnees.length > 0) {
-                        this.svData.detailData[index].nom_unite = donnees[0].uniteBase; // Update price per unit
-                        this.svData.detailData[index].puVente = donnees[0].cmup; // Update price per unit
-                        this.svData.detailData[index].qteDisponible = donnees[0].qte; // Update available quantity
+                        this.svData.detailData[index].nom_unite = donnees[0].unite_lot; // Update price per unit
+                        this.svData.detailData[index].puProduction = donnees[0].cmup_lot; // Update price per unit
+                        this.svData.detailData[index].qteDisponible = donnees[0].qte_lot; // Update available quantity
                     } else {
                         console.warn('No data found for the specified unit.');
                     }
@@ -559,17 +391,9 @@ export default {
                     // Assuming you want to get the first item
                     if (donnees.length > 0) {
 
-                        if(this.svData.detailData[index].qteVente <= this.svData.detailData[index].qteDisponible)
-                        {
-                            this.svData.detailData[index].montant_tva = donnees[0].montant_tva; // Update price per unit
-                            this.svData.detailData[index].pt = ((this.svData.detailData[index].puVente *this.svData.detailData[index].qteVente) - this.svData.detailData[index].montantreduction); // Dummy price
-                            this.svData.detailData[index].tva= ((this.svData.detailData[index].pt * this.svData.detailData[index].montant_tva)/100)
-                        }
-                        else
-                        {
-                            this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-                            this.svData.detailData[index].qteVente = 0;
-                        }
+                        this.svData.detailData[index].montant_tva = donnees[0].montant_tva; // Update price per unit
+                        this.svData.detailData[index].pt = ((this.svData.detailData[index].puProduction *this.svData.detailData[index].qteProduction) - this.svData.detailData[index].montantreduction); // Dummy price
+                        this.svData.detailData[index].tva= ((this.svData.detailData[index].pt * this.svData.detailData[index].montant_tva)/100)
 
                        
                     } else {
@@ -582,7 +406,7 @@ export default {
         },
         updatePT(index) {
             this.updateTVA(index);
-            this.svData.detailData[index].pt = ((this.svData.detailData[index].puVente *this.svData.detailData[index].qteVente) - this.svData.detailData[index].montantreduction); // Dummy price
+            this.svData.detailData[index].pt = ((this.svData.detailData[index].puProduction *this.svData.detailData[index].qteProduction) - this.svData.detailData[index].montantreduction); // Dummy price
             this.svData.detailData[index].tva= ((this.svData.detailData[index].pt * this.svData.detailData[index].montant_tva)/100);
 
             // this.updateTotal(index);
@@ -610,8 +434,8 @@ export default {
         resetForm() {
                 this.svData.detailData = [{
                     qteDisponible: 0,
-                    qteVente: 0,
-                    puVente: 0,                    
+                    qteProduction: 0,
+                    puProduction: 0,                    
                     montantreduction: 0,
                     pt:0,
                     tva:0,
@@ -636,7 +460,7 @@ export default {
                 this.svData.author = this.userData.name;
                     this.svData.refUser = this.userData.id;
                     this.insertOrUpdate(
-                    `${this.apiBaseURL}/insert_vente_globale_vente`,
+                    `${this.apiBaseURL}/insert_gaz_globale_production`,
                     JSON.stringify(this.svData)
                     )
                     .then(({ data }) => {
@@ -647,7 +471,7 @@ export default {
                         this.resetObj(this.svData);
                         this.fetchDataList();
                         this.resetForm();
-                        this.svData.libelle="Ventes des Produits";
+                        this.svData.libelle_production="Ventes des Produits";
                     })
                     .catch((err) => {
                         this.svErr(), this.isLoading(false);
@@ -675,71 +499,12 @@ export default {
 
 
         },
-        validate2() {
-
-            try
-            {
-                this.loadings = true;
-                this.progress = 0;
-
-                // Simuler un processus d'enregistrement
-                if (this.$refs.form.validate()) {
-                    this.isLoading(true);
-                    this.svData.author = this.userData.name;
-                        this.svData.refUser = this.userData.id;
-                        this.insertOrUpdate(
-                        `${this.apiBaseURL}/insert_vente_globale_vente_cash`,
-                        JSON.stringify(this.svData)
-                        )
-                        .then(({ data }) => {
-                            this.showMsg(data.data);
-                            this.isLoading(false);
-                            this.edit = false;
-                            this.dialog = false;
-                            this.resetObj(this.svData);
-                            this.fetchDataList();
-                            this.resetForm();
-                        })
-                        .catch((err) => {
-                            this.svErr(), this.isLoading(false);
-                        });
-            
-                }
-                //fin processus
-                const interval = setInterval(() => {
-                    if (this.progress < 100) {
-                    this.progress += 10; // Augmentez la progression
-                    } else {
-                    clearInterval(interval);
-                    this.loadings = false; // Arrêtez le chargement lorsque terminé
-                    this.progress = 0; // Réinitialisez la progression si nécessaire
-                    }
-                }, 100); // Ajustez le délai selon vos besoins
-
-            }
-            catch (error) {
-                // Bloc 5 : Gestion des erreurs
-                console.error(`Erreur lors de enregistrement:,`);
-                this.loadings = false; // Arrêtez le chargement en cas d'erreur
-            }
-
-
-
-        },
         fetchDataList() {
-        this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_vente_encours?page=`);
-        },
-        fetchListModule() {
-            this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_module_2`).then(
-                ({ data }) => {
-                    var donnees = data.data;
-                    this.moduleList = donnees;
-                }
-            );
+        this.fetch_data(`${this.apiBaseURL}/fetch_gaz_entete_production?page=`);
         },
         fetchListService() {
             //deviseList
-            this.editOrFetch(`${this.apiBaseURL}/fetch_service_pointvente_user_by_user/${this.userData.id}`).then(
+            this.editOrFetch(`${this.apiBaseURL}/fetch_service_magasin_user_by_user/${this.userData.id}`).then(
                 ({ data }) => {
                     var donnees = data.data;
                     this.serviceList = donnees;
@@ -755,14 +520,6 @@ export default {
                 }
             );
         },
-        fetchListClient() {
-            this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_client_2`).then(
-                ({ data }) => {
-                    var donnees = data.data;
-                    this.clientList = donnees;
-                }
-            );
-        },
         fetchListTVA() {
         //
             this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_tva_2`).then(
@@ -775,26 +532,8 @@ export default {
                 }
             );
         },
-        fetchListServeur() {
-            //deviseList
-            this.editOrFetch(`${this.apiBaseURL}/fetch_list_agent`).then(
-                ({ data }) => {
-                    var donnees = data.data;
-                    this.serveurList = donnees;
-                }
-            );
-        },
-        fetchListTable() {
-            //deviseList
-            this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_tables_2`).then(
-                ({ data }) => {
-                    var donnees = data.data;
-                    this.tableList = donnees;
-                }
-            );
-        },
         editData(id) {
-        this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_vente/${id}`).then(
+        this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_entete_production/${id}`).then(
             ({ data }) => {
 
             this.titleComponent = "modification des informations";
@@ -807,7 +546,7 @@ export default {
         },
         deleteData(id) {
         this.confirmMsg().then(({ res }) => {
-            this.delGlobal(`${this.apiBaseURL}/delete_vente_entete_vente/${id}`).then(
+            this.delGlobal(`${this.apiBaseURL}/delete_gaz_entete_production/${id}`).then(
             ({ data }) => {
                 this.showMsg(data.data);
                 this.fetchDataList();
@@ -815,21 +554,21 @@ export default {
             );
         });
         },
-        showDetailVente(refEnteteVente, name, refService) {
+        showGazDetailProduction(refEnteteProduction, name, refService) {
 
-        if (refEnteteVente != '') { 
+        if (refEnteteProduction != '') { 
 
-            this.$refs.VenteDetailVente.$data.etatModal = true;
-            this.$refs.VenteDetailVente.$data.refEnteteVente = refEnteteVente;
-            this.$refs.VenteDetailVente.$data.refService = refService;
-            this.$refs.VenteDetailVente.$data.svData.refEnteteVente = refEnteteVente;
-            this.$refs.VenteDetailVente.fetchDataList();
-            this.$refs.VenteDetailVente.fetchListDevise();
-            this.$refs.VenteDetailVente.get_produit_for_service(refService);
-            this.$refs.VenteDetailVente.fetchListTVA();
+            this.$refs.GazDetailProduction.$data.etatModal = true;
+            this.$refs.GazDetailProduction.$data.refEnteteProduction = refEnteteProduction;
+            this.$refs.GazDetailProduction.$data.refService = refService;
+            this.$refs.GazDetailProduction.$data.svData.refEnteteProduction = refEnteteProduction;
+            this.$refs.GazDetailProduction.fetchDataList();
+            this.$refs.GazDetailProduction.fetchListDevise();
+            this.$refs.GazDetailProduction.get_produit_for_service(refService);
+            this.$refs.GazDetailProduction.fetchListTVA();
             this.fetchDataList();
 
-            this.$refs.VenteDetailVente.$data.titleComponent =
+            this.$refs.GazDetailProduction.$data.titleComponent =
             "Detail Vente pour " + name;
 
         } else {
@@ -837,134 +576,7 @@ export default {
         }
         // 
 
-        },
-        showFacture(refEnteteVente, name,ServiceData) {
-
-        if (refEnteteVente != '') {
-
-            this.$refs.FactureVente.$data.dialog2 = true;
-            this.$refs.FactureVente.$data.refEnteteSortie = refEnteteVente;
-            this.$refs.FactureVente.$data.ServiceData = ServiceData;
-            this.$refs.FactureVente.showModel(refEnteteVente);
-            this.fetchDataList();
-
-            this.$refs.FactureVente.$data.titleComponent =
-            "La Facture pour " + name;
-
-        } else {
-            this.showError("Personne n'a fait cette action");
         }
-
-        },
-        showVentePaiement(refEnteteVente, name,totalFacture,totalPaie,RestePaie) {
-
-        if (refEnteteVente != '') {
-
-            this.$refs.VentePaiement.$data.etatModal = true;
-            this.$refs.VentePaiement.$data.refEnteteVente = refEnteteVente;
-            this.$refs.VentePaiement.$data.totalFacture = totalFacture;
-            this.$refs.VentePaiement.$data.totalPaie = totalPaie;
-            this.$refs.VentePaiement.$data.RestePaie = RestePaie;
-            this.$refs.VentePaiement.$data.svData.refEnteteVente = refEnteteVente;
-            this.$refs.VentePaiement.fetchDataList();
-            this.$refs.VentePaiement.get_mode_Paiement();
-            this.$refs.VentePaiement.getInfoFacture();
-            this.fetchDataList();
-
-            this.$refs.VentePaiement.$data.titleComponent =
-            "Detail Paiement pour " + name;
-
-        } else {
-            this.showError("Personne n'a fait cette action");
-        }
-
-        },    
-        payer_cash(code,datavente) 
-        {
-            this.isLoading(true);
-            this.svData.id=code;
-            this.svData.author = this.userData.name;
-            this.svData.refUser = this.userData.id;
-            this.svData.dateProduction = datavente;
-            this.insertOrUpdate(
-                `${this.apiBaseURL}/insert_vente_cash_vente/${this.svData.id}`,
-                JSON.stringify(this.svData)
-            )
-                .then(({ data }) => {
-                this.showMsg(data.data);
-                this.isLoading(false);
-                this.edit = false;                
-                this.resetObj(this.svData);
-                this.fetchDataList();
-                })
-                .catch((err) => {
-                this.svErr(), this.isLoading(false);
-                });
-        },
-        editDataRes(id) {
-        this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_vente/${id}`).then(
-            ({ data }) => {
-
-            this.titleComponent = "modification des informations";
-
-            this.getSvData(this.svData, data.data[0]);
-            this.edit = true;
-            this.dialog2 = true;
-            }
-        );
-        },
-        validateRes() {
-        if (this.$refs.form.validate()) {
-            this.isLoading(true);
-            if (this.edit) {
-            this.svData.author = this.userData.name;
-            this.svData.libelle= "Vente des Prosuits";
-            this.insertOrUpdate(
-                `${this.apiBaseURL}/update_affecter_reservation/${this.svData.id}`,
-                JSON.stringify(this.svData)
-            )
-                .then(({ data }) => {
-                this.showMsg(data.data);
-                this.isLoading(false);
-                this.edit = false;
-                this.dialog = false;
-                this.resetObj(this.svData);
-                this.fetchDataList();
-                })
-                .catch((err) => {
-                this.svErr(), this.isLoading(false);
-                });
-
-            }
-            else {
-            }
-
-        }
-        },
-        fetchListChambre() {
-            //deviseList
-            this.editOrFetch(`${this.apiBaseURL}/fetch_hotel_reservation_search`).then(
-                ({ data }) => {
-                    var donnees = data.data;
-                    this.chambreList = donnees;
-                }
-            );
-        },
-        showClient() {
-        this.$refs.ModelClient.$data.etatModal = true;
-        this.$refs.ModelClient.testTitle();
-        this.$refs.ModelClient.onPageChange();
-        this.$refs.ModelClient.fetchListCompte();
-        this.fetchListClient();
-
-        this.$refs.ModelClient.$data.titleComponentss =
-            "Un nouveau Client";
-
-        },
-
-
-        // VISUALISATION DES DONNEES DES COMMANDES============================================================
-
 
 
     },

@@ -133,7 +133,7 @@
                                   <td>{{ item.nom_service }}</td>
                                   <td>{{ item.nom_lot }}</td>
                                   <td>{{ item.qte_lot }}</td>
-                                  <td>{{ item.uniteBase }}</td>
+                                  <td>{{ item.unite_lot }}</td>
                                   <td>{{ item.pu_lot }}</td>
                                   <td>{{ item.cmup_lot }}</td>
                                   <td>{{ item.PTcmup_lot }}</td>                                
@@ -383,8 +383,8 @@
           this.$refs.MouvementStockGaz.$data.idStockService = idStockService;
           this.$refs.MouvementStockGaz.$data.svData.idStockService = idStockService;
           this.$refs.MouvementStockGaz.fetchDataList();
-          this.$refs.MouvementStockGaz.fetchListProduit();
-          this.onPageChange();  
+          this.$refs.MouvementStockGaz.getPrice(idStockService)
+          this.fetchDataList();            
           this.$refs.MouvementStockGaz.$data.titleComponent =
             "Mouvement Stock pour " + name;
   

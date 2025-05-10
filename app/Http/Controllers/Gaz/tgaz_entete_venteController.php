@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_entete_vente;
-use App\Models\Ventes\tgaz_detail_vente;
-use App\Models\Ventes\tgaz_detail_paiement_vente;
+use App\Models\Gaz\tgaz_entete_vente;
+use App\Models\Gaz\tgaz_detail_vente;
+use App\Models\Gaz\tgaz_detail_paiement_vente;
 use App\Models\Facture;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
@@ -349,7 +349,7 @@ class tgaz_entete_venteController extends Controller
 
    
             $data2 = DB::update(
-                'update tvente_stock_service set qte_lot = qte_lot + :qteVente where refProduit = :id',
+                'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteVente where refProduit = :id',
                 ['qteVente' => $qte,'id' => $idStockService]
             );     
             $data3 = DB::update(

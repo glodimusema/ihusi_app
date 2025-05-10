@@ -16,7 +16,7 @@ class CreateTgazParametreLotTable extends Migration
         Schema::create('tgaz_parametre_lot', function (Blueprint $table) {
             $table->id();
             $table->foreignId('refProduit')->constrained('tvente_produit')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('refFlot')->constrained('tgaz_lot')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('refLot')->constrained('tgaz_lot')->restrictOnUpdate()->restrictOnDelete();
             $table->double('pu_param',8,2);
             $table->double('qte_param',8,2);
             $table->string('autre_detail',100);

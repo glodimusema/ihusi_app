@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_detail_production;
-use App\Models\Ventes\tgaz_entete_production;
-use App\Models\Ventes\tgaz_mouvement_stock_service_lot;
+use App\Models\Gaz\tgaz_detail_production;
+use App\Models\Gaz\tgaz_entete_production;
+use App\Models\Gaz\tgaz_mouvement_stock_service_lot;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 use Carbon\Carbon;
@@ -33,8 +33,7 @@ class tgaz_detail_productionController extends Controller
     { 
 
         $data = DB::table('tgaz_detail_production')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.refPridStockServiceoduit')
-        ->join('tvente_services','tvente_services.id','=','tgaz_stock_service_lot.refService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_stock_service_lot.refLot')
 
         ->join('tgaz_entete_production','tgaz_entete_production.id','=','tgaz_detail_production.refEnteteProduction')        
@@ -56,7 +55,7 @@ class tgaz_detail_productionController extends Controller
         'tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'tgaz_entete_production.code','refService','module_id','dateProduction',
+        'tgaz_entete_production.code','tgaz_entete_production.refService','module_id','dateProduction',
         'libelle_production','tgaz_entete_production.montant','nom_service', 
         "tvente_module.nom_module")
 
@@ -84,8 +83,7 @@ class tgaz_detail_productionController extends Controller
     { 
 
         $data = DB::table('tgaz_detail_production')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.refPridStockServiceoduit')
-        ->join('tvente_services','tvente_services.id','=','tgaz_stock_service_lot.refService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_stock_service_lot.refLot')
 
         ->join('tgaz_entete_production','tgaz_entete_production.id','=','tgaz_detail_production.refEnteteProduction')        
@@ -107,7 +105,7 @@ class tgaz_detail_productionController extends Controller
         'tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'tgaz_entete_production.code','refService','module_id','dateProduction',
+        'tgaz_entete_production.code','tgaz_entete_production.refService','module_id','dateProduction',
         'libelle_production','tgaz_entete_production.montant','nom_service', 
         "tvente_module.nom_module")
 
@@ -132,8 +130,7 @@ class tgaz_detail_productionController extends Controller
     function fetch_single_data($id)
     {
         $data = DB::table('tgaz_detail_production')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.refPridStockServiceoduit')
-        ->join('tvente_services','tvente_services.id','=','tgaz_stock_service_lot.refService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_stock_service_lot.refLot')
 
         ->join('tgaz_entete_production','tgaz_entete_production.id','=','tgaz_detail_production.refEnteteProduction')        
@@ -155,7 +152,7 @@ class tgaz_detail_productionController extends Controller
         'tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'tgaz_entete_production.code','refService','module_id','dateProduction',
+        'tgaz_entete_production.code','tgaz_entete_production.refService','module_id','dateProduction',
         'libelle_production','tgaz_entete_production.montant','nom_service', 
         "tvente_module.nom_module")
 
@@ -175,8 +172,7 @@ class tgaz_detail_productionController extends Controller
     {
 
         $data = DB::table('tgaz_detail_production')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.refPridStockServiceoduit')
-        ->join('tvente_services','tvente_services.id','=','tgaz_stock_service_lot.refService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_stock_service_lot.refLot')
 
         ->join('tgaz_entete_production','tgaz_entete_production.id','=','tgaz_detail_production.refEnteteProduction')        
@@ -198,7 +194,7 @@ class tgaz_detail_productionController extends Controller
         'tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'tgaz_entete_production.code','refService','module_id','dateProduction',
+        'tgaz_entete_production.code','tgaz_entete_production.refService','module_id','dateProduction',
         'libelle_production','tgaz_entete_production.montant','nom_service', 
         "tvente_module.nom_module")
 
@@ -235,18 +231,18 @@ class tgaz_detail_productionController extends Controller
             $devises = $request->devise;
         }
 
-        $refFlot = 0;
+        $refLot = 0;
         $refService = 0;
         $cmupProduction = 0;
-        $data99=DB::table('tvente_stock_service') 
+        $data99=DB::table('tgaz_stock_service_lot') 
         ->select('id','refService','refLot','cmup_lot')
         ->where([
-            ['tvente_stock_service.id','=', $request->idStockService]
+            ['tgaz_stock_service_lot.id','=', $request->idStockService]
         ])      
         ->first();
         if ($data99) 
         {
-            $refFlot =  $data99->refLot;
+            $refLot =  $data99->refLot;
             $cmupProduction =  $data99->cmup_lot;        
         }
 
@@ -355,8 +351,8 @@ class tgaz_detail_productionController extends Controller
 
         $idProduit=0; 
         $qte_param = 0;
-        $refFlot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$request->idStockService)->first();
-        $save_prods = DB::table('tgaz_parametre_lot')->Where('refFlot',$refFlot)->get(); 
+        $refLot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$request->idStockService)->first();
+        $save_prods = DB::table('tgaz_parametre_lot')->Where('refLot',$refLot)->get(); 
         $refServices=DB::table("tgaz_entete_production")->pluck('tgaz_entete_production.refService')->Where('tgaz_entete_production.id',$request->refEnteteProduction)->first();
 
         foreach ($save_prods as $save_data) {
@@ -367,16 +363,16 @@ class tgaz_detail_productionController extends Controller
             $price_total = floatval($qte_param) * floatval($montants);
 
             $data_stock = DB::update(
-                'update tvente_stock_service set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
+                'update tgaz_stock_service_lot set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
                 ['qteProd' => $qte_total,'refProduit' => $idProduit,'refService' => $refServices]
             );
 
             $id_stock_services=0;
-            $data_stock_pros = DB::table('tvente_stock_service')       
-            ->select('tvente_stock_service.id as code_entete')
+            $data_stock_pros = DB::table('tgaz_stock_service_lot')       
+            ->select('tgaz_stock_service_lot.id as code_entete')
             ->where([
-                ['tvente_stock_service.refProduit','=', $idProduit],
-                ['tvente_stock_service.refService','=', $refServices]
+                ['tgaz_stock_service_lot.refProduit','=', $idProduit],
+                ['tgaz_stock_service_lot.refService','=', $refServices]
              ])
             ->get();
             foreach ($data_stock_pros as $list) {
@@ -448,18 +444,18 @@ class tgaz_detail_productionController extends Controller
             $devises = $request->devise;
         }
 
-        $refFlot = 0;
+        $refLot = 0;
         $refService = 0;
         $cmupProduction = 0;
-        $data99=DB::table('tvente_stock_service') 
+        $data99=DB::table('tgaz_stock_service_lot') 
         ->select('id','refService','refLot','cmup_lot')
         ->where([
-            ['tvente_stock_service.id','=', $request->idStockService]
+            ['tgaz_stock_service_lot.id','=', $request->idStockService]
         ])      
         ->first();
         if ($data99) 
         {
-            $refFlot =  $data99->refLot;
+            $refLot =  $data99->refLot;
             $cmupProduction =  $data99->cmup_lot;        
         }
 
@@ -568,8 +564,8 @@ class tgaz_detail_productionController extends Controller
 
         $idProduit=0; 
         $qte_param = 0;
-        $refFlot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$request->idStockService)->first();
-        $save_prods = DB::table('tgaz_parametre_lot')->Where('refFlot',$refFlot)->get(); 
+        $refLot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$request->idStockService)->first();
+        $save_prods = DB::table('tgaz_parametre_lot')->Where('refLot',$refLot)->get(); 
         $refServices=DB::table("tgaz_entete_production")->pluck('tgaz_entete_production.refService')->Where('tgaz_entete_production.id',$request->refEnteteProduction)->first();
 
         foreach ($save_prods as $save_data) {
@@ -580,16 +576,16 @@ class tgaz_detail_productionController extends Controller
             $price_total = floatval($qte_param) * floatval($montants);
 
             $data_stock = DB::update(
-                'update tvente_stock_service set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
+                'update tgaz_stock_service_lot set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
                 ['qteProd' => $qte_total,'refProduit' => $idProduit,'refService' => $refServices]
             );
 
             $id_stock_services=0;
-            $data_stock_pros = DB::table('tvente_stock_service')       
-            ->select('tvente_stock_service.id as code_entete')
+            $data_stock_pros = DB::table('tgaz_stock_service_lot')       
+            ->select('tgaz_stock_service_lot.id as code_entete')
             ->where([
-                ['tvente_stock_service.refProduit','=', $request->$idProduit],
-                ['tvente_stock_service.refService','=', $request->$refServices]
+                ['tgaz_stock_service_lot.refProduit','=', $request->$idProduit],
+                ['tgaz_stock_service_lot.refService','=', $request->$refServices]
              ])
             ->get();
             foreach ($data_stock_pros as $list) {
@@ -672,7 +668,7 @@ class tgaz_detail_productionController extends Controller
 
 
         $data2 = DB::update(
-            'update tvente_stock_service set qte = qte + :qteProduction where refProduit = :refProduit and refService = :refService',
+            'update tgaz_stock_service_lot set qte = qte + :qteProduction where refProduit = :refProduit and refService = :refService',
             ['qteProduction' => $qte,'refProduit' => $idProduit,'refService' => $refService]
         );
 
@@ -732,7 +728,7 @@ class tgaz_detail_productionController extends Controller
             $montants = 0;
             $devises ='';
     
-            if($data['devise'] != 'USD')
+            if($request->devise != 'USD')
             {
                 $montants = ($data['puProduction'])/$taux;
                 $devises='USD';
@@ -740,21 +736,21 @@ class tgaz_detail_productionController extends Controller
             else
             {
                 $montants = $data['puProduction'];
-                $devises = $data['devise'];
+                $devises = $request->devise;
             }
     
-            $refFlot = 0;
+            $refLot = 0;
             $refService = 0;
-            $cmupProduction = 0;
-            $data99=DB::table('tvente_stock_service') 
+            $cmupProduction = 0; 
+            $data99=DB::table('tgaz_stock_service_lot') 
             ->select('id','refService','refLot','cmup_lot')
             ->where([
-                ['tvente_stock_service.id','=', $data['idStockService']]
+                ['tgaz_stock_service_lot.id','=', $data['idStockService']]
             ])      
             ->first();
             if ($data99) 
             {
-                $refFlot =  $data99->refLot;
+                $refLot =  $data99->refLot;
                 $cmupProduction =  $data99->cmup_lot;        
             }
     
@@ -802,7 +798,7 @@ class tgaz_detail_productionController extends Controller
                 'idStockService'    =>  $data['idStockService'],
                 'puProduction'    =>  $montants,
                 'qteProduction'    =>  $data['qteProduction'],
-                'uniteProduction'    =>  $data['uniteProduction'],
+                'uniteProduction'    =>  $data['nom_unite'],
                 'cmupProduction'    =>  $cmupProduction,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,    
@@ -861,8 +857,8 @@ class tgaz_detail_productionController extends Controller
     
             $idProduit=0; 
             $qte_param = 0;
-            $refFlot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$data['idStockService'])->first();
-            $save_prods = DB::table('tgaz_parametre_lot')->Where('refFlot',$refFlot)->get(); 
+            $refLot = DB::table("tgaz_stock_service_lot")->pluck('refLot')->Where('id',$data['idStockService'])->first();
+            $save_prods = DB::table('tgaz_parametre_lot')->Where('refLot',$refLot)->get(); 
             $refServices=DB::table("tgaz_entete_production")->pluck('tgaz_entete_production.refService')->Where('tgaz_entete_production.id',$idmax)->first();
     
             foreach ($save_prods as $save_data) {
@@ -873,16 +869,16 @@ class tgaz_detail_productionController extends Controller
                 $price_total = floatval($qte_param) * floatval($montants);
     
                 $data_stock = DB::update(
-                    'update tvente_stock_service set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
+                    'update tgaz_stock_service_lot set qte = qte - :qteProd where refProduit = :refProduit and refService = :refService',
                     ['qteProd' => $qte_total,'refProduit' => $idProduit,'refService' => $refServices]
                 );
     
                 $id_stock_services=0;
-                $data_stock_pros = DB::table('tvente_stock_service')       
-                ->select('tvente_stock_service.id as code_entete')
+                $data_stock_pros = DB::table('tgaz_stock_service_lot')       
+                ->select('tgaz_stock_service_lot.id as code_entete')
                 ->where([
-                    ['tvente_stock_service.refProduit','=', $idProduit],
-                    ['tvente_stock_service.refService','=', $refServices]
+                    ['tgaz_stock_service_lot.refProduit','=', $idProduit],
+                    ['tgaz_stock_service_lot.refService','=', $refServices]
                  ])
                 ->get();
                 foreach ($data_stock_pros as $list) {
