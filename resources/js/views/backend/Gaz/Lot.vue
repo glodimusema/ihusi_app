@@ -30,7 +30,12 @@
   
                   <v-text-field label="Nom Lot" prepend-inner-icon="extension" dense
                     :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.nom_lot">
-                  </v-text-field>                 
+                  </v-text-field>  
+                  
+                  <v-autocomplete label="Selectionnez Categorie" prepend-inner-icon="mdi-map"
+                    :rules="[(v) => !!v || 'Ce champ est requis']" :items="categorieLotList" item-text="nom_categorie_lot"
+                    item-value="id" dense outlined v-model="svData.refCategorieLot" chips clearable>
+                  </v-autocomplete>
   
                   <v-select label="Unité" :items="[
                     { designation: 'KG' },
@@ -101,7 +106,8 @@
                   <thead>
                     <tr>
                       <th class="text-left">CodeLot</th>
-                      <th class="text-left">NomLot</th>                    
+                      <th class="text-left">NomLot</th> 
+                      <th class="text-left">Categorie</th>                   
                       <th class="text-left">Unité</th>
                       <th class="text-left">StockAlerte</th>
                       <th class="text-left">Mise à jour</th>
@@ -111,7 +117,8 @@
                   <tbody>
                     <tr v-for="item in fetchData" :key="item.id">
                       <td>{{ item.code_lot }}</td>
-                      <td>{{ item.nom_lot }}</td>                    
+                      <td>{{ item.nom_lot }}</td> 
+                      <td>{{ item.nom_categorie_lot }}</td>                    
                       <td>{{ item.unite_lot }}</td>
                       <td>{{ item.stock_alerte }}</td>
                       <td>
@@ -207,6 +214,7 @@
         //'id','nom_lot','code_lot','unite_lot','stock_alerte','author','refUser'
         svData: {
           id: "",
+          refCategorieLot : 0,
           nom_lot: "",
           code_lot: "",
           unite_lot: "",
@@ -216,7 +224,7 @@
         },
         fetchData: null,
         titreModal: "",
-  
+        categorieLotList: [],
         inserer: '',
         modifier: '',
         supprimer: '',
@@ -245,7 +253,16 @@
       },
       onPageChange() {
         this.fetch_data(`${this.apiBaseURL}/fetch_gaz_lot?page=`);
-      },
+      },    
+        fetchListCategorieLot() {
+          //deviseList
+          this.editOrFetch(`${this.apiBaseURL}/fetch_gaz_categorie_lot_2`).then(
+            ({ data }) => {
+              var donnees = data.data;
+              this.categorieLotList = donnees;
+            }
+          );
+        },
   
       validate() {
         if (this.$refs.form.validate()) {
@@ -304,7 +321,7 @@
           this.$refs.ParametreLot.$data.refLot = refLot;
           this.$refs.ParametreLot.$data.svData.refLot = refLot;
           this.$refs.ParametreLot.fetchDataList();
-          this.$refs.ParametreLot.fetchListProduit();
+          this.$refs.ParametreLot.fetchListCategorieLot();
           this.onPageChange();  
           this.$refs.ParametreLot.$data.titleComponent =
             "Parametre pour " + name;
@@ -336,6 +353,7 @@
   
       this.testTitle();
       this.onPageChange();
+      this.fetchListCategorieLot();
     },
   };
   </script>

@@ -967,8 +967,14 @@ export default {
                   href: "/admin/GazEnteteTransfert",
                 },
                 {
+                  //GazCategorieLot
                   text: "Parametre Kit",
                   href: "/admin/Lot",
+                },
+                {
+                  //
+                  text: "Categorie Kit",
+                  href: "/admin/GazCategorieLot",
                 },
                 {
                   icon: "store",

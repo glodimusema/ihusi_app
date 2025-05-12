@@ -27,8 +27,9 @@ class tgaz_lotController extends Controller
     public function index(Request $request)
     {
         $data = DB::table("tgaz_lot")
-        ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte','author','refUser',
-        "tgaz_lot.created_at");
+        ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
+        ->select("tgaz_lot.id",'refCategorieLot','nom_categorie_lot','nom_lot','code_lot',
+        'unite_lot','stock_alerte','author','refUser',"tgaz_lot.created_at");
 
         if (!is_null($request->get('query'))) {
             # code...
@@ -48,8 +49,9 @@ class tgaz_lotController extends Controller
     function fetch_tgaz_lot_2()
     {
          $data = DB::table("tgaz_lot")
-         ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte','author','refUser',
-         "tgaz_lot.created_at")
+        ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
+        ->select("tgaz_lot.id",'refCategorieLot','nom_categorie_lot','nom_lot','code_lot',
+        'unite_lot','stock_alerte','author','refUser',"tgaz_lot.created_at")
         ->get();
         
         return response()->json(['data' => $data]);
@@ -69,8 +71,9 @@ class tgaz_lotController extends Controller
         if ($request->id !='') 
         {
             # code...
-            // update  //'id','nom_lot','code_lot','unite_lot','stock_alerte','author','refUser'
+            // update  ,'refCategorieLot'//'id','nom_lot','code_lot','unite_lot','stock_alerte','author','refUser'
             $data = tgaz_lot::where("id", $request->id)->update([                
+                'refCategorieLot' =>  $request->refCategorieLot,
                 'nom_lot' =>  $request->nom_lot,
                 'code_lot' =>  $request->code_lot,
                 'unite_lot' =>  $request->unite_lot,
@@ -85,6 +88,7 @@ class tgaz_lotController extends Controller
         {
             // insertion 
             $data = tgaz_lot::create([
+                'refCategorieLot' =>  $request->refCategorieLot,
                 'nom_lot' =>  $request->nom_lot,
                 'code_lot' =>  $request->code_lot,
                 'unite_lot' =>  $request->unite_lot,

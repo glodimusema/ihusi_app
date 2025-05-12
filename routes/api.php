@@ -758,6 +758,12 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::post("insert_gaz_lot", 'tgaz_lotController@store');
     Route::get("fetch_gaz_lot_2", 'tgaz_lotController@fetch_tgaz_lot_2');
 
+    Route::get("fetch_gaz_categorie_lot", 'tgaz_categorie_lotController@index');
+    Route::get("fetch_single_gaz_categorie_lot/{id}", 'tgaz_categorie_lotController@edit');
+    Route::get("delete_gaz_categorie_lot/{id}", 'tgaz_categorie_lotController@destroy');
+    Route::post("insert_gaz_categorie_lot", 'tgaz_categorie_lotController@store');
+    Route::get("fetch_gaz_categorie_lot_2", 'tgaz_categorie_lotController@fetch_tgaz_categorie_lot_2');
+
     Route::get("fetch_gaz_parametre_lots", 'tgaz_parametre_lotController@all');
     Route::get("fetch_gaz_parametre_lot/{refEntete}", 'tgaz_parametre_lotController@fetch_data_entete');
     Route::get("fetch_single_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@fetch_single_data');
@@ -784,6 +790,27 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::post("insert_gaz_mouvement_stock", 'tgaz_mouvement_stock_service_lotController@insert_data');
     Route::post("update_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@update_data');
     Route::get("delete_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@delete_data');
+
+
+    // Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_destination", 'PdfGazController@fetch_rapport_detailtransfert_date_service_destination'); 
+    // Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_source", 'PdfGazController@fetch_rapport_detailtransfert_date_service_source'); 
+    // Route::get("pdf_gaz_fiche_mouvement_produit", 'PdfGazController@pdf_fiche_mouvement_produit'); 
+    Route::get("fetch_pdf_gaz_rapport_paiementfacture_date_banque", 'PdfGazController@fetch_rapport_paiementfacture_date_banque'); 
+    // Route::get("fetch_pdf_gaz_rapport_paiementfacture_date", 'PdfGazController@fetch_rapport_paiementfacture_date'); 
+    // Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_dette_date", 'PdfGazController@fetch_rapport_gaz_detailvente_dette_date'); 
+    // Route::get("fetch_pdf_gaz_rapport_detailvente_dette_date_service", 'PdfGazController@fetch_rapport_detailvente_dette_date_service'); 
+    // Route::get("pdf_gaz_fiche_stock_vente_service", 'PdfGazController@pdf_fiche_stock_vente_service'); 
+    // Route::get("fetch_pdf_gaz_rapport_detail_production_date_service_byproduit", 'PdfGazController@fetch_rapport_detail_production_date_service_byproduit'); 
+    // Route::get("fetch_pdf_gaz_rapport_detail_production_date_produit", 'PdfGazController@fetch_rapport_detail_production_date_produit'); 
+    // Route::get("fetch_pdf_gaz_rapport_detail_production_date", 'PdfGazController@fetch_rapport_detail_production_date'); 
+    //Route::get("fetch_pdf_gaz_rapport_detailvente_date_service_byproduit", 'PdfGazController@fetch_rapport_detailvente_date_service_byproduit'); 
+    // Route::get("fetch_pdf_gaz_rapport_detailvente_date_produit", 'PdfGazController@fetch_rapport_detailvente_date_produit'); 
+    // Route::get("fetch_pdf_gaz_rapport_detailvente_date_etat_facture_service", 'PdfGazController@fetch_rapport_detailvente_date_etat_facture_service'); 
+    //Route::get("fetch_pdf_gaz_rapport_detailvente_date_service", 'PdfGazController@fetch_rapport_detailvente_date_service'); 
+    // Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_date", 'PdfGazController@fetch_rapport_gaz_detailvente_date'); 
+    // Route::get("pdf_gaz_fiche_stock_vente_service_bycategorie_excel", 'PdfGazController@pdf_fiche_stock_vente_service_bycategorie_excel'); 
+    //Route::get("pdf_pdf_detail_vente_service_excel", 'PdfGazController@pdf_detail_vente_service_excel'); 
+    // Route::get("pdf_fiche_stock_vente_service_excel", 'PdfGazController@pdf_fiche_stock_vente_service_excel'); 
 
 
 

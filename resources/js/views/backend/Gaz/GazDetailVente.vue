@@ -115,9 +115,9 @@
                           <v-tooltip bottom color="black">
                             <template v-slot:activator="{ on, attrs }">
                               <span v-bind="attrs" v-on="on">
-                                <v-btn @click="dialog = true" fab color="  blue" dark>
+                                <!-- <v-btn @click="dialog = true" fab color="  blue" dark>
                                   <v-icon>add</v-icon>
-                                </v-btn>
+                                </v-btn> -->
                               </span>
                             </template>
                             <span>Ajouter le Detail</span>
@@ -191,13 +191,13 @@
                                           </v-list-item-title>
                                         </v-list-item>
   
-                                        <v-list-item link @click="editData(item.id)">
+                                        <!-- <v-list-item link @click="editData(item.id)">
                                           <v-list-item-icon>
                                             <v-icon color="blue">edit</v-icon>
                                           </v-list-item-icon>
                                           <v-list-item-title style="margin-left: -20px">Modifier
                                           </v-list-item-title>
-                                        </v-list-item>
+                                        </v-list-item> -->
   
                                         <v-list-item link @click="deleteData(item.id)">
                                           <v-list-item-icon>

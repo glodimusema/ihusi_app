@@ -15,6 +15,7 @@ class CreateTgazLotTable extends Migration
     {
         Schema::create('tgaz_lot', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('refCategorieLot')->constrained('tgaz_categorie_lot')->restrictOnUpdate()->restrictOnDelete();
             $table->string('nom_lot',225); 
             $table->string('code_lot',225);
             $table->string('unite_lot',225);
