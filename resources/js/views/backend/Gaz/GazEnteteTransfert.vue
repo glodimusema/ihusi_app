@@ -128,7 +128,7 @@
   
                             <v-list dense width="">
   
-                              <v-list-item link @click="showDetailTransfert(item.id, item.nom_service, item.refService)">
+                              <v-list-item link @click="showGazDetailTransfert(item.id, item.nom_service, item.refService)">
                                 <v-list-item-icon>
                                   <v-icon>mdi-cart-outline</v-icon>
                                 </v-list-item-icon>
@@ -332,8 +332,8 @@
           this.$refs.GazDetailTransfert.$data.refService = refService;
           this.$refs.GazDetailTransfert.$data.svData.refEnteteTransfert = refEnteteTransfert;
           this.$refs.GazDetailTransfert.fetchDataList();
+          this.$refs.GazDetailTransfert.fetchListService();          
           this.$refs.GazDetailTransfert.get_produit_for_service(refService);
-          this.$refs.GazDetailTransfert.fetchListService();
           this.fetchDataList();
   
           this.$refs.GazDetailTransfert.$data.titleComponent =

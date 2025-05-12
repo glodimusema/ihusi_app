@@ -8,41 +8,6 @@
             <FactureVente ref="FactureVente" />
             <ModelClient ref="ModelClient" />
 
-            <v-dialog v-model="dialog2" max-width="600px" persistent>
-                <v-card :loading="loading">
-                <v-form ref="form" lazy-validation>
-                    <v-card-title>
-                    La Reservation de la Chambre <v-spacer></v-spacer>
-                    <v-tooltip bottom color="black">
-                        <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
-                            <v-btn @click="dialog2 = false" text fab depressed>
-                            <v-icon>close</v-icon>
-                            </v-btn>
-                        </span>
-                        </template>
-                        <span>Fermer</span>
-                    </v-tooltip>
-                    </v-card-title>
-                    <v-card-text>
-
-                    <v-autocomplete label="Selectionnez la Resérvation de la Chambre" prepend-inner-icon="mdi-map"
-                        :rules="[(v) => !!v || 'Ce champ est requis']" :items="chambreList" item-text="designationReservation"
-                        item-value="id" dense outlined v-model="svData.refReservation" chips clearable>
-                    </v-autocomplete>
-
-                    </v-card-text>
-                    <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn depressed text @click="dialog2 = false"> Fermer </v-btn>
-                    <v-btn color="  blue" dark :loading="loading" @click="validateRes">
-                        {{ edit ? "Modifier" : "Ajouter" }}
-                    </v-btn>
-                    </v-card-actions>
-                </v-form>
-                </v-card>
-            </v-dialog>
-
             <v-form ref="form" v-model="valid" lazy-validation>
 
             <v-layout row wrap>                
@@ -153,7 +118,6 @@
                         <th>N°</th>
                         <th>Produit</th>
                         <th>Unité</th>
-                        <th>Qté Dispo</th>
                         <th>Qté</th>
                         <th>Pu</th>
                         <th>Reduction</th>
@@ -172,7 +136,7 @@
                             <v-autocomplete v-model="svData.idStockService" :items="kitList"
                                 label="Selectionnez le Kit" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="nom_lot" item-value="id"
-                                @change="fetchListDataKit(svData.idStockService, svData.qte_kit)"></v-autocomplete>
+                                @change="getPrice(svData.idStockService, svData.qte_kit)"></v-autocomplete>
                         </td>
                         <td class="short-cell">
                             <v-text-field v-model="svData.qteDisponible" label="Qté Dispo" readonly></v-text-field>
@@ -428,6 +392,7 @@ export default {
                 totalInvoice:0,
                 totalTVA:0,
                 totalTTC:0,
+                sommePU : 0,
                 indexEncours:0,
                 devise: "",
                 serveur_id : 0,
@@ -564,17 +529,9 @@ export default {
                     // Assuming you want to get the first item
                     if (donnees.length > 0) {
 
-                        if(this.svData.detailData[index].qteVente <= this.svData.detailData[index].qteDisponible)
-                        {
-                            this.svData.detailData[index].montant_tva = donnees[0].montant_tva; // Update price per unit
-                            this.svData.detailData[index].pt = ((this.svData.detailData[index].puVente *this.svData.detailData[index].qteVente) - this.svData.detailData[index].montantreduction); // Dummy price
-                            this.svData.detailData[index].tva= ((this.svData.detailData[index].pt * this.svData.detailData[index].montant_tva)/100)
-                        }
-                        else
-                        {
-                            this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-                            this.svData.detailData[index].qteVente = 0;
-                        }
+                        this.svData.detailData[index].montant_tva = donnees[0].montant_tva; // Update price per unit
+                        this.svData.detailData[index].pt = ((this.svData.detailData[index].puVente *this.svData.detailData[index].qteVente) - this.svData.detailData[index].montantreduction); // Dummy price
+                        this.svData.detailData[index].tva= ((this.svData.detailData[index].pt * this.svData.detailData[index].montant_tva)/100)                  
 
                        
                     } else {
@@ -919,42 +876,86 @@ export default {
             "Un nouveau Client";
 
         },
-        async fetchListDataKit(idStockService, qte_kit) {
-            try {
+          getPrice(idStockService, qte_kit) {
+              this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_service_stock/${idStockService}`).then(
+                  ({ data }) => {
+                      var donnees = data.data;
+                      donnees.map((item) => {
+                        this.svData.qteDisponible = item.qte_lot;
+                      });  
+                      
+                       if(this.svData.qteDisponible >= qte_kit)
+                       {
+                           this.fetchListDataKit(idStockService, qte_kit);
+                       }
+                       else
+                       {
+                           this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
+                           this.svData.qte_kit = 0;
+                       }
+                  }                  
+              );
+            
+              
+          },
+          
+       async getDataProduct(idStockService, qte_kit)
+       {
+         this.getPrice(idStockService);
+         this.fetchListDataKit(idStockService, qte_kit)
+       }
+       ,
+       async fetchListDataKit(idStockService, qte_kit) {        
+
+        // if(this.svData.qteDisponible >= qte_kit)
+        // {
+            try {                              
+
                 const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
                 const { data } = response;
 
                 // Vérifiez si les données existent
                 if (data && data.data) {
                     const donnees = data.data;
-                    this.svData.detailData = donnees.map((item, index) => {
-                        // Mettez à jour les propriétés selon vos besoins
-                        // this.updateUnite(index); // Appel de la fonction ici avec l'index
-                        
-                        return {
-                            ...item,
-                            qteDisponible: item.qte_param,
-                            qteVente: (item.qte_param * qte_kit),
-                            puVente: item.pu_param,
-                            devise: item.devise,
-                            montantreduction: 0,
-                            idStockService : idStockService,
-                            pt : ((item.qte_param * qte_kit) * item.pu_param),
-                            tva : 0,
-                            montant_tva : 0,
-                            id_tva : 1,
-                            nom_unite : item.uniteBase,
-                            idParamLot : item.id,
-                            produit_param : item.designation
-                        };
-                    });
+                    this.svData.detailData = [
+                            ...this.svData.detailData,
+                            ...donnees.map((item, index) => {
+                                return {
+                                    ...item,
+                                    // qteDisponible: item.qte_param,
+                                    qteVente: item.qte_param * qte_kit,
+                                    puVente: item.pu_param,
+                                    devise: item.devise,
+                                    montantreduction: 0,
+                                    idStockService: idStockService,
+                                    pt: (item.qte_param * qte_kit) * item.pu_param,
+                                    tva: 0,
+                                    montant_tva: 0,
+                                    // id_tva: 1,
+                                    nom_unite: item.uniteBase,
+                                    idParamLot: item.id,
+                                    produit_param: item.designation
+                                };
+                            })
+                        ];
+
+                        this.fetchListTVA();
+
                 } else {
                     console.error('Aucune donnée trouvée dans la réponse API.');
                 }
-            } catch (error) {
+            } 
+            catch (error) {
                 console.error('Erreur lors de la récupération des données:', error.message || error);
             }
-        },
+
+        // }
+        // else
+        // {
+        //     this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
+        //     this.svData.detailData[index].qteVente = 0;
+        // }
+       },
 
 
         // VISUALISATION DES DONNEES DES COMMANDES============================================================

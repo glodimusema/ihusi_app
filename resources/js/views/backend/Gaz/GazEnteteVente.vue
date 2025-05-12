@@ -271,13 +271,13 @@
                                 </v-list-item-title>
                               </v-list-item>
   
-                              <v-list-item link @click="editDataRes(item.id)">
+                              <!-- <v-list-item link @click="editDataRes(item.id)">
                                 <v-list-item-icon>
                                   <v-icon color="blue">edit</v-icon>
                                 </v-list-item-icon>
                                 <v-list-item-title style="margin-left: -20px">Affecter Reservation Chambre
                                 </v-list-item-title>
-                              </v-list-item>
+                              </v-list-item> -->
   
                               <v-list-item link @click="showFacture(item.id,item.noms,'Ventes')">
                                 <v-list-item-icon>
@@ -395,9 +395,9 @@
           if (this.edit) {
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
-            this.svData.libelle= "Vente des Prosuits";
+            this.svData.libelle= "Vente des Gaz et Accesseoires";
             this.insertOrUpdate(
-              `${this.apiBaseURL}/update_vente_entete_vente/${this.svData.id}`,
+              `${this.apiBaseURL}/update_gaz_entete_vente/${this.svData.id}`,
               JSON.stringify(this.svData)
             )
               .then(({ data }) => {
@@ -416,9 +416,9 @@
           else {
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
-            this.svData.libelle= "Vente des Prosuits";
+            this.svData.libelle= "Vente des Gaz et Accesseoires";
             this.insertOrUpdate(
-              `${this.apiBaseURL}/insert_vente_entete_vente`,
+              `${this.apiBaseURL}/insert_gaz_entete_vente`,
               JSON.stringify(this.svData)
             )
               .then(({ data }) => {
@@ -502,7 +502,7 @@
               );
           },
       editData(id) {
-        this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_vente/${id}`).then(
+        this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_entete_vente/${id}`).then(
           ({ data }) => {
   
             this.titleComponent = "modification des informations";
@@ -514,7 +514,7 @@
         );
       },
       editDataRes(id) {
-        this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_vente/${id}`).then(
+        this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_entete_vente/${id}`).then(
           ({ data }) => {
   
             this.titleComponent = "modification des informations";
@@ -527,7 +527,7 @@
       },
       deleteData(id) {
         this.confirmMsg().then(({ res }) => {
-          this.delGlobal(`${this.apiBaseURL}/delete_vente_entete_vente/${id}`).then(
+          this.delGlobal(`${this.apiBaseURL}/delete_gaz_entete_vente/${id}`).then(
             ({ data }) => {
               this.showMsg(data.data);
               this.fetchDataList();
@@ -536,7 +536,7 @@
         });
       },
       fetchDataList() {
-        this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_vente?page=`);
+        this.fetch_data(`${this.apiBaseURL}/fetch_gaz_entete_vente?page=`);
       },
   
       fetchListClient() {
@@ -556,7 +556,7 @@
               this.svData.refUser = this.userData.id;
               this.svData.dateVente = datavente;
               this.insertOrUpdate(
-                  `${this.apiBaseURL}/insert_vente_cash_vente/${this.svData.id}`,
+                  `${this.apiBaseURL}/insert_gaz_cash_vente/${this.svData.id}`,
                   JSON.stringify(this.svData)
               )
                   .then(({ data }) => {

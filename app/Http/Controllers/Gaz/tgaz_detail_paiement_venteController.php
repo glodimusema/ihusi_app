@@ -27,13 +27,13 @@ class tgaz_detail_paiement_venteController extends Controller
 
     
     public function all(Request $request)
-    { 
+    {  
         $data = DB::table('tgaz_detail_paiement_vente')
         ->join('tgaz_entete_paiement_vente','tgaz_entete_paiement_vente.id','=','tgaz_detail_paiement_vente.refEntetepaie')
-        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
-        // ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
-        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
-        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tgaz_entete_vente','tgaz_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
+        // ->join('tvente_module','tvente_module.id','=','tgaz_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tgaz_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tgaz_entete_vente.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
         ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
 
@@ -46,9 +46,9 @@ class tgaz_detail_paiement_venteController extends Controller
         
         ,'date_entete_paie','date_paie_current'
 
-        ,'nom_service','refClient','tvente_entete_vente.refService','tvente_entete_vente.refReservation',
-        'tvente_entete_vente.module_id','dateVente','libelle','tvente_entete_vente.montant',
-        'tvente_entete_vente.paie'
+        ,'nom_service','refClient','tgaz_entete_vente.refService',
+        'tgaz_entete_vente.module_id','dateVente','libelle','tgaz_entete_vente.montant',
+        'tgaz_entete_vente.paie'
 
         ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
         'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
@@ -84,10 +84,10 @@ class tgaz_detail_paiement_venteController extends Controller
 
         $data = DB::table('tgaz_detail_paiement_vente')
         ->join('tgaz_entete_paiement_vente','tgaz_entete_paiement_vente.id','=','tgaz_detail_paiement_vente.refEntetepaie')
-        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
-        // ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
-        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
-        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tgaz_entete_vente','tgaz_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
+        // ->join('tvente_module','tvente_module.id','=','tgaz_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tgaz_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tgaz_entete_vente.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
         ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
 
@@ -100,9 +100,9 @@ class tgaz_detail_paiement_venteController extends Controller
         
         ,'date_entete_paie','date_paie_current'
 
-        ,'nom_service','refClient','tvente_entete_vente.refService','tvente_entete_vente.refReservation',
-        'tvente_entete_vente.module_id','dateVente','libelle','tvente_entete_vente.montant',
-        'tvente_entete_vente.paie'
+        ,'nom_service','refClient','tgaz_entete_vente.refService',
+        'tgaz_entete_vente.module_id','dateVente','libelle','tgaz_entete_vente.montant',
+        'tgaz_entete_vente.paie'
 
         ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
         'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
@@ -138,10 +138,10 @@ class tgaz_detail_paiement_venteController extends Controller
 
         $data = DB::table('tgaz_detail_paiement_vente')
         ->join('tgaz_entete_paiement_vente','tgaz_entete_paiement_vente.id','=','tgaz_detail_paiement_vente.refEntetepaie')
-        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
-        // ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
-        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
-        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tgaz_entete_vente','tgaz_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
+        // ->join('tvente_module','tvente_module.id','=','tgaz_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tgaz_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tgaz_entete_vente.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
         ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
 
@@ -154,9 +154,9 @@ class tgaz_detail_paiement_venteController extends Controller
         
         ,'date_entete_paie','date_paie_current'
 
-        ,'nom_service','refClient','tvente_entete_vente.refService','tvente_entete_vente.refReservation',
-        'tvente_entete_vente.module_id','dateVente','libelle','tvente_entete_vente.montant',
-        'tvente_entete_vente.paie'
+        ,'nom_service','refClient','tgaz_entete_vente.refService',
+        'tgaz_entete_vente.module_id','dateVente','libelle','tgaz_entete_vente.montant',
+        'tgaz_entete_vente.paie'
 
         ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
         'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
@@ -190,10 +190,10 @@ class tgaz_detail_paiement_venteController extends Controller
     {
         $data= DB::table('tgaz_detail_paiement_vente')
         ->join('tgaz_entete_paiement_vente','tgaz_entete_paiement_vente.id','=','tgaz_detail_paiement_vente.refEntetepaie')
-        ->join('tvente_entete_vente','tvente_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
-        // ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
-        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
-        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tgaz_entete_vente','tgaz_entete_vente.id','=','tgaz_detail_paiement_vente.refEnteteVente')
+        // ->join('tvente_module','tvente_module.id','=','tgaz_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tgaz_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tgaz_entete_vente.refClient')
         ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
         ->join('tfin_ssouscompte as compteclient','compteclient.id','=','tvente_categorie_client.compte_client')
 
@@ -206,9 +206,9 @@ class tgaz_detail_paiement_venteController extends Controller
         
         ,'date_entete_paie','date_paie_current'
 
-        ,'nom_service','refClient','tvente_entete_vente.refService','tvente_entete_vente.refReservation',
-        'tvente_entete_vente.module_id','dateVente','libelle','tvente_entete_vente.montant',
-        'tvente_entete_vente.paie'
+        ,'nom_service','refClient','tgaz_entete_vente.refService',
+        'tgaz_entete_vente.module_id','dateVente','libelle','tgaz_entete_vente.montant',
+        'tgaz_entete_vente.paie'
 
         ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
         'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
@@ -239,10 +239,10 @@ class tgaz_detail_paiement_venteController extends Controller
         $refService = 0;
         $module_id = 5;      
 
-        $data_vente = DB::table('tvente_entete_vente')       
+        $data_vente = DB::table('tgaz_entete_vente')       
         ->select('id','code','refClient','refService','module_id',
                     'dateVente','libelle','montant','paie','author','refUser')
-        ->where('tvente_entete_vente.id', $request->refEnteteVente)
+        ->where('tgaz_entete_vente.id', $request->refEnteteVente)
         ->get();
         foreach ($data_vente as $list) {
             $refService= $list->refService;
@@ -329,7 +329,7 @@ class tgaz_detail_paiement_venteController extends Controller
         ]);
 
         $data3 = DB::update(
-            'update tvente_entete_vente set paie = paie + (:paiement), tvente_entete_vente.date_paie_current = :date_paie_current where id = :refEnteteVente',
+            'update tgaz_entete_vente set paie = paie + (:paiement), tgaz_entete_vente.date_paie_current = :date_paie_current where id = :refEnteteVente',
             ['paiement' => $montants,'refEnteteVente' => $idFacture,'date_paie_current' => $current]
         );
 
@@ -409,7 +409,7 @@ class tgaz_detail_paiement_venteController extends Controller
         ]);
 
         $data3 = DB::update(
-           'update tvente_entete_vente set paie = paie + (:paiement), tvente_entete_vente.date_paie_current = :date_paie_current where id = :refEnteteVente',
+           'update tgaz_entete_vente set paie = paie + (:paiement), tgaz_entete_vente.date_paie_current = :date_paie_current where id = :refEnteteVente',
             ['paiement' => $montants,'refEnteteVente' => $idFacture,'date_paie_current' => $current]
         );
 
@@ -503,7 +503,7 @@ class tgaz_detail_paiement_venteController extends Controller
             $montants = $deleted->montant_paie;
         }
         $data3 = DB::update(
-            'update tvente_entete_vente set paie = paie - (:paiement) where id = :refEnteteVente',
+            'update tgaz_entete_vente set paie = paie - (:paiement) where id = :refEnteteVente',
             ['paiement' => $montants,'refEnteteVente' => $idFacture]
         );
 

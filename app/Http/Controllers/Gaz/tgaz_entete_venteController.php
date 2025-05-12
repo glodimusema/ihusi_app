@@ -337,36 +337,55 @@ class tgaz_entete_venteController extends Controller
         $idStockService=0;
         $idDetail=0;
 
-        $deleteds = DB::table('tgaz_detail_vente')->Where('refEnteteVente',$id)->get(); 
-        foreach ($deleteds as $deleted) {
-            $idDetail = $deleted->id;
-            $qte = $deleted->qteVente;            
-            $pu = $deleted->puVente;
-            $idProduit = $deleted->refProduit;
-            $montantreduction = $deleted->montantreduction;
-            $montanttva = $deleted->montanttva;   
-            $idStockService = $deleted->idStockService;
+        $qteParLot = 0;
+        $priceParLot = 0;
+        $idStockLot = 0;
 
-   
+        $total_red = 0;
+        $total_tva = 0;
+        $total_pu = 0;
+        $idFacture = $id;
+
+        $data_qte_lot = DB::table('tgaz_detail_vente')       
+        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
+        SUM(tgaz_detail_vente.puVente) as total_pu,
+        SUM(tgaz_detail_vente.montanttva) as total_tva,
+        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
+         idStockService')
+        ->where([
+            ['tgaz_detail_vente.refEnteteVente','=', $idFacture]
+         ])
+        ->groupby('idStockService')
+        ->get();
+        foreach ($data_qte_lot as $list) {
+            $qteParLot= $list->qte_kit;
+            $priceParLot= $list->prix_total_kit;
+            $idStockLot= $list->idStockService;
+            $total_red = $list->total_reduction;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
+
             $data2 = DB::update(
-                'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteVente where refProduit = :id',
-                ['qteVente' => $qte,'id' => $idStockService]
-            );     
+            'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteLot where id = :idStockService',
+            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            );
+        
             $data3 = DB::update(
-                'update tgaz_entete_vente set montant = montant + (:pu * :qte),reduction = reduction - :reduction, totaltva = totaltva - :totaltva where id = :refEnteteVente',
-                ['pu' => $pu,'qte' => $qte,'reduction' => $montantreduction,'totaltva' => $montanttva,'refEnteteVente' => $id]
+                'update tgaz_entete_vente set montant = montant - (:montant),reduction = reduction - :reduction,totaltva = totaltva - :totaltva where id = :refEnteteVente',
+                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idFacture]
             );
 
             $nom_table = 'tgaz_detail_vente';
 
             $data4 = DB::update(
                 'delete from tgaz_mouvement_stock_service_lot where tgaz_mouvement_stock_service_lot.id_data = :id and nom_table=:nom_table',
-                ['id' => $idDetail, 'nom_table' => $nom_table]
+                ['id' => $id, 'nom_table' => $nom_table]
             );
-    
-            $data11 = tgaz_detail_vente::where('id',$idDetail)->delete();
+  
+        } 
+        $data = tgaz_detail_vente::where('id',$id)->delete();
 
-        }
         //=================== FIN DETAIL PAIEMENT ===========================================================
         //================= BLOC PAIEMENT ===================================================================
         $montants=0;

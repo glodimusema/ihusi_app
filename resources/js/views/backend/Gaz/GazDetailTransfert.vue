@@ -211,9 +211,6 @@
   
             refEnteteTransfert: 0,
             refService : 0,
-
-            // 'id','refEnteteTransfert','refDestination','idStockService',
-    // 'refLot','puTransfert','qteTransfert','uniteTransfert','author','refUser'
   
             svData: {          
             id: '',
@@ -238,7 +235,6 @@
       },
       created() {         
         // this.fetchDataList();
-        // this.fetchListProduit();
         // this.fetchListService();
       },
       computed: {

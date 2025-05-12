@@ -38,7 +38,7 @@ class tgaz_detail_venteController extends Controller
     public function all(Request $request)
     { 
         $data = DB::table('tgaz_detail_vente')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_vente.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
@@ -60,15 +60,16 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
         'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
         //Stock service
-        'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
+        'tgaz_stock_service_lot.refService as refService_StockServ',
+        'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
         //Parametre flot
-        'refProduit','refLot','pu_param','qte_param','autre_detail',
+        'refProduit','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
         "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
-        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
+        'cmup','Oldcode','Newcode','tvente_produit.tvaapplique','tvente_produit.estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
-        'tgaz_entete_vente.code','refClient','refService','module_id','serveur_id','etat_facture',
+        'tgaz_entete_vente.code','refClient','tgaz_entete_vente.refService','module_id','serveur_id','etat_facture',
         'dateVente','libelle','tgaz_entete_vente.montant','reduction','totaltva','tgaz_entete_vente.paie',
         'etat_facture',
         
@@ -105,7 +106,7 @@ class tgaz_detail_venteController extends Controller
     { 
 
         $data = DB::table('tgaz_detail_vente')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_vente.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
@@ -127,15 +128,16 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
         'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
         //Stock service
-        'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
+        'tgaz_stock_service_lot.refService as refService_StockServ',
+        'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
         //Parametre flot
-        'refProduit','refLot','pu_param','qte_param','autre_detail',
+        'refProduit','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
         "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
-        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
+        'cmup','Oldcode','Newcode','tvente_produit.tvaapplique','tvente_produit.estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
-        'tgaz_entete_vente.code','refClient','refService','module_id','serveur_id','etat_facture',
+        'tgaz_entete_vente.code','refClient','tgaz_entete_vente.refService','module_id','serveur_id','etat_facture',
         'dateVente','libelle','tgaz_entete_vente.montant','reduction','totaltva','tgaz_entete_vente.paie',
         'etat_facture',
         
@@ -169,7 +171,7 @@ class tgaz_detail_venteController extends Controller
     function fetch_single_data($id)
     {
         $data= DB::table('tgaz_detail_vente')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_vente.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
@@ -191,15 +193,16 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
         'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
         //Stock service
-        'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
+        'tgaz_stock_service_lot.refService as refService_StockServ',
+        'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
         //Parametre flot
-        'refProduit','refLot','pu_param','qte_param','autre_detail',
+        'refProduit','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
         "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
-        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
+        'cmup','Oldcode','Newcode','tvente_produit.tvaapplique','tvente_produit.estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
-        'tgaz_entete_vente.code','refClient','refService','module_id','serveur_id','etat_facture',
+        'tgaz_entete_vente.code','refClient','tgaz_entete_vente.refService','module_id','serveur_id','etat_facture',
         'dateVente','libelle','tgaz_entete_vente.montant','reduction','totaltva','tgaz_entete_vente.paie',
         'etat_facture',
         
@@ -228,7 +231,7 @@ class tgaz_detail_venteController extends Controller
     {      
 
         $data = DB::table('tgaz_detail_vente')
-        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_production.idStockService')
+        ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_detail_vente.idStockService')
 
         ->join('tgaz_parametre_lot','tgaz_parametre_lot.id','=','tgaz_detail_vente.idParamLot')
         ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
@@ -250,15 +253,16 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
         'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
         //Stock service
-        'refService as refService_StockServ','refLot','pu_lot','qte_lot','cmup_lot','active',
+        'tgaz_stock_service_lot.refService as refService_StockServ',
+        'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
         //Parametre flot
-        'refProduit','refLot','pu_param','qte_param','autre_detail',
+        'refProduit','pu_param','qte_param','autre_detail',
         'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot',
         "tvente_produit.designation as designation",'refCategorie','uniteBase','pu','qte',
-        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable',
+        'cmup','Oldcode','Newcode','tvente_produit.tvaapplique','tvente_produit.estvendable',
         "tvente_categorie_produit.designation as Categorie",
         //Entete Vente
-        'tgaz_entete_vente.code','refClient','refService','module_id','serveur_id','etat_facture',
+        'tgaz_entete_vente.code','refClient','tgaz_entete_vente.refService','module_id','serveur_id','etat_facture',
         'dateVente','libelle','tgaz_entete_vente.montant','reduction','totaltva','tgaz_entete_vente.paie',
         'etat_facture',
         
@@ -361,10 +365,6 @@ class tgaz_detail_venteController extends Controller
         
 
         $montanttva = (((floatval($request->qteVente) * floatval($montants))*floatval($pourtageTVA))/100);
-            // 'id','refEnteteVente','compte_vente','compte_variationstock',
-// 'compte_perte','compte_produit','compte_destockage','idStockService','idParamLot',
-// 'puVente','qteVente','uniteVente','cmupVente','devise','taux','montanttva',
-// 'montantreduction','priseencharge','active','author','refUser'
             $data = tgaz_detail_vente::create([
                 'refEnteteVente'       =>  $request->refEnteteVente,
                 'compte_vente'    =>  $compte_vente,
@@ -621,6 +621,7 @@ class tgaz_detail_venteController extends Controller
         $pu=0;
         $montantreduction=0;
         $montanttva=0;
+        $idmax = 0;
 
         $deleteds = DB::table('tgaz_detail_vente')->Where('id',$id)->get(); 
         foreach ($deleteds as $deleted) {
@@ -632,40 +633,53 @@ class tgaz_detail_venteController extends Controller
             $montanttva = $deleted->montanttva;
         }
 
-        $refService=0;
+
+        $qteParLot = 0;
+        $priceParLot = 0;
+        $idStockLot = 0;
+
+        $total_red = 0;
+        $total_tva = 0;
+        $total_pu = 0;
+
+        $data_qte_lot = DB::table('tgaz_detail_vente')       
+        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
+        SUM(tgaz_detail_vente.puVente) as total_pu,
+        SUM(tgaz_detail_vente.montanttva) as total_tva,
+        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
+         idStockService')
+        ->where([
+            ['tgaz_detail_vente.refEnteteVente','=', $idFacture]
+         ])
+        ->groupby('idStockService')
+        ->get();
+        foreach ($data_qte_lot as $list) {
+            $qteParLot= $list->qte_kit;
+            $priceParLot= $list->prix_total_kit;
+            $idStockLot= $list->idStockService;
+            $total_red = $list->total_reduction;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
+
+            $data2 = DB::update(
+            'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteLot where id = :idStockService',
+            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            );
         
+            $data3 = DB::update(
+                'update tgaz_entete_vente set montant = montant - (:montant),reduction = reduction - :reduction,totaltva = totaltva - :totaltva where id = :refEnteteVente',
+                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idFacture]
+            );
 
-        $data33=DB::table('tgaz_entete_vente') 
-         ->select('id','code','refClient','refService','module_id','dateVente',
-         'libelle','montant','paie','author','refUser')
-         ->where([
-            ['tgaz_entete_vente.id','=', $idFacture]
-        ])      
-        ->get();      
-        $output='';
-        foreach ($data33 as $row) 
-        {
-            $refService =  $row->refService;           
-        }
+            $nom_table = 'tgaz_detail_vente';
 
-
-        $data2 = DB::update(
-            'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteVente where refLot = :refLot and refService = :refService',
-            ['qteVente' => $qte,'refLot' => $refLot,'refService' => $refService]
-        );
-
-        $data3 = DB::update(
-            'update tgaz_entete_vente set montant = montant + (:pu * :qte),reduction = reduction - :reduction, totaltva = totaltva - :totaltva where id = :refEnteteVente',
-            ['pu' => $pu,'qte' => $qte,'reduction' => $montantreduction,'totaltva' => $montanttva,'refEnteteVente' => $idFacture]
-        );
-
-        $nom_table = 'tgaz_detail_vente';
-
-        $data4 = DB::update(
-            'delete from tgaz_mouvement_stock_service_lot where tgaz_mouvement_stock_service_lot.id_data = :id and nom_table=:nom_table',
-            ['id' => $id, 'nom_table' => $nom_table]
-        );
-
+            $data4 = DB::update(
+                'delete from tgaz_mouvement_stock_service_lot where tgaz_mouvement_stock_service_lot.id_data = :id and nom_table=:nom_table',
+                ['id' => $id, 'nom_table' => $nom_table]
+            );
+  
+        } 
         $data = tgaz_detail_vente::where('id',$id)->delete();
 
 
@@ -675,8 +689,6 @@ class tgaz_detail_venteController extends Controller
         ]);
         
     }
-
-
 
     function insert_dataGlobal(Request $request)
     {
@@ -815,12 +827,54 @@ class tgaz_detail_venteController extends Controller
                 'montanttva'    =>  $montanttva,
             ]);
 
+
+
+        }
+
+        $qteParLot = 0;
+        $priceParLot = 0;
+        $idStockLot = 0;
+
+        $total_red = 0;
+        $total_tva = 0;
+        $total_pu = 0;
+
+        $data_qte_lot = DB::table('tgaz_detail_vente')       
+        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
+        SUM(tgaz_detail_vente.puVente) as total_pu,
+        SUM(tgaz_detail_vente.montanttva) as total_tva,
+        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
+         idStockService')
+        ->where([
+            ['tgaz_detail_vente.refEnteteVente','=', $idmax]
+         ])
+        ->groupby('idStockService')
+        ->get();
+        foreach ($data_qte_lot as $list) {
+            $qteParLot= $list->qte_kit;
+            $priceParLot= $list->prix_total_kit;
+            $idStockLot= $list->idStockService;
+            $total_red = $list->total_reduction;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
+
+            $data2 = DB::update(
+            'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteLot where id = :idStockService',
+            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            );
+        
+            $data3 = DB::update(
+                'update tgaz_entete_vente set montant = montant + (:montant),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
+                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idmax]
+            );
+
             $id_detail_max=0;
             $detail_list = DB::table('tgaz_detail_vente')       
             ->selectRaw('MAX(id) as code_entete')
             ->where([
                 ['refUser','=', $request->refUser],
-                ['idStockService','=', $data['idStockService']]
+                ['idStockService','=', $idStockLot]
              ]) 
             ->get();
             foreach ($detail_list as $list) {
@@ -828,14 +882,14 @@ class tgaz_detail_venteController extends Controller
             }
           
             $data99 = tgaz_mouvement_stock_service_lot::create([             
-                'idStockService'    =>  $data['idStockService'],             
+                'idStockService'    =>  $idStockLot,             
                 'dateMvt'    =>   $request->dateVente,   
                 'type_mouvement'    =>  'Sortie',
                 'libelle_mouvement'    =>  'Vente des Gaz et Accesseoires',
                 'nom_table'    =>  'tgaz_detail_vente',
                 'id_data'    =>  $id_detail_max, 
-                'qteMvt'    =>  $data['qteVente'],
-                'puMvt'    =>  $montants,                   
+                'qteMvt'    =>  $qteParLot,
+                'puMvt'    =>  $total_pu,                   
                 'author'       =>  $request->author,
                 'refUser'       =>  $request->refUser,
                 'type_sortie'    =>  'Sortie',
@@ -849,30 +903,19 @@ class tgaz_detail_venteController extends Controller
                 'compte_destockage'    =>  $compte_destockage,
                 // 'compte_achat'    =>  $compte_achat,
                 // 'compte_stockage'    =>  $compte_stockage,
-                'puVente'    =>  $montants,
+                'puVente'    =>  $total_pu,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
-                'cmupMvt'    =>  $cmupVente
+                'cmupMvt'    =>  $total_pu
             ]); 
-    
-            $data2 = DB::update(
-                'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteVente where id = :idStockService',
-                ['qteVente' => $qteVente,'idStockService' => $data['idStockService']]
-            );
-    
-            $data3 = DB::update(
-                'update tgaz_entete_vente set montant = montant + (:pu * :qte),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
-                ['pu' => $montants,'qte' => $data['qteVente'],'reduction' => $data['montantreduction'],'totaltva' => $montanttva,'refEnteteVente' => $idmax]
-            );
 
-        }
+        }      
 
         return response()->json([
             'data'  =>  "Insertion avec succès!!!",
         ]);
        
     }
-
 
     function insert_dataGlobalCash(Request $request)
     {
@@ -1011,12 +1054,54 @@ class tgaz_detail_venteController extends Controller
                 'montanttva'    =>  $montanttva,
             ]);
 
+
+        }
+
+        $qteParLot = 0;
+        $priceParLot = 0;
+        $idStockLot = 0;
+
+        $total_red = 0;
+        $total_tva = 0;
+        $total_pu = 0;
+
+        $data_qte_lot = DB::table('tgaz_detail_vente')       
+        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
+        SUM(tgaz_detail_vente.puVente) as total_pu,
+        SUM(tgaz_detail_vente.montanttva) as total_tva,
+        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
+         idStockService')
+        ->where([
+            ['tgaz_detail_vente.refEnteteVente','=', $idmax]
+         ])
+        ->groupby('idStockService')
+        ->get();
+        foreach ($data_qte_lot as $list) {
+            $qteParLot= $list->qte_kit;
+            $priceParLot= $list->prix_total_kit;
+            $idStockLot= $list->idStockService;
+            $total_red = $list->total_reduction;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
+
+            $data2 = DB::update(
+            'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteLot where id = :idStockService',
+            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            );
+        
+            $data3 = DB::update(
+                'update tgaz_entete_vente set montant = montant + (:montant),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
+                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idmax]
+            );
+
+
             $id_detail_max=0;
             $detail_list = DB::table('tgaz_detail_vente')       
             ->selectRaw('MAX(id) as code_entete')
             ->where([
                 ['refUser','=', $request->refUser],
-                ['idStockService','=', $data['idStockService']]
+                ['idStockService','=', $idStockLot]
              ]) 
             ->get();
             foreach ($detail_list as $list) {
@@ -1024,14 +1109,14 @@ class tgaz_detail_venteController extends Controller
             }
           
             $data99 = tgaz_mouvement_stock_service_lot::create([             
-                'idStockService'    =>  $data['idStockService'],             
+                'idStockService'    =>  $idStockLot,             
                 'dateMvt'    =>   $request->dateVente,   
                 'type_mouvement'    =>  'Sortie',
                 'libelle_mouvement'    =>  'Vente des Gaz et Accesseoires',
                 'nom_table'    =>  'tgaz_detail_vente',
                 'id_data'    =>  $id_detail_max, 
-                'qteMvt'    =>  $data['qteVente'],
-                'puMvt'    =>  $montants,                   
+                'qteMvt'    =>  $qteParLot,
+                'puMvt'    =>  $total_pu,                   
                 'author'       =>  $request->author,
                 'refUser'       =>  $request->refUser,
                 'type_sortie'    =>  'Sortie',
@@ -1045,23 +1130,14 @@ class tgaz_detail_venteController extends Controller
                 'compte_destockage'    =>  $compte_destockage,
                 // 'compte_achat'    =>  $compte_achat,
                 // 'compte_stockage'    =>  $compte_stockage,
-                'puVente'    =>  $montants,
+                'puVente'    =>  $total_pu,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
-                'cmupMvt'    =>  $cmupVente
+                'cmupMvt'    =>  $total_pu
             ]); 
-    
-            $data2 = DB::update(
-                'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteVente where id = :idStockService',
-                ['qteVente' => $qteVente,'idStockService' => $data['idStockService']]
-            );
-    
-            $data3 = DB::update(
-                'update tgaz_entete_vente set montant = montant + (:pu * :qte),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
-                ['pu' => $montants,'qte' => $data['qteVente'],'reduction' => $data['montantreduction'],'totaltva' => $montanttva,'refEnteteVente' => $idmax]
-            );
 
-        }
+        }      
+
 
         //PAIEMENT DE LA FACTURE ===================================================================
 

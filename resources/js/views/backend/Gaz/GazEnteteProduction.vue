@@ -310,18 +310,18 @@
       fetchDataList() {
         this.fetch_data(`${this.apiBaseURL}/fetch_gaz_entete_production?page=`);
       },    
-      showGazDetailProduction(refEnteteVente, name, refService) {
+      showGazDetailProduction(refEnteteProduction, name, refService) {
   
-        if (refEnteteVente != '') { 
+        if (refEnteteProduction != '') { 
   
           this.$refs.GazDetailProduction.$data.etatModal = true;
-          this.$refs.GazDetailProduction.$data.refEnteteVente = refEnteteVente;
+          this.$refs.GazDetailProduction.$data.refEnteteProduction = refEnteteProduction;
           this.$refs.GazDetailProduction.$data.refService = refService;
-          this.$refs.GazDetailProduction.$data.svData.refEnteteVente = refEnteteVente;
+          this.$refs.GazDetailProduction.$data.svData.refEnteteProduction = refEnteteProduction;
           this.$refs.GazDetailProduction.fetchDataList();
-          this.$refs.GazDetailProduction.fetchListDevise();
-          this.$refs.GazDetailProduction.get_produit_for_service(refService);
+          this.$refs.GazDetailProduction.fetchListDevise();          
           this.$refs.GazDetailProduction.fetchListTVA();
+          this.$refs.GazDetailProduction.get_produit_for_service(refService);
           this.fetchDataList();
   
           this.$refs.GazDetailProduction.$data.titleComponent =

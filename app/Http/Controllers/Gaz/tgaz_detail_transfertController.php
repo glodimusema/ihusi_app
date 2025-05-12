@@ -119,7 +119,7 @@ class tgaz_detail_transfertController extends Controller
     {    
 
         $id_service = $request->refDestination;
-        $id_flot = 0;
+        $id_lot = 0;
 
 
         $temp_idservice = 0;
@@ -135,7 +135,7 @@ class tgaz_detail_transfertController extends Controller
         ])
         ->get();
         foreach ($stockservice as $list) {
-            $id_flot = $list->refLot;
+            $id_lot = $list->refLot;
         }
 
         $cmupVente=0;
@@ -150,7 +150,7 @@ class tgaz_detail_transfertController extends Controller
         'devise','taux','active','refUser','author')
         ->where([
            ['tgaz_stock_service_lot.refService','=',  $id_service],
-           ['tgaz_stock_service_lot.refLot','=',  $id_flot]
+           ['tgaz_stock_service_lot.refLot','=',  $id_lot]
        ])
         ->first();
         if ($stockservicedest) {
@@ -171,7 +171,7 @@ class tgaz_detail_transfertController extends Controller
         ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte',
         'author','refUser',"tgaz_lot.created_at")
         ->where([
-           ['tgaz_lot.id','=',  $id_flot]
+           ['tgaz_lot.id','=',  $id_lot]
         ])
         ->first();
         if ($products) {
@@ -206,11 +206,11 @@ class tgaz_detail_transfertController extends Controller
 
        $refServiceSource = $request->refService;  
 
-       if(($id_service == $temp_idservice) && ($id_flot == $temp_idflot))
+       if(($id_service == $temp_idservice) && ($id_lot == $temp_idflot))
        {
             $data23 = DB::update(
             'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteTransfert where (refLot = :refLot) and (refService = :refService)',
-            ['qteTransfert' => $qteEntree,'refLot' => $id_flot,'refService' => $id_service]
+            ['qteTransfert' => $qteEntree,'refLot' => $id_lot,'refService' => $id_service]
             );
 
             $data22 = DB::update(
@@ -224,7 +224,7 @@ class tgaz_detail_transfertController extends Controller
                'insert into tgaz_stock_service_lot (refService,refLot,pu_lot,qte_lot,cmup_lot,devise,
                taux,active,refUser,author) 
                values (:refService,:refLot,:pu_lot,:qte_lot,:cmup_lot,:devise,:taux,:active,:refUser,:author)',
-               ['refService' => $id_service,'refLot' => $id_flot,'pu_lot' => $cmupTemp,'qte_lot' => $qteEntree,
+               ['refService' => $id_service,'refLot' => $id_lot,'pu_lot' => $cmupTemp,'qte_lot' => $qteEntree,
                'cmup_lot' => $cmupTemp,'devise' => $devise,'taux' => $taux,'active' => $active,
                'refUser' => $request->refUser,'author' => $request->author]
            );
@@ -238,7 +238,7 @@ class tgaz_detail_transfertController extends Controller
 
         $data = tgaz_detail_transfert::create([
             'refEnteteTransfert'       => $request->refEnteteTransfert,
-            'refLot'       =>  $id_flot,  
+            'refLot'       =>  $id_lot,  
             'refDestination'       =>  $request->refDestination,  
             'idStockService'       =>  $temp_id,         
             'author'       =>  $request->author,
@@ -278,7 +278,7 @@ class tgaz_detail_transfertController extends Controller
     {
 
         $qte=0;
-        $id_flot=0;
+        $id_lot=0;
         $id_service=0;
         $id_source;
         $status_source = '';
@@ -298,7 +298,7 @@ class tgaz_detail_transfertController extends Controller
         ->Where('tgaz_detail_transfert.id',$id)->get(); 
         foreach ($deleteds as $deleted) {
             $qte = $deleted->qteTotal;
-            $id_flot = $deleted->refLot;
+            $id_lot = $deleted->refLot;
             $id_service = $deleted->refDestination;
             $id_source = $deleted->refService;
             $status_source = $deleted->status_source;
@@ -312,7 +312,7 @@ class tgaz_detail_transfertController extends Controller
         'devise','taux','active','refUser','author')
         ->where([
            ['tgaz_stock_service_lot.refService','=',  $id_service],
-           ['tgaz_stock_service_lot.refLot','=',  $id_flot]
+           ['tgaz_stock_service_lot.refLot','=',  $id_lot]
        ])
         ->get();
         foreach ($listeStockDest as $list) {
@@ -325,7 +325,7 @@ class tgaz_detail_transfertController extends Controller
         'devise','taux','active','refUser','author')
         ->where([
            ['tgaz_stock_service_lot.refService','=',  $id_service],
-           ['tgaz_stock_service_lot.refLot','=',  $id_flot]
+           ['tgaz_stock_service_lot.refLot','=',  $id_lot]
        ])
         ->get();
         foreach ($listeStockSource as $list) {
@@ -336,12 +336,12 @@ class tgaz_detail_transfertController extends Controller
 
         $data2 = DB::update(
             'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteStock where (refLot = :refLot) and (refService = :refService)',
-            ['qteStock' => $qte,'refLot' => $id_flot,'refService' => $id_service]
+            ['qteStock' => $qte,'refLot' => $id_lot,'refService' => $id_service]
         );
 
         $data3 = DB::update(
             'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteStock where (refLot = :refLot) and (refService = :refService)',
-            ['qteStock' => $qte,'refLot' => $id_flot,'refService' => $id_source]
+            ['qteStock' => $qte,'refLot' => $id_lot,'refService' => $id_source]
         );
 
         
@@ -391,13 +391,26 @@ class tgaz_detail_transfertController extends Controller
         foreach ($detailData as $data) {
             
             $refIdStockSource = $data['idStockService'];
-            $id_flot = 0;
+            $id_lot = 0;
+
+            $puTransfert=0;
+            $data_stockss = DB::table('tgaz_stock_service_lot')       
+            ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
+            'devise','taux','active','refUser','author')
+            ->where([
+               ['tgaz_stock_service_lot.id','=',  $refIdStockSource]
+           ])
+            ->first();
+            if ($data_stockss) {
+                $id_lot = $data_stockss->id;
+                $puTransfert = floatval($data_stockss->cmup_lot);
+            }
     
             $temp_idservice = 0;
             $temp_idflot = 0;
             $temp_id=0;
 
-            $puTransfert=0;
+            
             $qteTransfert=0;
             $uniteTransfert='';
             $cmupVente=0;
@@ -409,7 +422,7 @@ class tgaz_detail_transfertController extends Controller
             'devise','taux','active','refUser','author')
             ->where([
                ['tgaz_stock_service_lot.refService','=',  $request->refDestination],
-               ['tgaz_stock_service_lot.refLot','=',  $id_flot]
+               ['tgaz_stock_service_lot.refLot','=',  $id_lot]
            ])
             ->first();
             if ($stockservicedest) {
@@ -417,7 +430,7 @@ class tgaz_detail_transfertController extends Controller
                 $temp_idflot = $stockservicedest->refLot;
                 $temp_id = $stockservicedest->id;
 
-                $puTransfert = floatval($stockservicedest->cmup_lot);
+                
                 $qteTransfert = floatval($stockservicedest->qte_lot);
 
                 $cmupVente = floatval($stockservicedest->cmup_lot);
@@ -429,7 +442,7 @@ class tgaz_detail_transfertController extends Controller
             ->select("tgaz_lot.id",'nom_lot','code_lot','unite_lot','stock_alerte',
             'author','refUser',"tgaz_lot.created_at")
             ->where([
-               ['tgaz_lot.id','=',  $id_flot]
+               ['tgaz_lot.id','=',  $id_lot]
             ])
             ->first();
             if ($products) {
@@ -462,10 +475,9 @@ class tgaz_detail_transfertController extends Controller
 
            $data90 = tgaz_detail_transfert::create([
                 'refEnteteTransfert'       => $idmax,
-                'refLot'       =>  $id_flot,  
+                'refLot'       =>  $id_lot,  
                 'refDestination'       =>  $request->refDestination,  
                 'idStockService'       =>  $refIdStockSource, 
-                'refLot' =>  $id_flot, 
                 'puTransfert'       =>  $puTransfert, 
                 'qteTransfert'      =>  $data['qteTransfert'], 
                 'uniteTransfert'    =>  $uniteTransfert,       
@@ -473,7 +485,7 @@ class tgaz_detail_transfertController extends Controller
                 'refUser'    =>  $request->refUser
             ]);
 
-           if(($request->refDestination == $temp_idservice) && ($id_flot == $temp_idflot))
+           if(($request->refDestination == $temp_idservice) && ($id_lot == $temp_idflot))
            {
 
 
@@ -568,7 +580,7 @@ class tgaz_detail_transfertController extends Controller
                $data22 = DB::update(
                    'insert into tgaz_stock_service_lot (refService,refLot,pu_lot,qte_lot,cmup_lot,devise,taux,active,refUser,author) 
                    values (:refService,:refLot,:pu_lot,:qte_lot,:cmup_lot,:devise,:taux,:active,:refUser,:author)',
-                   ['refService' => $request->refDestination,'refLot' => $id_flot,'pu_lot' => $cmupTemp,'qte_lot' => $qteEntree,
+                   ['refService' => $request->refDestination,'refLot' => $id_lot,'pu_lot' => $cmupTemp,'qte_lot' => $qteEntree,
                    'cmup_lot' => $cmupTemp,'devise' => $devise,'taux' => $taux,'active' => $active,
                    'refUser' => $request->refUser,'author' => $request->author]
                );
@@ -634,12 +646,17 @@ class tgaz_detail_transfertController extends Controller
                 ->selectRaw('MAX(id) as code_entete')
                 ->where([
                    ['tgaz_stock_service_lot.refService','=',  $request->refDestination],
-                   ['tgaz_stock_service_lot.refLot','=',  $id_flot]
+                   ['tgaz_stock_service_lot.refLot','=',  $id_lot]
                ])
                 ->first();
                 if ($data_dest) {
                     $id_stock_servi_dest = $data_dest->code_entete;
                 }
+
+                $compte_variationstock = 0;
+                $compte_produit = 0;
+                $compte_achat = 0;
+                $compte_stockage = 0;
               
                 $data98 = tgaz_mouvement_stock_service_lot::create([             
                     'idStockService'    =>  $id_stock_servi_dest,             
