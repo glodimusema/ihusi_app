@@ -792,25 +792,25 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::get("delete_gaz_mouvement_stock/{id}", 'tgaz_mouvement_stock_service_lotController@delete_data');
 
 
-    // Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_destination", 'PdfGazController@fetch_rapport_detailtransfert_date_service_destination'); 
-    // Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_source", 'PdfGazController@fetch_rapport_detailtransfert_date_service_source'); 
-    // Route::get("pdf_gaz_fiche_mouvement_produit", 'PdfGazController@pdf_fiche_mouvement_produit'); 
+    Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_destination", 'PdfGazController@fetch_rapport_detailtransfert_date_service_destination'); 
+    Route::get("fetch_pdf_gaz_rapport_detailtransfert_date_service_source", 'PdfGazController@fetch_rapport_detailtransfert_date_service_source'); 
+    Route::get("pdf_gaz_fiche_mouvement_produit", 'PdfGazController@pdf_fiche_mouvement_produit'); 
     Route::get("fetch_pdf_gaz_rapport_paiementfacture_date_banque", 'PdfGazController@fetch_rapport_paiementfacture_date_banque'); 
-    // Route::get("fetch_pdf_gaz_rapport_paiementfacture_date", 'PdfGazController@fetch_rapport_paiementfacture_date'); 
-    // Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_dette_date", 'PdfGazController@fetch_rapport_gaz_detailvente_dette_date'); 
-    // Route::get("fetch_pdf_gaz_rapport_detailvente_dette_date_service", 'PdfGazController@fetch_rapport_detailvente_dette_date_service'); 
-    // Route::get("pdf_gaz_fiche_stock_vente_service", 'PdfGazController@pdf_fiche_stock_vente_service'); 
-    // Route::get("fetch_pdf_gaz_rapport_detail_production_date_service_byproduit", 'PdfGazController@fetch_rapport_detail_production_date_service_byproduit'); 
-    // Route::get("fetch_pdf_gaz_rapport_detail_production_date_produit", 'PdfGazController@fetch_rapport_detail_production_date_produit'); 
-    // Route::get("fetch_pdf_gaz_rapport_detail_production_date", 'PdfGazController@fetch_rapport_detail_production_date'); 
-    //Route::get("fetch_pdf_gaz_rapport_detailvente_date_service_byproduit", 'PdfGazController@fetch_rapport_detailvente_date_service_byproduit'); 
-    // Route::get("fetch_pdf_gaz_rapport_detailvente_date_produit", 'PdfGazController@fetch_rapport_detailvente_date_produit'); 
-    // Route::get("fetch_pdf_gaz_rapport_detailvente_date_etat_facture_service", 'PdfGazController@fetch_rapport_detailvente_date_etat_facture_service'); 
-    //Route::get("fetch_pdf_gaz_rapport_detailvente_date_service", 'PdfGazController@fetch_rapport_detailvente_date_service'); 
-    // Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_date", 'PdfGazController@fetch_rapport_gaz_detailvente_date'); 
-    // Route::get("pdf_gaz_fiche_stock_vente_service_bycategorie_excel", 'PdfGazController@pdf_fiche_stock_vente_service_bycategorie_excel'); 
-    //Route::get("pdf_pdf_detail_vente_service_excel", 'PdfGazController@pdf_detail_vente_service_excel'); 
-    // Route::get("pdf_fiche_stock_vente_service_excel", 'PdfGazController@pdf_fiche_stock_vente_service_excel'); 
+    Route::get("fetch_pdf_gaz_rapport_paiementfacture_date", 'PdfGazController@fetch_rapport_paiementfacture_date'); 
+    Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_dette_date", 'PdfGazController@fetch_rapport_gaz_detailvente_dette_date'); 
+    Route::get("fetch_pdf_gaz_rapport_detailvente_dette_date_service", 'PdfGazController@fetch_rapport_detailvente_dette_date_service'); 
+    Route::get("pdf_gaz_fiche_stock_vente_service", 'PdfGazController@pdf_fiche_stock_vente_service'); 
+    Route::get("fetch_pdf_gaz_rapport_detail_production_date_service_byproduit", 'PdfGazController@fetch_rapport_detail_production_date_service_byproduit'); 
+    Route::get("fetch_pdf_gaz_rapport_detail_production_date_produit", 'PdfGazController@fetch_rapport_detail_production_date_produit'); 
+    Route::get("fetch_pdf_gaz_rapport_detail_production_date", 'PdfGazController@fetch_rapport_detail_production_date'); 
+    Route::get("fetch_pdf_gaz_rapport_detailvente_date_service_byproduit", 'PdfGazController@fetch_rapport_detailvente_date_service_byproduit'); 
+    Route::get("fetch_pdf_gaz_rapport_detailvente_date_produit", 'PdfGazController@fetch_rapport_detailvente_date_produit'); 
+    Route::get("fetch_pdf_gaz_rapport_detailvente_date_etat_facture_service", 'PdfGazController@fetch_rapport_detailvente_date_etat_facture_service'); 
+    Route::get("fetch_pdf_gaz_rapport_detailvente_date_service", 'PdfGazController@fetch_rapport_detailvente_date_service'); 
+    Route::get("fetch_pdf_gaz_rapport_gaz_detailvente_date", 'PdfGazController@fetch_rapport_gaz_detailvente_date'); 
+    Route::get("pdf_gaz_fiche_stock_vente_service_bycategorie_excel", 'PdfGazController@pdf_fiche_gaz_stock_vente_service_bycategorie_excel'); 
+    Route::get("pdf_pdf_detail_vente_service_excel", 'PdfGazController@pdf_detail_vente_service_excel'); 
+    Route::get("pdf_gaz_fiche_stock_vente_service_excel", 'PdfGazController@pdf_fiche_stock_vente_service_excel'); 
 
 
 

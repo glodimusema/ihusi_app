@@ -145,7 +145,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="exportToExcelDetailVenteService" block color="  blue" dark>
-                                            <v-icon>print</v-icon> LES VENTES/SERVICE/EXCEL
+                                            <v-icon>print</v-icon> LES VENTES/SERVICE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -242,24 +242,11 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-                            <!-- exportToExcelFicheStockServiceSansPrix -->
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="exportToExcelFicheStockService" block color="  blue" dark>
                                             <v-icon>print</v-icon> FICHE STOCK/SERVICE/EXCEL.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <!-- exportToExcelFicheStockServiceSansPrix  -->
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelFicheStockServiceSansPrix" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/SANS PRIX/EXCEL.
                                         </v-btn>
                                     </span>
                                 </template>
@@ -394,26 +381,13 @@ export default {
       ,
      
       async GetLot() {
-          this.isLoading(true);
-          await axios
-              .get(`${this.apiBaseURL}/fetch_tgaz_lot_2`)
-              .then((res) => {
-              var chart = res.data.data;
+        this.editOrFetch(`${this.apiBaseURL}/fetch_gaz_lot_2`).then(
+          ({ data }) => {
+            var donnees = data.data;
+            this.lotList = donnees;
+          }
+        );
 
-              if (chart) {
-                  this.lotList = chart;
-              } else {
-                  this.lotList = [];
-              }
-
-              this.isLoading(false);
-              })
-              .catch((err) => {
-              this.errMsg();
-              this.makeFalse();
-              reject(err);
-              });
-              //fetch_pdf_rapport_detailentree_date
         },
         showDetailProductionByDate_Produit() {
             var date1 =  this.dates[0] ;
@@ -546,7 +520,7 @@ export default {
 
                 if(this.svData.idService!=""  && this.svData.refLot!="")
                 {
-                    window.open(`${this.apiBaseURL}/pdf_gaz_fiche_mouvement_produit?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&idProduit="+this.svData.refLot);
+                    window.open(`${this.apiBaseURL}/pdf_gaz_fiche_mouvement_produit?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService+"&refLot="+this.svData.refLot);
                 }else
                 {
                     this.showError("Veillez selectionner le service svp");
@@ -692,7 +666,7 @@ export default {
 
                     if(this.svData.idService!="")
                     {
-                        const response = await axios.get(`${this.apiBaseURL}/pdf_fiche_stock_vente_service_excel?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
+                        const response = await axios.get(`${this.apiBaseURL}/pdf_gaz_fiche_stock_vente_service_excel?date1=` + date1+"&date2="+date2+"&idService="+this.svData.idService);
                         let users = response.data; // Changez const en let
 
                         console.log('Réponse de API:', users); // Vérifiez la structure des données
@@ -817,11 +791,12 @@ export default {
 
     },
     created() {
+        this.GetLot();
         this.fetchListCategorieClient();
         this.fetchListCategorieLot();
         this.fetchListServiceVente();
         this.fetchListFournisseur();
-        this.GetLot();
+        
         this.showDate=true;
     },
 };

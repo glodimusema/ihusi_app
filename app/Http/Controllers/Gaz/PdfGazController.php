@@ -400,8 +400,8 @@ function printRapportDetailVente($date1, $date2)
                     <td class="cs9FE9304F" style="width:83px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
                     <td class="cs9FE9304F" colspan="3" style="width:172px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
                     <td class="cs9FE9304F" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE&nbsp;PROD.</nobr></td>
-                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ARTICLE</nobr></td>
+                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>KIT</nobr></td>
+                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>COMPOSANT</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:36px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Qte</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:39px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
                     <td class="csEAC52FCD" colspan="2" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PHT</nobr></td>
@@ -665,7 +665,7 @@ function printRapportDetailVente_Service($date1, $date2,$idService)
          ->where([
             ['dateVente','>=', $date1],
             ['dateVente','<=', $date2],
-            ['tvente_services.id','=', $idService],
+            ['tgaz_entete_vente.refService','=', $idService],
         ])    
          ->get(); 
          $output='';
@@ -958,8 +958,8 @@ function printRapportDetailVente_Service($date1, $date2,$idService)
                         <td class="cs9FE9304F" style="width:83px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
                         <td class="cs9FE9304F" colspan="3" style="width:172px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
                         <td class="cs9FE9304F" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                        <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE&nbsp;PROD.</nobr></td>
-                        <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ARTICLE</nobr></td>
+                        <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>KIT</nobr></td>
+                        <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CONPOSANT</nobr></td>
                         <td class="cs9FE9304F" colspan="2" style="width:36px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Qte</nobr></td>
                         <td class="cs9FE9304F" colspan="2" style="width:39px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
                         <td class="csEAC52FCD" colspan="2" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PHT</nobr></td>
@@ -1225,7 +1225,7 @@ function printRapportDetailVente_EtatFacture_Service($date1, $date2,$etat_factur
             ['dateVente','>=', $date1],
             ['dateVente','<=', $date2],
             ['tgaz_entete_vente.etat_facture','=', $etat_facture],
-            ['tvente_services.id','=', $idService]
+            ['tgaz_entete_vente.refService','=', $idService]
         ])    
          ->get(); 
          //$idService
@@ -1699,7 +1699,7 @@ public function fetch_rapport_detailvente_date_produit(Request $request)
 {
     //refDepartement
 
-    if ($request->get('date1') && $request->get('date2')&& $request->get('refProduit')) {
+    if ($request->get('date1') && $request->get('date2')&& $request->get('refLot')) {
         // code...
         $date1 = $request->get('date1');
         $date2 = $request->get('date2');
@@ -2089,8 +2089,8 @@ function printRapportDetailVente_Produit($date1, $date2,$refLot)
                     <td class="cs9FE9304F" style="width:83px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
                     <td class="cs9FE9304F" colspan="3" style="width:172px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
                     <td class="cs9FE9304F" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE&nbsp;PROD.</nobr></td>
-                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ARTICLE</nobr></td>
+                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>KIT</nobr></td>
+                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>COMPOSANT</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:36px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Qte</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:39px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
                     <td class="csEAC52FCD" colspan="2" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PHT</nobr></td>
@@ -3195,8 +3195,8 @@ function printRapportDetailProduction($date1, $date2)
                     <td class="cs9FE9304F" style="width:83px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
                     <td class="cs9FE9304F" colspan="3" style="width:172px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
                     <td class="cs9FE9304F" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE&nbsp;PROD.</nobr></td>
-                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>ARTICLE</nobr></td>
+                    <td class="cs9FE9304F" colspan="2" style="width:147px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>KIT</nobr></td>
+                    <td class="cs9FE9304F" style="width:178px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>UNITE</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:36px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Qte</nobr></td>
                     <td class="cs9FE9304F" colspan="2" style="width:39px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PU</nobr></td>
                     <td class="csEAC52FCD" colspan="2" style="width:72px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>PHT</nobr></td>
@@ -3327,15 +3327,15 @@ function showDetailProduction($date1, $date2)
                 <td></td>
                 <td></td>
                 <td class="csD06EB5B2" style="width:83px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->codeFacture.'</td>
-                <td class="csD06EB5B2" colspan="3" style="width:172px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->noms.'</td>
-                <td class="csD06EB5B2" style="width:72px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->dateVente.'</td>
+                <td class="csD06EB5B2" colspan="3" style="width:172px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->nom_service.'</td>
+                <td class="csD06EB5B2" style="width:72px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->dateProduction.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:147px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->nom_lot.'</td>
                 <td class="csD06EB5B2" style="width:178px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->unite_lot.'</td>
-                <td class="csD06EB5B2" colspan="2" style="width:36px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->qteVente.'</td>
-                <td class="csD06EB5B2" colspan="2" style="width:39px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->puVente.'$</td>
-                <td class="csBFBB3693" colspan="2" style="width:72px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->PTVente.'$</td>
+                <td class="csD06EB5B2" colspan="2" style="width:36px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->qteProduction.'</td>
+                <td class="csD06EB5B2" colspan="2" style="width:39px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->puProduction.'$</td>
+                <td class="csBFBB3693" colspan="2" style="width:72px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->PTProduction.'$</td>
                 <td class="cs8681714E" style="width:48px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->montanttva.'$</td>
-                <td class="cs8681714E" colspan="2" style="width:88px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->PTVenteTVA.'$</td>
+                <td class="cs8681714E" colspan="2" style="width:88px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->PTProductionTVA.'$</td>
             </tr>
         ';          
    
@@ -4896,7 +4896,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         "tgaz_stock_service_lot.cmup_lot",
         "tgaz_stock_service_lot.devise",
         "tgaz_stock_service_lot.taux",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tgaz_lot.refCategorieLot', '=', $refCategorie],
@@ -4906,7 +4906,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
         "tgaz_stock_service_lot.id",
         'tgaz_stock_service_lot.refService',
         'tgaz_stock_service_lot.refLot',
-        "tgaz_lot.nom_lot as designation",
+        "tgaz_lot.nom_lot",
         "refCategorieLot",
         "tgaz_categorie_lot.nom_categorie_lot",
         "tgaz_stock_service_lot.pu_lot",            
@@ -4948,7 +4948,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -4959,7 +4959,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -4969,7 +4969,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
     
     //======================================================================
@@ -5001,7 +5001,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -5012,7 +5012,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -5022,7 +5022,7 @@ function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idServ
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
     
 
@@ -7047,7 +7047,7 @@ function showPaieFacturation($date1, $date2)
     
     ,'date_entete_paie','date_paie_current'
 
-    ,'nom_service','refClient','tgaz_entete_vente.refService','tgaz_entete_vente.refReservation',
+    ,'nom_service','refClient','tgaz_entete_vente.refService',
     'tgaz_entete_vente.module_id','dateVente','libelle','tgaz_entete_vente.montant',
     'tgaz_entete_vente.paie'
 
@@ -7605,11 +7605,11 @@ function showPaiementFacturation_Banque($date1, $date2,$refBanque)
 function pdf_fiche_mouvement_produit(Request $request)
 {
 
-    if ($request->get('date1') && $request->get('date2') && $request->get('idLot') && $request->get('idService')) 
+    if ($request->get('date1') && $request->get('date2') && $request->get('refLot') && $request->get('idService')) 
     {
         $date1 = $request->get('date1');
         $date2 = $request->get('date2');
-        $refLot = $request->get('idLot');
+        $refLot = $request->get('refLot');
         $refService = $request->get('idService');
 
         $html = $this->getInfoMouvementProduit($date1,$date2,$refLot,$refService);
@@ -7755,7 +7755,7 @@ function getInfoMouvementProduit($date1,$date2,$refLot,$refService)
 
             $data_entree = DB::table('tgaz_mouvement_stock_service_lot')   
             ->join('tgaz_stock_service_lot','tgaz_stock_service_lot.id','=','tgaz_mouvement_stock_service_lot.idStockService')
-            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt * qteBase),3),0) as totalEntree'))
+            ->select(DB::raw('IFNULL(ROUND(SUM(qteMvt),3),0) as totalEntree'))
             ->where([               
                 ['dateMvt','>=', $date1],
                 ['dateMvt','<=', $date2],
@@ -7997,7 +7997,7 @@ function getInfoMouvementProduit($date1,$date2,$refLot,$refService)
                     </tr>
                     ';
                                                                     
-                                        $output .= $this->showMouvementProduit($date1,$date2,$refProduit,$refService); 
+                                        $output .= $this->showMouvementProduit($date1,$date2,$refLot,$refService); 
                                                                     
                                         $output.='
                     <tr style="vertical-align:top;">
@@ -8031,7 +8031,6 @@ function showMouvementProduit($date1,$date2,$refLot,$refService)
     'tvente_categorie_produit.compte_produit','tvente_categorie_produit.compte_destockage',
     'tvente_categorie_produit.compte_achat','tvente_categorie_produit.compte_stockage','dateMvt',
     'type_mouvement','libelle_mouvement','nom_table','id_data','puMvt','qteMvt','uniteMvt',
-    'puBase','qteBase','tgaz_mouvement_stock_service_lot.uniteBase',
     'cmupMvt','tgaz_mouvement_stock_service_lot.devise','tgaz_mouvement_stock_service_lot.taux','tgaz_mouvement_stock_service_lot.author',
     'tgaz_mouvement_stock_service_lot.refUser','tgaz_mouvement_stock_service_lot.created_at',
 
@@ -8040,14 +8039,15 @@ function showMouvementProduit($date1,$date2,$refLot,$refService)
     'tvente_produit.estvendable',  
 
     'nom_service','tgaz_stock_service_lot.refService','tgaz_stock_service_lot.refLot',
-    'tgaz_stock_service_lot.pu','tgaz_stock_service_lot.qte','tgaz_stock_service_lot.cmup','tgaz_stock_service_lot.active')
-    ->selectRaw("(CASE WHEN (type_mouvement = 'Entree') THEN (qteMvt * qteBase) END) as qteEntree")
-    ->selectRaw("(CASE WHEN (type_mouvement = 'Sortie') THEN (qteMvt * qteBase) END) as qteSortie")
-    ->selectRaw("((CASE WHEN (type_mouvement = 'Entree') THEN (qteMvt * qteBase) END) - (CASE WHEN (type_mouvement = 'Sortie') THEN (qteMvt * qteBase) END)) as solde")
+    'tgaz_stock_service_lot.pu_lot','tgaz_stock_service_lot.qte_lot',
+    'tgaz_stock_service_lot.cmup_lot','tgaz_stock_service_lot.active')
+    ->selectRaw("(CASE WHEN (type_mouvement = 'Entree') THEN (qteMvt) END) as qteEntree")
+    ->selectRaw("(CASE WHEN (type_mouvement = 'Sortie') THEN (qteMvt) END) as qteSortie")
+    ->selectRaw("((CASE WHEN (type_mouvement = 'Entree') THEN (qteMvt) END) - (CASE WHEN (type_mouvement = 'Sortie') THEN (qteMvt) END)) as solde")
     ->where([               
         ['dateMvt','>=', $date1],
         ['dateMvt','<=', $date2],
-        ['tgaz_stock_service_lot.refLot','=', $refProduit],
+        ['tgaz_stock_service_lot.refLot','=', $refLot],
         ['tgaz_stock_service_lot.refService','=', $refService]                
     ])
     ->orderBy("dateMvt", "asc")
@@ -8518,7 +8518,7 @@ function showDetailTransfert_Service_Source($date1,$date2,$idService)
             ['date_transfert','<=', $date2],
             ['servicesOrigine.id','=', $idService]
         ])
-        ->orderBy("tgaz_detail_transfertController.created_at", "asc")
+        ->orderBy("tgaz_detail_transfert.created_at", "asc")
         ->get();
         $output='';
 
@@ -8534,7 +8534,7 @@ function showDetailTransfert_Service_Source($date1,$date2,$idService)
                     <td class="cs6AEC9C2" colspan="2" style="width:80px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
                     <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
                     <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
-                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->nom_lot.'</td>
                     <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'('.$row->uniteTransfert.')</nobr></td>
                     <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
                     <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
@@ -8984,14 +8984,13 @@ function showDetailTransfert_Service_Destination($date1,$date2,$idService)
 
         ,'nom_lot','code_lot','unite_lot','stock_alerte')
         ->selectRaw('(qteTransfert*puTransfert) as PTTransfert')
-        ->selectRaw('(qteBase*puBase) as PTBase')
         ->selectRaw('CONCAT("S",YEAR(date_transfert),"",MONTH(date_transfert),"00",refEnteteTransfert) as codeFacture')
         ->where([
             ['date_transfert','>=', $date1],
             ['date_transfert','<=', $date2],
             ['servicesDestination.id','=', $idService]
         ])
-        ->orderBy("tgaz_detail_transfertController.created_at", "asc")
+        ->orderBy("tgaz_detail_transfert.created_at", "asc")
         ->get();
         $output='';
 
@@ -9007,7 +9006,7 @@ function showDetailTransfert_Service_Destination($date1,$date2,$idService)
                     <td class="cs6AEC9C2" colspan="2" style="width:80px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
                     <td class="cs6AEC9C2" colspan="2" style="width:128px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceOrigine.'</td>
                     <td class="cs6AEC9C2" colspan="2" style="width:129px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->ServiceDestination.'</td>
-                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:179px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->nom_lot.'</td>
                     <td class="cs6AEC9C2" style="width:35px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->qteTransfert.'('.$row->uniteTransfert.')</nobr></td>
                     <td class="cs6AEC9C2" colspan="3" style="width:63px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->puTransfert.'$</nobr></td>
                     <td class="cs6AEC9C2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->PTTransfert.'$</nobr></td>
@@ -9720,7 +9719,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
         "tgaz_stock_service_lot.cmup_lot",
         "tgaz_stock_service_lot.devise",
         "tgaz_stock_service_lot.taux",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tgaz_stock_service_lot.refService', '=', $idService]
@@ -9729,7 +9728,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
         "tgaz_stock_service_lot.id",
         'tgaz_stock_service_lot.refService',
         'tgaz_stock_service_lot.refLot',
-        "tgaz_lot.nom_lot as designation",
+        "tgaz_lot.nom_lot",
         "refCategorieLot",
         "tgaz_categorie_lot.nom_categorie_lot",
         "tgaz_stock_service_lot.pu_lot",            
@@ -9761,6 +9760,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             ->select(
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
+                'tvente_services.nom_service',
                 'tgaz_stock_service_lot.refLot',
                 "tgaz_lot.nom_lot as designation",
                 "refCategorieLot",
@@ -9771,7 +9771,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -9780,8 +9780,9 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             ->groupBy(
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
+                'tvente_services.nom_service',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -9791,7 +9792,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
     
     //======================================================================
@@ -9823,7 +9824,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -9833,7 +9834,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -9843,7 +9844,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
     
 
@@ -10161,7 +10162,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
 //     return response()->json(['error' => 'Invalid parameters'], 400);
 // }
 //=============== FICHE DE STOCK DES SERVICES BY CATEGORIE EXCEL=======================================================================================
-function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
+function pdf_fiche_gaz_stock_vente_service_bycategorie_excel(Request $request)
 {
     if ($request->get('date1') && $request->get('date2') && $request->get('idCategorie') && $request->get('idService')) {
         $date1 = $request->get('date1');
@@ -10245,7 +10246,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
         "tgaz_stock_service_lot.cmup_lot",
         "tgaz_stock_service_lot.devise",
         "tgaz_stock_service_lot.taux",
-        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteBase * dtSortie.qteMvt), 3), 0) as totalSortie')
+        DB::raw('IFNULL(ROUND(SUM(dtSortie.qteMvt), 3), 0) as totalSortie')
     )
     ->where([
         ['tgaz_lot.refCategorieLot', '=', $refCategorie],
@@ -10255,7 +10256,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
         "tgaz_stock_service_lot.id",
         'tgaz_stock_service_lot.refService',
         'tgaz_stock_service_lot.refLot',
-        "tgaz_lot.nom_lot as designation",
+        "tgaz_lot.nom_lot",
         "refCategorieLot",
         "tgaz_categorie_lot.nom_categorie_lot",
         "tgaz_stock_service_lot.pu_lot",            
@@ -10297,7 +10298,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteBase * mvtEntree.qteMvt), 3), 0) as stockEntree'),
+                DB::raw('IFNULL(ROUND(SUM(mvtEntree.qteMvt), 3), 0) as stockEntree'),
     
             )
             ->where([
@@ -10308,7 +10309,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -10318,7 +10319,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
     
     //======================================================================
@@ -10350,7 +10351,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.cmup_lot",
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux",            
-                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteBase * mvtSortie.qteMvt), 3), 0) as stockSortie'),
+                DB::raw('IFNULL(ROUND(SUM(mvtSortie.qteMvt), 3), 0) as stockSortie'),
     
             )
             ->where([
@@ -10361,7 +10362,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.id",
                 'tgaz_stock_service_lot.refService',
                 'tgaz_stock_service_lot.refLot',
-                "tgaz_lot.nom_lot as designation",
+                "tgaz_lot.nom_lot",
                 "refCategorieLot",
                 "tgaz_categorie_lot.nom_categorie_lot",
                 "tgaz_stock_service_lot.pu_lot",            
@@ -10371,7 +10372,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 "tgaz_stock_service_lot.devise",
                 "tgaz_stock_service_lot.taux"
                 )
-            ->orderBy("tvente_produit.designation", "asc")
+            ->orderBy("tgaz_lot.nom_lot", "asc")
             ->get();
         
     

@@ -49,8 +49,7 @@ class tgaz_lotController extends Controller
     function fetch_tgaz_lot_2()
     {
          $data = DB::table("tgaz_lot")
-        ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
-        ->select("tgaz_lot.id",'refCategorieLot','nom_categorie_lot','nom_lot','code_lot',
+        ->select("tgaz_lot.id",'refCategorieLot','nom_lot','code_lot',
         'unite_lot','stock_alerte','author','refUser',"tgaz_lot.created_at")
         ->get();
         
