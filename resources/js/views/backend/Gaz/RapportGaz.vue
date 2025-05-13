@@ -59,26 +59,13 @@
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailDetailEntreeByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS DES APPROVISONNEMENTS
+                                        <v-btn @click="showDetailProductionByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS DES PRODUCTIONS
                                         </v-btn>
                                     </span>
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailDetailRequisitionByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS DES REQUISITIONS
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip> 
 
                             <br>
 
@@ -86,57 +73,14 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showPaiementFactureGazByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS DES PAIEMENTS FOURNISSEUR
+                                            <v-icon>print</v-icon> RAPPORTS DES PAIEMENTS
                                         </v-btn>
                                     </span>
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip> 
-                            <br>
 
-                            <!-- <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/PRODUIT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>                           
-                            <br> -->
-                            <!-- <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockUniteByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/CAISSE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>                           
-                            <br> -->
-                                <v-flex xs12 sm12 md12 lg12>
-                                    <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la Catégorie Client" prepend-inner-icon="map"
-                                        :rules="[(v) => !!v || 'Ce champ est requis']" :items="categorieList"
-                                        item-text="designation" item-value="id" dense outlined v-model="svData.refCategorie" clearable
-                                        chips>
-                                        </v-autocomplete>
-                                    </div>
-                                </v-flex>
-                            <!-- <br> -->
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailSortieByDate_Categorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS DES VENTES/CATEGORIE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
+                           
                             <br>
 
                             <v-flex xs12 sm12 md12 lg12>
@@ -172,34 +116,7 @@
                                         <!-- serviceList -->
                                         </v-autocomplete>
                                     </div>
-                                </v-flex>                           
-
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_Categorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/CATEGORIE PRODUIT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                                <!-- showFicheStockByDate_CategorieUnite -->
-                            </v-tooltip>                          
-                            
-                            
-                            
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_CategorieUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/CAISSE/CATEGORIE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                                <!-- showFicheStockByDate_CategorieUnite -->
-                            </v-tooltip>                             
+                                </v-flex>   
                             
                             <br>
                                 <v-flex xs12 sm12 md12 lg12>
@@ -247,53 +164,6 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailVenteByDate_ServiceByCategorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> VENTES/SERVICE/CAT.PROD.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailUsageByDate_Service" block color="  blue" dark>
-                                            <v-icon>print</v-icon> SORTIE/SERVICE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailUsageByDate_ServiceByCategorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> SORTIE/SERVICE/CATEGORIE PROD
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <!-- showMouvementProduitByDate_ServiceByProduit -->
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailUsageByDate_ServiceByProduit" block color="  blue" dark>
-                                            <v-icon>print</v-icon> SORTIE/SERVICE/PRODUIT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
                             <!-- showMouvementProduitByDate_ServiceByProduit -->
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
@@ -327,17 +197,7 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-                            <br>                                
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailCuisineByDate_Service" block color="  blue" dark>
-                                            <v-icon>print</v-icon> LES COMMANDES CUISINES/SERVICE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
+                            
                             <br>
                               <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
@@ -348,168 +208,7 @@
                                     </span>
                                 </template>
                                 <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_Service_SansPrix" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./SANS PRIX
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-autocomplete label="Produit Vendable" :items="[
-                                { designation: 'OUI' },
-                                { designation: 'NON' }
-                                ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
-                                item-text="designation" item-value="designation" v-model="svData.statut">
-                            </v-autocomplete>
-                            <!-- <br>showFicheStockByDate_Service_Vendable_cmup -->
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_Service_Vendable" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_Service_Vendable_cmup" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/SERV./VENDABLE/CMUP
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_Service_Cout" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/COUT/SERVICE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showInventaireByDate_Service" block color="  blue" dark>
-                                            <v-icon>print</v-icon> INVENTAIRE STOCK/SERVICE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_ServiceUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE DE STOCK/SERVICE PIVOT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                              <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showInventaireByDate_ServiceUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> INVENTAIRE DE STOCK/SERVICE PIVOT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_ServiceByCategorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/CATEGORIE PROD.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showInventaireByDate_ServiceByCategorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> INVENTAIRE/SERVICE/CATEGORIE PROD.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheStockByDate_ServiceByCategorieUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/CATEGORIE PIVOT.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showInventaireByDate_ServiceByCategorieUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> INVENTAIRE/SERVICE/CATEGORIE PIVOT.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailVenteByDate_ServiceByCategorieUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> SORTIE/SERVICE/CATEGORIE PIVOT.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>                            
-                            <br>
-                            <v-autocomplete label="Type Sortie" :items="[
-                                { designation: 'Casse' },
-                                { designation: 'Usage Service' },
-                                { designation: 'Peertes deverses' }
-                                ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
-                                item-text="designation" item-value="designation" v-model="svData.type_sortie">
-                            </v-autocomplete>
-                            <!-- <br> -->
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailUsageByDate_ServiceByTypeSortie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORT SORTIE/SERVICE/TYPE SORTIE.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
+                            </v-tooltip>                          
                             <br>
                             <v-autocomplete label="Etat de la Facture" :items="[
                                 { designation: 'Cash' },
@@ -543,129 +242,6 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-
-                            <v-autocomplete label="Selectionnez le Fournisseur" prepend-inner-icon="mdi-map"
-                                    :rules="[(v) => !!v || 'Ce champ est requis']" :items="fournisseurList" item-text="noms" item-value="id"
-                                    outlined dense v-model="svData.refFournisseur">
-                            </v-autocomplete>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailEntreeByDate_Fss" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS ENTREE/FOURNISSEUR
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailCommandeByDate_Fss" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORTS COMMANDE/FOURNISSEUR
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-<!-- showSoldeFactureCommandeByDate -->
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showSoldeFactureCommandeByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> SOLDES DES FOURNISSEURS
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showEnteteFactureCommandeByDate" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FACTURE DES FOURNISSEURS
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelEnteteCommande" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FACTURES DES FOURNISSEURS/EXCEL
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelDetailCommande" block color="  blue" dark>
-                                            <v-icon>print</v-icon> DETAILS DES FACTURES DES FSS./EXCEL
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showEnteteFactureCommandeByDate_Fss" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FACTURE DES FOURNISSEURS/FOURNISSEUR
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showPaiementFactureGazByDate_Fss" block color="  blue" dark>
-                                            <v-icon>print</v-icon> PAIEMENTS DES FOURNISSEURS/FOURNISSEUR
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailEntreeByDate_Fss_Produit" block color="  blue" dark>
-                                            <v-icon>print</v-icon> ENTREE/FOURNISSEUR/PRODUIT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showDetailCommandeByDate_Fss_Produit" block color="  blue" dark>
-                                            <v-icon>print</v-icon>COMMANDE/FOURNISSEUR/PRODUIT
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
                             <!-- exportToExcelFicheStockServiceSansPrix -->
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
@@ -690,71 +266,6 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelFicheStockServiceCategorie" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/CATEGORIE/EXCEL.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-
-
-
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelFicheStockServiceUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERVICE/EXCEL PIVOT.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="exportToExcelFicheStockServiceCategorieUnite" block color="  blue" dark>
-                                            <v-icon>print</v-icon> FICHE STOCK/SERV./CATEGORIE/EXCEL PIVOT.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-                            <br>
-
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheSyntheseCompteByDate_Service_Vente" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORT SYNTHESE COMPTES/VENTE
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-
-                            <br>
-
-                            <v-tooltip bottom color="black">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on">
-                                        <v-btn @click="showFicheSyntheseCompteByDate_Service_Approv" block color="  blue" dark>
-                                            <v-icon>print</v-icon> RAPPORT SYNTHESE COMPTES/APPROV.
-                                        </v-btn>
-                                    </span>
-                                </template>
-                                <span>Imprimer le rapport</span>
-                            </v-tooltip>
-
-
-    
-
                             
                             </v-col>
                         </v-row>
@@ -1083,8 +594,7 @@ export default {
             } else {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
             }
-        },       
-
+        }, 
         rechargement()
         {
             this.onPageChange();

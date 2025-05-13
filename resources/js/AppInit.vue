@@ -979,7 +979,7 @@ export default {
                 {
                   icon: "store",
                   text: "Rapports",
-                  href: "/admin/RapportsJour_Reservation",
+                  href: "/admin/RapportGaz",
                 },
               ],
             },

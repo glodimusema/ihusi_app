@@ -246,6 +246,8 @@ import GazEnteteProduction from './views/backend/Gaz/GazEnteteProduction.vue'
 import GazTransfertStock from './views/backend/Gaz/GazTransfertStock.vue'
 import GazEnteteTransfert from './views/backend/Gaz/GazEnteteTransfert.vue'
 import Lot from './views/backend/Gaz/Lot.vue'
+import RapportGaz from './views/backend/Gaz/RapportGaz.vue'
+// RapportGaz
 import GazCategorieLot from './views/backend/Gaz/GazCategorieLot.vue'
 
 import VenteEnteteUse from './views/backend/Ventes/VenteEnteteUse.vue'
@@ -1713,10 +1715,15 @@ const Router = new VueRouter({
         name: 'GazTransfertStock',
         component: GazTransfertStock,
     },
-    {        
+    {   //RapportGaz     
         path: '/admin/GazEnteteTransfert',
         name: 'GazEnteteTransfert',
         component: GazEnteteTransfert,
+    },
+    {   
+        path: '/admin/RapportGaz',
+        name: 'RapportGaz',
+        component: RapportGaz,
     },
     {        
         path: '/admin/Lot',
