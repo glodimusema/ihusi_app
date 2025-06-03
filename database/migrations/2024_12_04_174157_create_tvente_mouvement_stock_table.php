@@ -25,7 +25,7 @@ class CreateTventeMouvementStockTable extends Migration
             $table->foreignId('compte_stockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete()->nullable();
             $table->date('dateMvt'); 
             $table->string('type_mouvement')->default('Entree');
-            $table->string('libelle_mouvement',50);
+            $table->string('libelle_mouvement',500);
             $table->string('nom_table',50);
             $table->integer('id_data');
             $table->double('puMvt');

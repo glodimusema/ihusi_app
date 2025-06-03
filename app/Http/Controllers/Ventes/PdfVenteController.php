@@ -10903,6 +10903,8 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                 $row1 = $data1[$i];
                 $row2 = $data2[$i];            
     
+                $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
+
                 $totalSortie = floatval($row22->totalSortie);
                 $totalEntree = floatval($row11->totalEntree);
     
@@ -10914,7 +10916,8 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                 $totalG = floatval($totalSI) + floatval($stockEntree);
                 $TGSortie = floatval($stockSortie);
                 $totalSF = floatval($totalG) - floatval($stockSortie);
-                $totalPT = floatval($totalSF) * floatval($row2->cmup);
+                $cmup_pivot = ((floatval($cmup_data)) * (floatval($row11->qtePivot)));
+                $totalPT = floatval($totalSF) * floatval($cmup_pivot);              
     
     
                 $output .= '
@@ -10927,12 +10930,12 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                         <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalG,2).' '.$row1->unitePivot.'</td>
                         <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($TGSortie,2).' '.$row1->unitePivot.'</td>
                         <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSF,2).' '.$row1->unitePivot.'</td>                
-                        <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row1->cmup,2).'$</td>
+                        <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($cmup_pivot,2).'$</td>
                         <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT,2).'$</td>
                     </tr>
                 ';   
     
-        }
+            }
         } else {
             // Gérer le cas où les tableaux n'ont pas la même longueur
             echo 'Les tableaux ont pas la même longueur.';
@@ -11576,41 +11579,44 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
     && (count($data1) === count($data22)))
     {
         for ($i = 0; $i < count($data1); $i++) {
-            $row11 = $data11[$i];
-            $row22 = $data22[$i];
-            $row1 = $data1[$i];
-            $row2 = $data2[$i];            
+                $row11 = $data11[$i];
+                $row22 = $data22[$i];
+                $row1 = $data1[$i];
+                $row2 = $data2[$i];            
+    
+                $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
 
-            $totalSortie = floatval($row22->totalSortie);
-            $totalEntree = floatval($row11->totalEntree);
-
-            $stockSortie = floatval($row2->stockSortie);            
-            $stockEntree = floatval($row1->stockEntree);
-
-            $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
-            $totalGEntree = floatval($stockEntree);
-            $totalG = floatval($totalSI) + floatval($stockEntree);
-            $TGSortie = floatval($stockSortie);
-            $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($row2->cmup);
-
-
-            $output .= '
-                <tr style="vertical-align:top;">
-                    <td style="width:0px;height:24px;"></td>
-                    <td></td>
-                    <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
-                    <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"> '.round((floatval($totalSI)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>
-                    <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalGEntree)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.' </td>
-                    <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalG)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>
-                    <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($TGSortie)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>
-                    <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalSF)/floatval($row2->qtePivot)),2).' '.$row2->unitePivot.'</td>                
-                    <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($row2->cmup, 2).'$</td>
-                    <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT, 2).'$</td>
-                </tr>
-            ';   
-
-    }
+                $totalSortie = floatval($row22->totalSortie);
+                $totalEntree = floatval($row11->totalEntree);
+    
+                $stockSortie = floatval($row2->stockSortie);            
+                $stockEntree = floatval($row1->stockEntree);
+    
+                $totalSI = ((floatval($totalEntree)) - (floatval($totalSortie)));
+                $totalGEntree = floatval($stockEntree);
+                $totalG = floatval($totalSI) + floatval($stockEntree);
+                $TGSortie = floatval($stockSortie);
+                $totalSF = floatval($totalG) - floatval($stockSortie);
+                $cmup_pivot = ((floatval($cmup_data)) * (floatval($row11->qtePivot)));
+                $totalPT = floatval($totalSF) * floatval($cmup_pivot);              
+    
+    
+                $output .= '
+                    <tr style="vertical-align:top;">
+                        <td style="width:0px;height:24px;"></td>
+                        <td></td>
+                        <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
+                        <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSI,2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalGEntree,2).' '.$row1->unitePivot.' </td>
+                        <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalG,2).' '.$row1->unitePivot.'</td>
+                        <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($TGSortie,2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSF,2).' '.$row1->unitePivot.'</td>                
+                        <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($cmup_pivot,2).'$</td>
+                        <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT,2).'$</td>
+                    </tr>
+                ';   
+    
+            }
     } else {
         // Gérer le cas où les tableaux n'ont pas la même longueur
         echo 'Les tableaux ont pas la même longueur.';
@@ -25344,7 +25350,7 @@ function showDetailFicheStockServiceByVendableCMUP($date1, $date2, $refCategorie
             ->where([
                 ['tvente_produit.refCategorie', '=', $refCategorie],
                 ['tvente_stock_service.refService', '=', $idService],
-                ['tvente_produit.estvendable','=', $statut],
+                // ['tvente_produit.estvendable','=', $statut],
             ])
             // ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService", 
             ->groupBy("tvente_stock_service.id", "tvente_stock_service.refService",
@@ -25720,6 +25726,8 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             $row1 = $data1[$i];
             $row2 = $data2[$i];            
 
+            $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
+            
             $totalSortie = floatval($row22->totalSortie);
             $totalEntree = floatval($row11->totalEntree);
 
@@ -25731,7 +25739,9 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
             $totalG = floatval($totalSI) + floatval($stockEntree);
             $TGSortie = floatval($stockSortie);
             $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+            $totalPT = floatval($totalSF) * floatval($cmup_data);
+
+
 
             $data_return[] = [
                 'id' => $row1->id,
@@ -25743,7 +25753,7 @@ function pdf_fiche_stock_vente_service_excel(Request $request)
                 'Total' => $totalG,
                 'Sortie' => $TGSortie,
                 'SF' => $totalSF,
-                'PU' => round($row1->cmup,2),
+                'PU' => round($cmup_data,2),
                 'PT' => round($totalPT,2),
                 'Unité' => $row1->uniteBase
             ];
@@ -25783,7 +25793,7 @@ function pdf_fiche_stock_vente_service_sans_prix_excel(Request $request)
         $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
              ->where('dtEntree.type_mouvement', '=', 'Entree')
              ->where('dtEntree.dateMvt', '<', $date1);
-    })
+        })
 
         // Utilisez distinct() avant select()
         ->distinct()
@@ -25978,7 +25988,9 @@ function pdf_fiche_stock_vente_service_sans_prix_excel(Request $request)
             $row11 = $data11[$i];
             $row22 = $data22[$i];
             $row1 = $data1[$i];
-            $row2 = $data2[$i];            
+            $row2 = $data2[$i];   
+            
+            $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
 
             $totalSortie = floatval($row22->totalSortie);
             $totalEntree = floatval($row11->totalEntree);
@@ -26238,7 +26250,9 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 $row11 = $data11[$i];
                 $row22 = $data22[$i];
                 $row1 = $data1[$i];
-                $row2 = $data2[$i];            
+                $row2 = $data2[$i];      
+                
+                $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
     
                 $totalSortie = floatval($row22->totalSortie);
                 $totalEntree = floatval($row11->totalEntree);
@@ -26251,7 +26265,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                 $totalG = floatval($totalSI) + floatval($stockEntree);
                 $TGSortie = floatval($stockSortie);
                 $totalSF = floatval($totalG) - floatval($stockSortie);
-                $totalPT = floatval($totalSF) * floatval($row2->cmup);
+                $totalPT = floatval($totalSF) * floatval($cmup_data);
     
                 $data_return[] = [
                     'id' => $row1->id,
@@ -26263,7 +26277,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
                     'Total' => $totalG,
                     'Sortie' => $TGSortie,
                     'SF' => $totalSF,
-                    'PU' => round($row1->cmup,2),
+                    'PU' => round($cmup_data,2),
                     'PT' => round($totalPT,2),
                     'Unité' => $row1->uniteBase
                 ];
@@ -26514,7 +26528,9 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             $row11 = $data11[$i];
             $row22 = $data22[$i];
             $row1 = $data1[$i];
-            $row2 = $data2[$i];            
+            $row2 = $data2[$i];    
+            
+            $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
 
             $totalSortie = floatval($row22->totalSortie);
             $totalEntree = floatval($row11->totalEntree);
@@ -26527,7 +26543,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             $totalG = floatval($totalSI) + floatval($stockEntree);
             $TGSortie = floatval($stockSortie);
             $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+            $totalPT = floatval($totalSF) * floatval($cmup_data);
 
             $data_return[] = [
                 'id' => $row1->id,
@@ -26539,8 +26555,8 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 'Total' => round((floatval($totalG)/floatval($row1->qtePivot)),2),
                 'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
                 'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
-                'PU' => round($row1->cmup,2),
-                'PT' => round($totalPT,2),
+                'PU' => round((floatval(round($cmup_data,2)) * floatval($row1->qtePivot)),2),
+                'PT' => round((floatval(round($totalPT,2)) * floatval($row1->qtePivot)),2),
                 'Unité' => $row1->unitePivot
             ];
 
@@ -26772,6 +26788,8 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             $row1 = $data1[$i];
             $row2 = $data2[$i];            
 
+            $cmup_data = floatval($this->calculerCoutMoyen($row1->id, $date1, $date2));
+
             $totalSortie = floatval($row22->totalSortie);
             $totalEntree = floatval($row11->totalEntree);
 
@@ -26783,7 +26801,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             $totalG = floatval($totalSI) + floatval($stockEntree);
             $TGSortie = floatval($stockSortie);
             $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($row2->cmup);
+            $totalPT = floatval($totalSF) * floatval($cmup_data);
 
             $data_return[] = [
                 'id' => $row1->id,
@@ -26795,8 +26813,8 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 'Total' => round((floatval($totalG)/floatval($row1->qtePivot)),2),
                 'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
                 'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
-                'PU' => round($row1->cmup,2),
-                'PT' => round($totalPT,2),
+                'PU' => round((floatval(round($cmup_data,2)) * floatval($row1->qtePivot)),2),
+                'PT' => round((floatval(round($totalPT,2)) * floatval($row1->qtePivot)),2),
                 'Unité' => $row1->unitePivot
             ];
 

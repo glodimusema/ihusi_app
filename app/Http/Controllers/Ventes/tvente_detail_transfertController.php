@@ -500,6 +500,37 @@ class tvente_detail_transfertController extends Controller
             'refUser'    =>  $request->refUser
         ]);
 
+
+
+            $nom_service_source = '';
+            $nom_service_destination = '';    
+            $date_serv_source = DB::table("tvente_services")
+            ->select("tvente_services.id","tvente_services.nom_service",
+            "tvente_services.created_at","status",
+            'tvente_services.active')
+             ->where([
+                ['tvente_services.id','=',  $request->refService]
+            ])      
+            ->first();
+            if ($date_serv_source) 
+            {                 
+                 $nom_service_source=$date_serv_source->nom_service; 
+            }
+
+            $date_serv_desti = DB::table("tvente_services")
+            ->select("tvente_services.id","tvente_services.nom_service",
+            "tvente_services.created_at","status",
+            'tvente_services.active')
+             ->where([
+                ['tvente_services.id','=',  $request->refDestination]
+            ])      
+            ->first();
+            if ($date_serv_desti) 
+            {                 
+                 $nom_service_destination=$date_serv_desti->nom_service; 
+            }
+
+
         $idmax=0;
         $maxid = DB::table('tvente_entete_transfert')       
         ->selectRaw('MAX(tvente_entete_transfert.id) as code_entete')
@@ -676,12 +707,15 @@ class tvente_detail_transfertController extends Controller
             foreach ($detail_list1 as $list) {
                 $id_detail_max1 = $list->code_entete;
             }
+
+            // $nom_service_source
+            // $nom_service_destination
           
             $data999 = tvente_mouvement_stock::create([             
                 'idStockService'    =>  $refIdStockSource,             
                 'dateMvt'    =>   $request->date_transfert,   
                 'type_mouvement'    =>  'Sortie',
-                'libelle_mouvement'    =>  'Transfert Stock',
+                'libelle_mouvement'    =>  'Transfert Stock'.' vers : '.$nom_service_destination.' N°:'.$id_detail_max1,
                 'nom_table'    =>  'tvente_detail_transfert',
                 'id_data'    =>  $id_detail_max1, 
                 'qteMvt'    =>  $data['qteTransfert'],
@@ -726,7 +760,7 @@ class tvente_detail_transfertController extends Controller
                     'idStockService'    =>  $temp_id,             
                     'dateMvt'    =>   $request->date_transfert,   
                     'type_mouvement'    =>  'Entree',
-                    'libelle_mouvement'    =>  'Entrée Stock',
+                    'libelle_mouvement'    =>  'Reception Stock'.' au près du service : '.$nom_service_source.' N°:'.$id_detail_max1,
                     'nom_table'    =>  'tvente_detail_transfert',
                     'id_data'    =>  $id_detail_max, 
                     'qteMvt'    =>  $data['qteTransfert'],
@@ -786,7 +820,7 @@ class tvente_detail_transfertController extends Controller
                     'idStockService'    =>  $data['idStockService'],             
                     'dateMvt'    =>   $request->date_transfert,   
                     'type_mouvement'    =>  'Sortie',
-                    'libelle_mouvement'    =>  'Transfert Stock',
+                    'libelle_mouvement'    =>  'Transfert Stock'.' vers : '.$nom_service_destination.' N°:'.$id_detail_max1,
                     'nom_table'    =>  'tvente_detail_transfert',
                     'id_data'    =>  $id_detail_max1, 
                     'qteMvt'    =>  $data['qteTransfert'],
@@ -843,7 +877,7 @@ class tvente_detail_transfertController extends Controller
                     'idStockService'    =>  $id_stock_servi_dest,             
                     'dateMvt'    =>   $request->date_transfert,   
                     'type_mouvement'    =>  'Entree',
-                    'libelle_mouvement'    =>  'Entrée Stock',
+                    'libelle_mouvement'    =>  'Reception Stock'.' au près du service : '.$nom_service_source.' N°:'.$id_detail_max1,
                     'nom_table'    =>  'tvente_detail_transfert',
                     'id_data'    =>  $id_detail_max, 
                     'qteMvt'    =>  $data['qteTransfert'],
