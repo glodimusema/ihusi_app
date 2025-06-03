@@ -423,6 +423,20 @@ class tvente_detail_venteController extends Controller
             $taux=$data5->taux;                           
          }
 
+        $dateVente=0;
+        $data_entete =  DB::table("tvente_entete_vente")
+        ->select("tvente_entete_vente.id", "tvente_entete_vente.dateVente")
+        ->where([
+            ['tvente_entete_vente.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateVente=$data_entete->dateVente;                           
+         }
+        
+        $cmup_data = floatval($this->calculerCoutMoyen($request->idStockService, $dateVente, $dateVente));
+
         $montants=0;
         $devises='';
         if($request->devise != 'USD')
@@ -437,7 +451,7 @@ class tvente_detail_venteController extends Controller
         }  
 
 
-            $cmup_data = 0;
+            
             $refProduit=0;
             $data99=DB::table('tvente_stock_service') 
             ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
@@ -448,8 +462,7 @@ class tvente_detail_venteController extends Controller
             ->first();
             if ($data99) 
             {
-                $refProduit =  $data99->refProduit; 
-                $cmup_data =  $data99->cmup;           
+                $refProduit =  $data99->refProduit;
             }
 
 
@@ -465,7 +478,7 @@ class tvente_detail_venteController extends Controller
             $compte_produit=0;
             $compte_destockage=0;
             $compte_stockage=0;
-            $cmupVente=0;
+            $cmupVente = $cmup_data;
 
             $data3=DB::table('tvente_produit')
             ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -502,11 +515,11 @@ class tvente_detail_venteController extends Controller
             $qteVente = $qteBase * floatval($request->qteVente);
             if($estunite = "OUI")
             {
-            $puBase=  floatval($montants);
+              $puBase=  floatval($montants);
             }
             else
             {
-            $puBase=  floatval($montants) / floatval($qteBase);
+              $puBase=  floatval($montants) / floatval($qteBase);
             }
             
         $montanttva=0;
@@ -548,7 +561,7 @@ class tvente_detail_venteController extends Controller
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupVente'    =>  $cmupVente,
+                'cmupVente'    =>  $cmup_data,
                 'montanttva'    =>  $montanttva,
             ]);
 
@@ -592,7 +605,7 @@ class tvente_detail_venteController extends Controller
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupMvt'    =>  $cmupVente
+                'cmupMvt'    =>  $cmup_data
             ]); 
 
             $data2 = DB::update(
@@ -889,8 +902,6 @@ class tvente_detail_venteController extends Controller
         
     }
 
-
-
     function insert_dataGlobal(Request $request)
     {
         $id_module = 4;
@@ -927,6 +938,8 @@ class tvente_detail_venteController extends Controller
         $detailData = $request->detailData;
 
         foreach ($detailData as $data) {
+
+            $cmup_data = floatval($this->calculerCoutMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
 
             $active = "OUI";
 
@@ -1071,7 +1084,7 @@ class tvente_detail_venteController extends Controller
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupVente'    =>  $cmupVente,
+                'cmupVente'    =>  $cmup_data,
                 'montanttva'    =>  $montanttva,
             ]);
 
@@ -1174,6 +1187,8 @@ class tvente_detail_venteController extends Controller
 
         foreach ($detailData as $data) {
 
+            $cmup_data = floatval($this->calculerCoutMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
+
             $active = "OUI";
 
             $taux=0;
@@ -1198,10 +1213,8 @@ class tvente_detail_venteController extends Controller
             {
                 $montants = $data['puVente'];
                 $devises = $request->devise;
-            }  
+            }
 
-
-            $cmup_data = 0;
             $refProduit=0;
             $data99=DB::table('tvente_stock_service') 
             ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
@@ -1212,8 +1225,7 @@ class tvente_detail_venteController extends Controller
             ->get();
             foreach ($data99 as $row) 
             {
-                $refProduit =  $row->refProduit;
-                $cmup_data =  $row->cmup;           
+                $refProduit =  $row->refProduit; 
             }
 
 
@@ -1313,7 +1325,7 @@ class tvente_detail_venteController extends Controller
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupVente'    =>  $cmupVente,
+                'cmupVente'    =>  $cmup_data,
                 'montanttva'    =>  $montanttva,
             ]);
 
@@ -1357,7 +1369,7 @@ class tvente_detail_venteController extends Controller
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupMvt'    =>  $cmupVente
+                'cmupMvt'    =>  $cmup_data
             ]); 
     
             $data2 = DB::update(

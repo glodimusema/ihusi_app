@@ -236,12 +236,26 @@ class tvente_detail_utilisationController extends Controller
         $data5 =  DB::table("tvente_taux")
         ->select("tvente_taux.id", "tvente_taux.taux", 
         "tvente_taux.created_at", "tvente_taux.author")
-         ->get(); 
-         $output='';
-         foreach ($data5 as $row) 
+         ->first(); 
+         if ($data5) 
          {                                
-            $taux=$row->taux;                           
+            $taux=$data5->taux;                           
          }
+
+        $dateUse=0;
+        $data_entete =  DB::table("tvente_entete_utilisation")
+        ->select("tvente_entete_utilisation.id", "tvente_entete_utilisation.dateUse")
+        ->where([
+            ['tvente_entete_utilisation.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateUse=$data_entete->dateUse;                           
+         }
+
+
+         $cmup_data = floatval($this->calculerCoutMoyen($request->idStockService, $dateUse, $dateUse));
 
         $montants=0;
         $devises='USD';
@@ -305,7 +319,7 @@ class tvente_detail_utilisationController extends Controller
         $qteBase =  1;
         $puBase = $montants;      
         $estunite = 'OUI';
-        $cmupVente = $montants; 
+        $cmupVente = $cmup_data; 
 
         $qteVente = $qteBase * floatval($request->qteVente);
         if($estunite = "OUI")
@@ -346,7 +360,7 @@ class tvente_detail_utilisationController extends Controller
             'puBase'    =>  $puBase,
             'qteBase'    =>  $qteBase,
             'uniteBase'    =>  $uniteBase,
-            'cmupVente'    =>  $cmupVente,
+            'cmupVente'    =>  $cmup_data,
             'montanttva'    =>  $montanttva,
         ]);
 
@@ -683,6 +697,8 @@ class tvente_detail_utilisationController extends Controller
 
         foreach ($detailData as $data) {
 
+            $cmup_data = floatval($this->calculerCoutMoyen($data['idStockService'], $request->dateUse, $request->dateUse));
+
             $active = "OUI";
 
             $taux=0;
@@ -696,7 +712,7 @@ class tvente_detail_utilisationController extends Controller
                 $taux=$row->taux;                           
              }
     
-            $montants=0;
+            $montants= $cmup_data;
             $devises='USD';
             $refProduit=0;
             $data99=DB::table('tvente_stock_service') 
@@ -709,7 +725,7 @@ class tvente_detail_utilisationController extends Controller
             foreach ($data99 as $row) 
             {
                 $refProduit =  $row->refProduit;
-                $montants =  $row->cmup;           
+                // $montants =  $row->cmup;           
             }
 
 
@@ -725,7 +741,7 @@ class tvente_detail_utilisationController extends Controller
             $compte_produit=0;
             $compte_destockage=0;
             $compte_stockage=0;
-            $cmupVente=0;
+            $cmupVente=$cmup_data;
     
             $data3=DB::table('tvente_produit')
             ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -744,14 +760,14 @@ class tvente_detail_utilisationController extends Controller
                 $compte_produit= $row->compte_produit;
                 $compte_destockage= $row->compte_destockage;
                 $compte_stockage= $row->compte_stockage; 
-                $cmupVente=$row->cmup;         
+                // $cmupVente=$row->cmup;         
             } 
             $uniteVente = '';
             $uniteBase = '';
             $puBase=0;
             $qteBase=0;
             $estunite='';
-            $cmupVente=0;
+            $cmupVente=$cmup_data;
     
             $uniteVente = $data['nom_unite'];
             $uniteBase = $data['nom_unite'];           
@@ -793,13 +809,13 @@ class tvente_detail_utilisationController extends Controller
                 'compte_perte'    =>  $compte_perte,
                 'compte_produit'    =>  $compte_produit,
                 'compte_destockage'    =>  $compte_destockage,
-                'puVente'    =>  $montants,
+                'puVente'    =>  $cmup_data,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupVente'    =>  $cmupVente,
+                'cmupVente'    =>  $cmup_data,
                 'montanttva'    =>  $montanttva,
             ]);
 
@@ -824,7 +840,7 @@ class tvente_detail_utilisationController extends Controller
                 'nom_table'    =>  'tvente_detail_utilisation',
                 'id_data'    =>  $id_detail_max, 
                 'qteMvt'    =>  $data['qteVente'],
-                'puMvt'    =>  $montants,                   
+                'puMvt'    =>  $cmup_data,                   
                 'author'       =>  $request->author,
                 'refUser'       =>  $request->refUser,
                 'type_sortie'    =>  'Sortie',
@@ -838,13 +854,13 @@ class tvente_detail_utilisationController extends Controller
                 'compte_destockage'    =>  $compte_destockage,
                 'compte_achat'    =>  0,
                 'compte_stockage'    =>  0,
-                'puVente'    =>  $montants,
+                'puVente'    =>  $cmup_data,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
                 'puBase'    =>  $puBase,
                 'qteBase'    =>  $qteBase,
                 'uniteBase'    =>  $uniteBase,
-                'cmupMvt'    =>  $cmupVente
+                'cmupMvt'    =>  $cmup_data
             ]); 
 
     

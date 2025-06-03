@@ -514,6 +514,8 @@ class tvente_detail_transfertController extends Controller
             
             $refIdStockSource = $data['idStockService'];
             $id_produit = 0;
+
+            $cmup_data = floatval($this->calculerCoutMoyen($refIdStockSource, $request->date_transfert, $request->date_transfert));
     
             $temp_idservice = 0;
             $temp_idproduit = 0;
@@ -566,17 +568,18 @@ class tvente_detail_transfertController extends Controller
                 if($estunite = "NON")
                 {
                      if ($qteBase != 0) {
-                         $puBase=  floatval($list->cmup);
-                         $puTransfert = floatval($list->cmup) * floatval($qteBase);  
-                     } else {
-                         $puBase=  floatval($list->cmup);
-                         $puTransfert = floatval($list->cmup) * floatval($qteBase);
+                         $puBase=  floatval($cmup_data);
+                         $puTransfert = floatval($cmup_data) * floatval($qteBase);  
+                     } 
+                     else {
+                         $puBase=  floatval($cmup_data);
+                         $puTransfert = floatval($cmup_data) * floatval($qteBase);
                      }                           
                 }
                 else
                 {
-                   $puBase=  floatval($list->cmup);
-                   $puTransfert=floatval($list->cmup);
+                   $puBase=  floatval($cmup_data);
+                   $puTransfert=floatval($cmup_data);
                 }
             }
   
@@ -1048,6 +1051,8 @@ class tvente_detail_transfertController extends Controller
           {
               $idStockService =  $row->id;           
           }
+
+          $cmup_data = floatval($this->calculerCoutMoyen($idStockService, $date_transfert, $date_transfert));
          
 
           $data = tvente_detail_transfert::create([
@@ -1058,7 +1063,7 @@ class tvente_detail_transfertController extends Controller
               'author'       =>  $author,
               'refUser'    =>  $refUser,
   
-              'puTransfert'       =>  $puTransfert, 
+              'puTransfert'       =>  $cmup_data, 
               'qteTransfert'       =>  $qteTransfert, 
               'uniteTransfert'       =>  $uniteTransfert, 
               'puBase'       =>  $puBase, 
@@ -1089,7 +1094,7 @@ class tvente_detail_transfertController extends Controller
                   'nom_table'    =>  'tvente_detail_transfert',
                   'id_data'    =>  $id_detail_max, 
                   'qteMvt'    =>  $qteTransfert,
-                  'puMvt'    =>  $puTransfert,                   
+                  'puMvt'    =>  $cmup_data,                   
                   'author'       =>  $request->author,
                   'refUser'       =>  $request->refUser,
                   'type_sortie'    =>  'Entree',
@@ -1103,13 +1108,13 @@ class tvente_detail_transfertController extends Controller
                   'compte_destockage'    =>  0,
                   'compte_achat'    =>  $compte_achat,
                   'compte_stockage'    =>  $compte_stockage,
-                  'puVente'    =>  $puTransfert,
+                  'puVente'    =>  $cmup_data,
                   'devise'    =>  'USD',
                   'taux'    =>  $taux,
                   'puBase'    =>  $puBase,
                   'qteBase'    =>  $qteBase,
                   'uniteBase'    =>  $uniteBase,
-                  'cmupMvt'    =>  $puTransfert
+                  'cmupMvt'    =>  $cmup_data
               ]); 
 
           }
@@ -1119,7 +1124,7 @@ class tvente_detail_transfertController extends Controller
                   'insert into tvente_stock_service (refService,refProduit,pu,qte,uniteBase,cmup,devise,taux,active,refUser,author) 
                   values (:refService,:refProduit,:pu,:qte,:uniteBase,:cmup,:devise,:taux,:active,:refUser,:author)',
                   ['refService' => $id_service_destination,'refProduit' => $id_produit,'pu' => $cmupTemp,'qte' => $qteEntree,
-                  'uniteBase' => $uniteBase,'cmup' => $cmupTemp,'devise' => $devise,'taux' => $taux,'active' => $active,
+                  'uniteBase' => $uniteBase,'cmup' => $cmup_data,'devise' => $devise,'taux' => $taux,'active' => $active,
                   'refUser' => $request->refUser,'author' => $request->author]
               );
 
@@ -1202,6 +1207,8 @@ class tvente_detail_transfertController extends Controller
             
             $refIdStockSource = $data['idStockService'];
             $id_produit = 0;
+
+            $cmup_data = floatval($this->calculerCoutMoyen($refIdStockSource, $request->date_transfert, $request->date_transfert));
     
             $temp_idservice = 0;
             $temp_idproduit = 0;
