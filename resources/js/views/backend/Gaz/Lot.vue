@@ -321,7 +321,7 @@
           this.$refs.ParametreLot.$data.refLot = refLot;
           this.$refs.ParametreLot.$data.svData.refLot = refLot;
           this.$refs.ParametreLot.fetchDataList();
-          this.$refs.ParametreLot.fetchListCategorieLot();
+          this.$refs.ParametreLot.fetchListProduit();
           this.onPageChange();  
           this.$refs.ParametreLot.$data.titleComponent =
             "Parametre pour " + name;

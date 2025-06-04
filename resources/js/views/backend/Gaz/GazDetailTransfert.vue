@@ -121,7 +121,7 @@
                               <tbody>
                                 <tr v-for="item in fetchData" :key="item.id">
                                   <td>{{ item.ServiceDestination }}</td>
-                                  <td>{{ item.designation }}</td>
+                                  <td>{{ item.nom_lot }}</td>
                                   <td>{{ item.qteTransfert }}</td>
                                   <td>{{ item.uniteTransfert }}</td>
                                   <td>{{ item.puTransfert }}</td>

@@ -116,6 +116,7 @@
                 <thead>
                     <tr>
                         <th>N°</th>
+                        <th>Kit</th>
                         <th>Produit</th>
                         <th>Unité</th>
                         <th>Qté</th>
@@ -128,15 +129,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="short-cell">
-                            <v-text-field v-model="svData.qte_kit" label="Quantité"></v-text-field>
-                        </td>
+                    <tr>                        
                         <td class="long-cell">
                             <v-autocomplete v-model="svData.idStockService" :items="kitList"
                                 label="Selectionnez le Kit" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="nom_lot" item-value="id"
-                                @change="getPrice(svData.idStockService, svData.qte_kit)"></v-autocomplete>
+                               ></v-autocomplete>
+                        </td>
+                        <td class="short-cell">
+                            <v-text-field v-model="svData.qte_kit" label="Quantité" 
+                             @change="getPrice(svData.idStockService, svData.qte_kit)"></v-text-field>
                         </td>
                         <td class="short-cell">
                             <v-text-field v-model="svData.qteDisponible" label="Qté Dispo" readonly></v-text-field>
@@ -146,6 +148,9 @@
                     <tr v-for="(item, index) in svData.detailData" :key="index">
                         <td class="short-cell">
                             <v-text-field v-model="item.idParamLot" label="Id" readonly></v-text-field>
+                        </td>
+                        <td class="long-cell">
+                            <v-text-field v-model="item.code_lot" label="Kit" readonly></v-text-field>
                         </td>
                         <td class="long-cell">
                             <v-text-field v-model="item.produit_param" label="Produit" readonly></v-text-field>
@@ -410,6 +415,7 @@ export default {
                     tva:0,
                     montant_tva:0,
                     idStockService : 0,
+                    code_lot : '',
                     nom_unite : '',
 
                     idParamLot : 0,
@@ -463,6 +469,7 @@ export default {
                 devise: "",
                 montantreduction: 0,
                 idStockService : 0,
+                code_lot : '',
                 pt:0,
                 tva:0,
                 montant_tva:0,
@@ -579,6 +586,7 @@ export default {
                     tva:0,
                     montant_tva:0,
                     idStockService : 0,
+                    code_lot :'',
                     nom_unite : '',
                     idParamLot : 0,
                     produit_param : "",
@@ -905,59 +913,110 @@ export default {
          this.fetchListDataKit(idStockService, qte_kit)
        }
        ,
-       async fetchListDataKit(idStockService, qte_kit) {        
+    //    async fetchListDataKit(idStockService, qte_kit) {        
 
-        // if(this.svData.qteDisponible >= qte_kit)
-        // {
-            try {                              
+    //     // if(this.svData.qteDisponible >= qte_kit)
+    //     // {
+    //         try { 
+    //             // Vérifier si les données de ce lot existent déjà
+    //             const existeDeja = this.svData.detailData.some(row => row.idStockService === idStockService);
+    //             if (existeDeja) {
+    //                 alert('Les données de ce Kit ont déjà été ajoutées.');
+    //                 return;
+    //                 // console.error('Les données de ce lot ont déjà été ajoutées.');
+    //             }
+    //             else
+    //             {
+    //                 const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
+    //                 const { data } = response;
 
-                const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
-                const { data } = response;
+    //                 // Vérifiez si les données existent
+    //                 if (data && data.data) {
+    //                     const donnees = data.data;
+    //                     this.svData.detailData = [
+    //                         ...this.svData.detailData.filter(row => row && row.produit_param),
+    //                         ...donnees.map((item) => ({
+    //                             ...item,
+    //                             qteVente: item.qte_param * qte_kit,
+    //                             puVente: item.pu_param,
+    //                             devise: item.devise,
+    //                             montantreduction: 0,
+    //                             idStockService,
+    //                             code_lot: item.code_lot,
+    //                             pt: (item.qte_param * qte_kit) * item.pu_param,
+    //                             tva: 0,
+    //                             montant_tva: 0,
+    //                             nom_unite: item.uniteBase,
+    //                             idParamLot: item.id,
+    //                             produit_param: item.designation
+    //                           }))
+    //                         ];
+    //                         this.fetchListTVA();
 
-                // Vérifiez si les données existent
-                if (data && data.data) {
-                    const donnees = data.data;
-                    this.svData.detailData = [
-                            ...this.svData.detailData,
-                            ...donnees.map((item, index) => {
-                                return {
-                                    ...item,
-                                    // qteDisponible: item.qte_param,
-                                    qteVente: item.qte_param * qte_kit,
-                                    puVente: item.pu_param,
-                                    devise: item.devise,
-                                    montantreduction: 0,
-                                    idStockService: idStockService,
-                                    pt: (item.qte_param * qte_kit) * item.pu_param,
-                                    tva: 0,
-                                    montant_tva: 0,
-                                    // id_tva: 1,
-                                    nom_unite: item.uniteBase,
-                                    idParamLot: item.id,
-                                    produit_param: item.designation
-                                };
-                            })
-                        ];
+    //                 } else {
+    //                     console.error('Aucune donnée trouvée dans la réponse API.');
+    //                 }   
+    //             }
 
-                        this.fetchListTVA();
+    //         } 
+    //         catch (error) {
+    //             console.error('Erreur lors de la récupération des données:', error.message || error);
+    //         }
 
+    //     // }
+    //     // else
+    //     // {
+    //     //     this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
+    //     //     this.svData.detailData[index].qteVente = 0;
+    //     // }
+    //    },
+        async fetchListDataKit(idStockService, qte_kit) {
+        try {
+            const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
+            const { data } = response;
+
+            if (data && data.data) {
+            const donnees = data.data;
+
+            // Filtrer les lignes valides (supprimer les lignes vides avant tout)
+            this.svData.detailData = this.svData.detailData.filter(row => row && row.produit_param);
+
+            donnees.forEach(item => {
+                const index = this.svData.detailData.findIndex(
+                row => row.idStockService === idStockService && row.idParamLot === item.id
+                );
+
+                const newRow = {
+                ...item,
+                qteVente: item.qte_param * qte_kit,
+                puVente: item.pu_param,
+                devise: item.devise,
+                montantreduction: 0,
+                idStockService,
+                            code_lot: item.code_lot,
+                pt: (item.qte_param * qte_kit) * item.pu_param,
+                tva: 0,
+                montant_tva: 0,
+                nom_unite: item.uniteBase,
+                idParamLot: item.id,
+                produit_param: item.designation
+                };
+
+                if (index !== -1) {this.svData.detailData.splice(index, 1, newRow); // mettre à jour
                 } else {
-                    console.error('Aucune donnée trouvée dans la réponse API.');
+                this.svData.detailData.push(newRow); // ajouter
                 }
-            } 
-            catch (error) {
-                console.error('Erreur lors de la récupération des données:', error.message || error);
+            });
+
+            this.fetchListTVA();
+            } else {
+            console.error('Aucune donnée trouvée dans la réponse API.');
             }
-
-        // }
-        // else
-        // {
-        //     this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-        //     this.svData.detailData[index].qteVente = 0;
-        // }
-       },
-
-
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données:', error.message || error);
+        }
+        }
+       ,
         // VISUALISATION DES DONNEES DES COMMANDES============================================================
 
 
