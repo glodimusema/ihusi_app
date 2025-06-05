@@ -15,6 +15,26 @@ class CreateTgazDetailInventaireTable extends Migration
     {
         Schema::create('tgaz_detail_inventaire', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('refEnteteVente')->constrained('tgaz_entete_inventaire')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('compte_vente')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('compte_variationstock')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('compte_perte')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('compte_produit')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('compte_destockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('idStockService')->constrained('tgaz_stock_service_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
+            $table->double('puVente');
+            $table->double('qteVente');
+            $table->double('qteObs');
+            $table->string('uniteVente');
+            $table->double('cmupVente');
+            $table->string('devise',50);
+            $table->double('taux');
+            $table->double('montanttva')->default(0);
+            $table->double('montantreduction')->default(0);
+            $table->string('priseencharge')->default('NON');
+            $table->string('active')->default('OUI');
+            $table->string('author',100);  
+            $table->foreignId('refUser')->constrained('users')->restrictOnUpdate()->restrictOnDelete();            
             $table->timestamps();
         });
     }

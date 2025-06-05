@@ -15,7 +15,7 @@ class CreateTventeDetailInventaireTable extends Migration
     {
         Schema::create('tvente_detail_inventaire', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('refEnteteVente')->constrained('tvente_entete_vente')->restrictOnUpdate()->restrictOnDelete();
+            $table->foreignId('refEnteteVente')->constrained('tvente_entete_inventaire')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('refProduit')->constrained('tvente_produit')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('compte_vente')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('compte_variationstock')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();

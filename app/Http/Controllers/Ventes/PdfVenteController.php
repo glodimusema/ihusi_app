@@ -11598,7 +11598,7 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                 $TGSortie = floatval($stockSortie);
                 $totalSF = floatval($totalG) - floatval($stockSortie);
                 $cmup_pivot = ((floatval($cmup_data)) * (floatval($row11->qtePivot)));
-                $totalPT = floatval($totalSF) * floatval($cmup_pivot);              
+                $totalPT = (floatval($totalSF)/floatval($row1->qtePivot)) * floatval($cmup_pivot);              
     
     
                 $output .= '
@@ -26543,7 +26543,12 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
             $totalG = floatval($totalSI) + floatval($stockEntree);
             $TGSortie = floatval($stockSortie);
             $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($cmup_data);
+
+            $cmup_pivot = floatval($cmup_data) * floatval($row1->qtePivot);
+            $totalPT = (floatval($totalSF)/floatval($row1->qtePivot)) * floatval($cmup_pivot);
+
+            // $totalPT = (floatval($totalSF)/floatval($row1->qtePivot)) * floatval($cmup_pivot);
+            // $totalPT = floatval($totalSF) * floatval($cmup_data);
 
             $data_return[] = [
                 'id' => $row1->id,
@@ -26556,7 +26561,7 @@ function pdf_fiche_stock_vente_service_bycategorie_unite_excel(Request $request)
                 'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
                 'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
                 'PU' => round((floatval(round($cmup_data,2)) * floatval($row1->qtePivot)),2),
-                'PT' => round((floatval(round($totalPT,2)) * floatval($row1->qtePivot)),2),
+                'PT' => round(floatval($totalPT),2),
                 'Unité' => $row1->unitePivot
             ];
 
@@ -26801,7 +26806,9 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
             $totalG = floatval($totalSI) + floatval($stockEntree);
             $TGSortie = floatval($stockSortie);
             $totalSF = floatval($totalG) - floatval($stockSortie);
-            $totalPT = floatval($totalSF) * floatval($cmup_data);
+            $cmup_pivot = floatval($cmup_data) * floatval($row1->qtePivot);
+            $totalPT = (floatval($totalSF)/floatval($row1->qtePivot)) * floatval($cmup_pivot);
+            // $totalPT = floatval($totalSF) * floatval($cmup_data);
 
             $data_return[] = [
                 'id' => $row1->id,
@@ -26814,7 +26821,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
                 'Sortie' => round((floatval($TGSortie)/floatval($row1->qtePivot)),2),
                 'SF' => round((floatval($totalSF)/floatval($row1->qtePivot)),2),
                 'PU' => round((floatval(round($cmup_data,2)) * floatval($row1->qtePivot)),2),
-                'PT' => round((floatval(round($totalPT,2)) * floatval($row1->qtePivot)),2),
+                'PT' => round(floatval($totalPT),2),
                 'Unité' => $row1->unitePivot
             ];
 
