@@ -10788,7 +10788,7 @@ function showDetailFicheStockUnite($date1,$date2,$refCategorie)
                      ->whereBetween('mvtEntree.dateMvt', [$date1, $date2]);
             })
         
-                // Utilisez distinct() avant select()
+                // Utilisez distinct() avant select() 
                 ->distinct()
                 ->select(
                     "tvente_stock_service.id",
@@ -11606,11 +11606,11 @@ function showDetailFicheStockServiceByCatUnite($date1,$date2,$refCategorie,$idSe
                         <td style="width:0px;height:24px;"></td>
                         <td></td>
                         <td class="cs8F59FFB2" colspan="2" style="width:165px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row1->designation.'</td>
-                        <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSI,2).' '.$row1->unitePivot.'</td>
-                        <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalGEntree,2).' '.$row1->unitePivot.' </td>
-                        <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalG,2).' '.$row1->unitePivot.'</td>
-                        <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($TGSortie,2).' '.$row1->unitePivot.'</td>
-                        <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalSF,2).' '.$row1->unitePivot.'</td>                
+                        <td class="cs6F7E55AC" colspan="2" style="width:105px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalSI)/floatval($row1->qtePivot)),2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalGEntree)/floatval($row1->qtePivot)),2).' '.$row1->unitePivot.' </td>
+                        <td class="csD149F8AB" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalG)/floatval($row1->qtePivot)),2).' '.$row1->unitePivot.'</td>
+                        <td class="cs4B928201" colspan="2" style="width:109px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($TGSortie)/floatval($row1->qtePivot)),2).' '.$row1->unitePivot.'</td>
+                        <td class="csE78F4A6" style="width:76px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round((floatval($totalSF)/floatval($row1->qtePivot)),2).' '.$row1->unitePivot.'</td>                
                         <td class="cs4B928201" colspan="3" style="width:139px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($cmup_pivot,2).'$</td>
                         <td class="cs6F7E55AC" colspan="2" style="width:133px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.round($totalPT,2).'$</td>
                     </tr>
@@ -26583,7 +26583,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
 
         $data_return = []; // Initialisation du tableau pour stocker les résultats
 
-            // Récupérer les données de stock, mouvements et ventes en une seule requête 
+        // Récupérer les données de stock, mouvements et ventes en une seule requête 
         $data11 = DB::table('tvente_stock_service')
         ->join('tvente_services', 'tvente_services.id', '=', 'tvente_stock_service.refService')
         ->Join('tvente_produit', 'tvente_produit.id', '=', 'tvente_stock_service.refProduit')
@@ -26593,7 +26593,7 @@ function pdf_fiche_stock_vente_service_unite_excel(Request $request)
         $join->on('dtEntree.idStockService', '=', 'tvente_stock_service.id')        
              ->where('dtEntree.type_mouvement', '=', 'Entree')
              ->where('dtEntree.dateMvt', '<', $date1);
-    })
+        })
 
         // Utilisez distinct() avant select()
         ->distinct()
