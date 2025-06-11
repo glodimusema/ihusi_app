@@ -507,7 +507,7 @@ class tgaz_detail_venteController extends Controller
         ->first();
         if ($data99) 
         {
-            $refLot =  $data99->refProduit; 
+            $refLot =  $data99->refLot; 
             $cmup_data =  $data99->cmup_lot;           
         }
 

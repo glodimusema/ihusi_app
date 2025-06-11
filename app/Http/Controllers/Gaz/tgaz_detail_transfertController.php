@@ -402,7 +402,7 @@ class tgaz_detail_transfertController extends Controller
            ])
             ->first();
             if ($data_stockss) {
-                $id_lot = $data_stockss->id;
+                $id_lot = $data_stockss->refLot;
                 $puTransfert = floatval($data_stockss->cmup_lot);
             }
     
@@ -530,21 +530,21 @@ class tgaz_detail_transfertController extends Controller
                 'cmupMvt'    =>  $puTransfert
             ]); 
 
-                $data23 = DB::update(
-                'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteTransfert where id = :id',
-                ['qteTransfert' => $qteEntree,'id' => $temp_id]
-                );
+            $data23 = DB::update(
+            'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteTransfert where id = :id',
+            ['qteTransfert' => $qteEntree,'id' => $temp_id]
+            );
 
-                $id_detail_max=0;
-                $detail_list = DB::table('tgaz_detail_transfert')       
-                ->selectRaw('MAX(id) as code_entete')
-                ->where('refUser', $request->refUser)
-                ->get();
-                foreach ($detail_list as $list) {
-                    $id_detail_max= $list->code_entete;
-                }
+            $id_detail_max=0;
+            $detail_list = DB::table('tgaz_detail_transfert')       
+            ->selectRaw('MAX(id) as code_entete')
+            ->where('refUser', $request->refUser)
+            ->get();
+            foreach ($detail_list as $list) {
+                $id_detail_max= $list->code_entete;
+            }
               
-                $data98 = tgaz_mouvement_stock_service_lot::create([             
+            $data98 = tgaz_mouvement_stock_service_lot::create([             
                     'idStockService'    =>  $temp_id,             
                     'dateMvt'    =>   $request->date_transfert,   
                     'type_mouvement'    =>  'Entree',
@@ -569,10 +569,7 @@ class tgaz_detail_transfertController extends Controller
                     'devise'    =>  'USD',
                     'taux'    =>  $taux,
                     'cmupMvt'    =>  $puTransfert
-                ]); 
-
-
-
+            ]); 
 
            }
            else

@@ -1055,10 +1055,6 @@ class tvente_detail_venteController extends Controller
       {
           $pourtageTVA = $row->montant_tva;
       }
-
-
-
-
          
          $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
     
@@ -1634,7 +1630,7 @@ class tvente_detail_venteController extends Controller
             'data'  =>  "Modification  avec succès!!!",
         ]); 
     }
-
+ 
 
 
 

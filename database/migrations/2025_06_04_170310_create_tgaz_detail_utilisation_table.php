@@ -16,18 +16,10 @@ class CreateTgazDetailUtilisationTable extends Migration
         Schema::create('tgaz_detail_utilisation', function (Blueprint $table) {
             $table->id();
             $table->foreignId('refEnteteVente')->constrained('tgaz_entete_utilisation')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('compte_vente')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('compte_variationstock')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('compte_perte')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('compte_produit')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
-            $table->foreignId('compte_destockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('idStockService')->constrained('tgaz_stock_service_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
             $table->double('puVente');
             $table->double('qteVente');
             $table->string('uniteVente');
-            $table->double('puBase');
-            $table->double('qteBase');
-            $table->string('uniteBase');
             $table->double('cmupVente');
             $table->string('devise',50);
             $table->double('taux');

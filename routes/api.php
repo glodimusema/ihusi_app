@@ -678,6 +678,41 @@ Route::group(['namespace'   =>  "Logistique"], function(){
 
 Route::group(['namespace'   =>  "Gaz"], function(){
 
+    Route::get("fetch_gaz_entete_inventaire", 'tgaz_entete_inventaireController@all');
+    Route::get("fetch_gaz_entete_inventaire/{refEntete}", 'tgaz_entete_inventaireController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_inventaire/{id}", 'tgaz_entete_inventaireController@fetch_single_data');    
+    Route::post("insert_gaz_entete_inventaire", 'tgaz_entete_inventaireController@insert_data');
+    Route::post("update_gaz_entete_inventaire/{id}", 'tgaz_entete_inventaireController@update_data');
+    Route::get("delete_gaz_entete_inventaire/{id}", 'tgaz_entete_inventaireController@delete_data');
+
+    Route::get("fetch_gaz_detail_inventaire", 'tgaz_detail_inventaireController@all');
+    Route::get("fetch_gaz_detail_inventaire/{refEntete}", 'tgaz_detail_inventaireController@fetch_data_entete');
+    Route::get("fetch_single_gaz_detail_inventaire/{id}", 'tgaz_detail_inventaireController@fetch_single_data');    
+    Route::post("insert_gaz_detail_inventaire", 'tgaz_detail_inventaireController@insert_data');
+    Route::post("insert_gaz_globale_inventaire", 'tgaz_detail_inventaireController@insert_dataGlobal');
+    Route::post("insert_gaz_globale_inventaire_innitial", 'tgaz_detail_inventaireController@insert_dataGlobalInnitialise');
+    Route::get('/fetch_gaz_detail_inventaire/{id}', 'tgaz_detail_inventaireController@fetch_detail_facture');
+    Route::post("update_gaz_detail_inventaire/{id}", 'tgaz_detail_inventaireController@update_data');
+    Route::get("delete_gaz_detail_inventaire/{id}", 'tgaz_detail_inventaireController@delete_data');
+
+
+    Route::get("fetch_gaz_entete_utilisation", 'tgaz_entete_utilisationController@all');
+    Route::get("fetch_gaz_entete_utilisation/{refEntete}", 'tgaz_entete_utilisationController@fetch_data_entete');
+    Route::get("fetch_single_gaz_entete_utilisation/{id}", 'tgaz_entete_utilisationController@fetch_single_data');    
+    Route::post("insert_gaz_entete_utilisation", 'tgaz_entete_utilisationController@insert_data');
+    Route::post("update_gaz_entete_utilisation/{id}", 'tgaz_entete_utilisationController@update_data');
+    Route::get("delete_gaz_entete_utilisation/{id}", 'tgaz_entete_utilisationController@delete_data');
+
+    Route::get("fetch_gaz_detail_utilisation", 'tgaz_detail_utilisationController@all');
+    Route::get("fetch_gaz_detail_utilisation/{refEntete}", 'tgaz_detail_utilisationController@fetch_data_entete');
+    Route::get("fetch_single_gaz_detail_utilisation/{id}", 'tgaz_detail_utilisationController@fetch_single_data');    
+    Route::post("insert_gaz_detail_utilisation", 'tgaz_detail_utilisationController@insert_data');
+    Route::post("insert_gaz_globale_utilisation", 'tgaz_detail_utilisationController@insert_dataGlobal');
+    Route::get('/fetch_gaz_detail_utilisation/{id}', 'tgaz_detail_utilisationController@fetch_detail_facture');
+    Route::post("update_gaz_detail_utilisation/{id}", 'tgaz_detail_utilisationController@update_data');
+    Route::get("delete_gaz_detail_utilisation/{id}", 'tgaz_detail_utilisationController@delete_data');
+
+
     Route::get("fetch_gaz_paiement", 'tgaz_detail_paiement_venteController@all');
     Route::get("fetch_gaz_paiement_byentete/{refEntete}", 'tgaz_detail_paiement_venteController@fetch_data_entete');
     Route::get("fetch_gaz_paiement_byentetepaie/{refEntete}", 'tgaz_detail_paiement_venteController@fetch_data_entete_paie');
