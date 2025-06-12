@@ -137,8 +137,7 @@ class tgaz_stock_service_lotController extends Controller
         }       
         $data->orderBy("tgaz_stock_service_lot.created_at", "desc");
         return $this->apiData($data->paginate(10));
-    }   
-
+    }  
 
     function fetch_single_data($id)
     {
@@ -160,8 +159,6 @@ class tgaz_stock_service_lotController extends Controller
             'data'  => $data,
         ]);
     }
-
-
 
     function fetch_stock_data_byservice($refService)
     {
@@ -411,6 +408,44 @@ class tgaz_stock_service_lotController extends Controller
     }
 
 
+    function fetch_stock_data_gaz_byserviceAndCategorie(Request $request)   
+    {
+
+        if ($request->get('refService') && $request->get('refCategorie'))
+        {
+            $refService = $request->get('refService');
+            $refCategorie = $request->get('refCategorie');
+
+            $data = DB::table('tgaz_stock_service_lot')
+            ->join('tvente_services','tvente_services.id','=','tgaz_stock_service_lot.refService')
+            ->join('tgaz_lot','tgaz_lot.id','=','tgaz_stock_service_lot.refLot')
+            ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
+            ->select('tgaz_stock_service_lot.id','tgaz_stock_service_lot.refService',
+            'tgaz_stock_service_lot.refLot','tgaz_stock_service_lot.devise',
+            'tgaz_stock_service_lot.taux','tgaz_stock_service_lot.active',
+            'tgaz_stock_service_lot.refUser','tgaz_stock_service_lot.author' ,
+            "tvente_services.nom_service","stock_alerte","tgaz_stock_service_lot.created_at",
+            'nom_lot','code_lot','unite_lot','refCategorieLot','nom_categorie_lot')
+            ->selectRaw('IFNULL(tvente_stock_service.qte_lot,0) as qte')
+            ->selectRaw('ROUND(tvente_stock_service.pu_lot,2) as pu')
+            ->selectRaw('ROUND(tvente_stock_service.cmup_lot,2) as cmup')
+            ->selectRaw('ROUND(IFNULL((tvente_stock_service.cmup_lot * tvente_stock_service.qte_lot),0),2) as PTCmup')          
+            ->where([
+                ['tgaz_lot.refCategorieLot','=', $refCategorie],
+                ['tgaz_stock_service_lot.refService','=', $refService]
+            ])
+            ->get();
+    
+            return response()->json([
+                'data'  => $data,
+            ]);
+        }
+        else
+        {
+
+        } 
+
+    }
 
 
     function insert_data(Request $request)

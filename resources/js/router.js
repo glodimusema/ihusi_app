@@ -245,6 +245,12 @@ import GazCreateProduction from './views/backend/Gaz/GazCreateProduction.vue'
 import GazEnteteProduction from './views/backend/Gaz/GazEnteteProduction.vue'
 import GazTransfertStock from './views/backend/Gaz/GazTransfertStock.vue'
 import GazEnteteTransfert from './views/backend/Gaz/GazEnteteTransfert.vue'
+
+import GazCreateUsage from './views/backend/Gaz/GazCreateUsage.vue'
+import GazCreateInventaire from './views/backend/Gaz/GazCreateInventaire.vue'
+import GazEnteteInventaire from './views/backend/Gaz/GazEnteteInventaire.vue'
+import GazEnteteUsage from './views/backend/Gaz/GazEnteteUsage.vue'
+
 import Lot from './views/backend/Gaz/Lot.vue'
 import RapportGaz from './views/backend/Gaz/RapportGaz.vue'
 // RapportGaz
@@ -1715,7 +1721,27 @@ const Router = new VueRouter({
         name: 'GazTransfertStock',
         component: GazTransfertStock,
     },
-    {   //RapportGaz     
+    {        
+        path: '/admin/GazEnteteUsage',
+        name: 'GazEnteteUsage',
+        component: GazEnteteUsage,
+    },
+    {        
+        path: '/admin/GazEnteteInventaire',
+        name: 'GazEnteteInventaire',
+        component: GazEnteteInventaire,
+    },
+    {        
+        path: '/admin/GazCreateInventaire',
+        name: 'GazCreateInventaire',
+        component: GazCreateInventaire,
+    },
+    {        
+        path: '/admin/GazCreateUsage',
+        name: 'GazCreateUsage',
+        component: GazCreateUsage,
+    },
+    {       
         path: '/admin/GazEnteteTransfert',
         name: 'GazEnteteTransfert',
         component: GazEnteteTransfert,

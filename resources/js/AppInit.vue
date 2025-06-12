@@ -967,6 +967,22 @@ export default {
                   href: "/admin/GazEnteteTransfert",
                 },
                 {
+                  text: "Création Inventaire",
+                  href: "/admin/GazCreateInventaire",
+                },
+                {
+                  text: "Liste des Inventaires",
+                  href: "/admin/GazEnteteInventaire",
+                },
+                {
+                  text: "Création Usage",
+                  href: "/admin/GazCreateUsage",
+                },
+                {
+                  text: "Liste des Usages",
+                  href: "/admin/GazEnteteUsage",
+                },
+                {
                   //GazCategorieLot
                   text: "Parametre Kit",
                   href: "/admin/Lot",
