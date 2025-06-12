@@ -293,6 +293,20 @@ class tgaz_detail_venteController extends Controller
         $current = Carbon::now();
         $active = "OUI";
 
+        $dateVente=0;
+        $data_entete =  DB::table("tgaz_entete_vente")
+        ->select("tgaz_entete_vente.id", "tgaz_entete_vente.dateVente")
+        ->where([
+            ['tgaz_entete_vente.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateVente=$data_entete->dateVente;                           
+         }
+
+        $cmup_data = floatval($this->calculerCoutGazMoyen($request->idStockService, $dateVente, $dateVente));
+
         $taux=0;
         $data5 =  DB::table("tvente_taux")
         ->select("tvente_taux.id", "tvente_taux.taux", 
@@ -318,9 +332,10 @@ class tgaz_detail_venteController extends Controller
         }  
 
 
-            $cmup_data = 0;
+            $cmup_data = $cmup_data;
+            $cmupVente = $cmup_data;
             $refLot=0;
-            $cmupVente=0;
+            
             $data99=DB::table('tgaz_stock_service_lot') 
             ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
             'devise','taux','active','refUser','author')
@@ -330,9 +345,7 @@ class tgaz_detail_venteController extends Controller
             ->first();
             if ($data99) 
             {
-                $refLot =  $data99->refLot; 
-                $cmup_data =  $data99->cmup_lot;     
-                $cmupVente = $data99->cmup_lot;;      
+                $refLot =  $data99->refLot;       
             }
 
 
@@ -450,6 +463,21 @@ class tgaz_detail_venteController extends Controller
         $montanttvaDeleted = 0;
         $montantreductionDeleted = 0;
 
+        $dateVente=0;
+        $data_entete =  DB::table("tgaz_entete_vente")
+        ->select("tgaz_entete_vente.id", "tgaz_entete_vente.dateVente")
+        ->where([
+            ['tgaz_entete_vente.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateVente=$data_entete->dateVente;                           
+         }
+
+        $cmup_data = floatval($this->calculerCoutGazMoyen($request->idStockService, $dateVente, $dateVente));
+
+
         $deleted =  DB::table("tgaz_detail_vente")
         ->select('id','refEnteteVente','compte_vente','compte_variationstock',
         'compte_perte','compte_produit','compte_destockage','idStockService','idParamLot',
@@ -493,10 +521,8 @@ class tgaz_detail_venteController extends Controller
         {
             $montants = $request->puVente;
             $devises = $request->devise;
-        }  
+        }
 
-
-        $cmup_data = 0;
         $refLot=0;
         $data99=DB::table('tgaz_stock_service_lot') 
         ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
@@ -507,27 +533,26 @@ class tgaz_detail_venteController extends Controller
         ->first();
         if ($data99) 
         {
-            $refLot =  $data99->refLot; 
-            $cmup_data =  $data99->cmup_lot;           
+            $refLot =  $data99->refLot;          
         }
 
 
 
-            $qte=$request->qteVente;
-            $idDetail=$refLot;
-            $idFacture=$request->refEnteteVente;
+        $qte=$request->qteVente;
+        $idDetail=$refLot;
+        $idFacture=$request->refEnteteVente;
 
-            $compte_achat = 0;
-            $compte_vente =0;
-            $compte_variationstock=0;
-            $compte_perte=0;
-            $compte_produit=0;
-            $compte_destockage=0;
-            $compte_stockage=0;
+        $compte_achat = 0;
+        $compte_vente =0;
+        $compte_variationstock=0;
+        $compte_perte=0;
+        $compte_produit=0;
+        $compte_destockage=0;
+        $compte_stockage=0;
 
 
         $uniteVente = '';
-        $cmupVente=0;
+        $cmupVente= $cmup_data;
 
         $uniteVente = $request->nom_unite;
         $cmupVente = $cmup_data; 
@@ -751,9 +776,9 @@ class tgaz_detail_venteController extends Controller
                 $devises = $request->devise;
             }  
 
-         $cmup_data = 0;
+         $cmup_data = floatval($this->calculerCoutGazMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
          $refLot=0;
-         $cmupVente=0;
+         $cmupVente= $cmup_data;
          $data99=DB::table('tgaz_stock_service_lot') 
          ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
          'devise','taux','active','refUser','author')
@@ -763,9 +788,7 @@ class tgaz_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refLot =  $row->refLot;
-             $cmup_data =  $row->cmup_lot;  
-             $cmupVente = $row->cmup_lot;         
+             $refLot =  $row->refLot;     
          }
 
          $qte=$data['qteVente'];
@@ -965,6 +988,7 @@ class tgaz_detail_venteController extends Controller
                 $taux=$row->taux;                           
              }
     
+            $cmup_data = floatval($this->calculerCoutGazMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
             $montants=0;
             $devises='';
             if($request->devise != 'USD')
@@ -978,9 +1002,8 @@ class tgaz_detail_venteController extends Controller
                 $devises = $request->devise;
             }  
 
-         $cmup_data = 0;
          $refLot=0;
-         $cmupVente=0;
+         $cmupVente= $cmup_data;
          $data99=DB::table('tgaz_stock_service_lot') 
          ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
          'devise','taux','active','refUser','author')
@@ -990,9 +1013,7 @@ class tgaz_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refLot =  $row->refLot;
-             $cmup_data =  $row->cmup_lot;  
-             $cmupVente = $row->cmup_lot;         
+             $refLot =  $row->refLot;       
          }
 
          $qte=$data['qteVente'];

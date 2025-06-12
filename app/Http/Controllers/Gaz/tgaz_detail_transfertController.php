@@ -393,6 +393,8 @@ class tgaz_detail_transfertController extends Controller
             $refIdStockSource = $data['idStockService'];
             $id_lot = 0;
 
+            $cmup_data = floatval($this->calculerCoutGazMoyen($refIdStockSource, $request->date_transfert, $request->date_transfert));
+
             $puTransfert=0;
             $data_stockss = DB::table('tgaz_stock_service_lot')       
             ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
@@ -402,8 +404,7 @@ class tgaz_detail_transfertController extends Controller
            ])
             ->first();
             if ($data_stockss) {
-                $id_lot = $data_stockss->refLot;
-                $puTransfert = floatval($data_stockss->cmup_lot);
+                $id_lot = $data_stockss->refLot;                
             }
     
             $temp_idservice = 0;
@@ -413,8 +414,9 @@ class tgaz_detail_transfertController extends Controller
             
             $qteTransfert=0;
             $uniteTransfert='';
-            $cmupVente=0;
-            $cmupTemp=0;
+            $cmupVente= $cmup_data;
+            $cmupTemp= $cmup_data;
+            $puTransfert = $cmup_data;
             $SI=0;  
    
            $stockservicedest = DB::table('tgaz_stock_service_lot')       
@@ -432,9 +434,6 @@ class tgaz_detail_transfertController extends Controller
 
                 
                 $qteTransfert = floatval($stockservicedest->qte_lot);
-
-                $cmupVente = floatval($stockservicedest->cmup_lot);
-                $cmupTemp = floatval($stockservicedest->cmup_lot);
                 $SI = floatval($stockservicedest->qte_lot);
             }
 
@@ -650,11 +649,7 @@ class tgaz_detail_transfertController extends Controller
                     $id_stock_servi_dest = $data_dest->code_entete;
                 }
 
-                $compte_variationstock = 0;
-                $compte_produit = 0;
-                $compte_achat = 0;
-                $compte_stockage = 0;
-              
+                            
                 $data98 = tgaz_mouvement_stock_service_lot::create([             
                     'idStockService'    =>  $id_stock_servi_dest,             
                     'dateMvt'    =>   $request->date_transfert,   
@@ -670,13 +665,6 @@ class tgaz_detail_transfertController extends Controller
         
                     'active'    =>  $active,
                     'uniteMvt'    =>  $uniteTransfert,
-                    'compte_vente'    =>  0,
-                    'compte_variationstock'    =>  $compte_variationstock,
-                    'compte_perte'    =>  0,
-                    'compte_produit'    =>  $compte_produit,
-                    'compte_destockage'    =>  0,
-                    'compte_achat'    =>  $compte_achat,
-                    'compte_stockage'    =>  $compte_stockage,
                     'devise'    =>  'USD',
                     'taux'    =>  $taux,
                     'cmupMvt'    =>  $puTransfert

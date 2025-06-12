@@ -481,7 +481,36 @@ trait GlobalMethod{
         }
 
         return $coutMoyen;
-  }
+    }
+
+    function calculerCoutGazMoyen($articleIdStk, $date1, $date2) 
+    {
+        // Exécuter la requête pour obtenir le stock final et la valeur totale
+        $result = DB::table('tgaz_mouvement_stock_service_lot')
+            ->select(
+                DB::raw('SUM(CASE WHEN type_mouvement = "Entree" THEN qteMvt ELSE 0 END) as stock_final'),
+                DB::raw('SUM(CASE WHEN type_mouvement = "Entree" THEN (qteMvt * puMvt) ELSE 0 END) as valeur_totale')
+            )
+            ->where([
+                ['tgaz_mouvement_stock_service_lot.dateMvt','<=', $date2],
+                ['tgaz_mouvement_stock_service_lot.idStockService','=', $articleIdStk],
+                ['tgaz_mouvement_stock_service_lot.type_mouvement','=', 'Entree'],
+            ])       
+            ->first();
+
+        // Initialiser les variables
+        $coutMoyen = 0;
+        $stockFinal = $result->stock_final ?? 0;
+        $valeurTotale = $result->valeur_totale ?? 0;
+
+        // Calculer le coût moyen si le stock final est supérieur à 0
+        if ($stockFinal > 0) {
+            $coutMoyen = round(floatval($valeurTotale) / floatval($stockFinal), 3);
+            // $coutMoyen = $valeurTotale;
+        }
+
+        return $coutMoyen;
+    }
 
 
 

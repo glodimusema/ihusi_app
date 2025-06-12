@@ -220,6 +220,20 @@ class tgaz_detail_utilisationController extends Controller
         $current = Carbon::now();
         $active = "OUI";
 
+        $dateUse=0;
+        $data_entete =  DB::table("tgaz_entete_utilisation")
+        ->select("tgaz_entete_utilisation.id", "tgaz_entete_utilisation.dateUse")
+        ->where([
+            ['tgaz_entete_utilisation.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateUse=$data_entete->dateUse;                           
+         }
+
+        $cmup_data = floatval($this->calculerCoutGazMoyen($request->idStockService, $dateUse, $dateUse));
+
         $taux=0;
         $data5 =  DB::table("tvente_taux")
         ->select("tvente_taux.id", "tvente_taux.taux", 
@@ -243,23 +257,8 @@ class tgaz_detail_utilisationController extends Controller
          }
 
 
-        $cmup_data = 0;
-
-        $montants=0;
+        $montants = $cmup_data;
         $devises='USD';
-
-        $data99=DB::table('tgaz_stock_service_lot') 
-        ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
-        'devise','taux','active','refUser','author')
-        ->where([
-            ['tgaz_stock_service_lot.id','=', $request->idStockService]
-        ])      
-        ->get();
-        foreach ($data99 as $row) 
-        {
-            $montants =  $row->cmup_lot;  
-            $cmup_data = $row->cmup_lot; 
-        }
 
         $qte=$request->qteVente;
         $idFacture=$request->refEnteteVente;
@@ -321,7 +320,7 @@ class tgaz_detail_utilisationController extends Controller
             'puVente'    =>  $montants,
             'devise'    =>  $devises,
             'taux'    =>  $taux,
-            'cmupMvt'    =>  $cmupVente
+            'cmupMvt'    =>  $cmup_data
         ]); 
 
 
@@ -342,6 +341,19 @@ class tgaz_detail_utilisationController extends Controller
         $qteVente=0;
         $montanttvaDeleted = 0;
         $montantreductionDeleted = 0;
+
+        $dateUse=0;
+        $data_entete =  DB::table("tgaz_entete_utilisation")
+        ->select("tgaz_entete_utilisation.id", "tgaz_entete_utilisation.dateUse")
+        ->where([
+            ['tgaz_entete_utilisation.id','=', $request->refEnteteVente]
+        ])
+        ->first(); 
+         if ($data_entete) 
+         {                                
+            $dateUse=$data_entete->dateUse;                           
+         }
+        $cmup_data = floatval($this->calculerCoutGazMoyen($request->idStockService, $dateUse, $dateUse));
 
         $deleted =  DB::table("tgaz_detail_utilisation")
         ->select('id','refEnteteVente','puVente','qteVente','uniteVente','cmupVente',
@@ -375,28 +387,17 @@ class tgaz_detail_utilisationController extends Controller
             $taux=$row->taux;                           
          }
 
-        $montants=0;
+        $montants = $cmup_data;
         $devises='USD';
-        $data99=DB::table('tgaz_stock_service_lot') 
-        ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
-        'devise','taux','active','refUser','author')
-        ->where([
-            ['tgaz_stock_service_lot.id','=', $request->idStockService]
-        ])      
-        ->get();
-        foreach ($data99 as $row) 
-        {
-            $montants =  $row->cmup_lot;           
-        }
 
         $qte=$request->qteVente;
         $idFacture=$request->refEnteteVente;
 
         $uniteVente = '';
-        $cmupVente=0;
+        $cmupVente = $cmup_data;
 
         $uniteVente = $request->nom_unite;
-        $cmupVente = $montants; 
+        $cmupVente = $cmup_data; 
 
         $qteVente = floatval($request->qteVente);
 
@@ -527,7 +528,7 @@ class tgaz_detail_utilisationController extends Controller
 
         foreach ($detailData as $data) {
 
-            $cmup_data = $data['puVente'];
+            $cmup_data = floatval($this->calculerCoutGazMoyen($data['idStockService'], $request->dateUse, $request->dateUse));
 
             $active = "OUI";
 
@@ -550,7 +551,7 @@ class tgaz_detail_utilisationController extends Controller
     
    
             $uniteVente = '';
-            $cmupVente=$cmup_data;
+            $cmupVente = $cmup_data;
     
             $uniteVente = $data['nom_unite'];
             $cmupVente = $montants;  
