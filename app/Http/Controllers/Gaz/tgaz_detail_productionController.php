@@ -917,6 +917,7 @@ class tgaz_detail_productionController extends Controller
                 }
         
                 $nom_table = 'tgaz_detail_production';
+                $qte_base = 1;
         
                 $data_mvt = tvente_mouvement_stock::create([             
                     'idStockService'    =>  $id_stock_services,             
@@ -944,7 +945,7 @@ class tgaz_detail_productionController extends Controller
                     'devise'    =>  $devises,
                     'taux'    =>  $taux,
                     'puBase'    =>  $price_total,
-                    'qteBase'    =>  $qte_total,
+                    'qteBase'    =>  $qte_base,
                     'uniteBase'    =>  $data['uniteProduction'],
                     'cmupMvt'    =>  $cmupProduction
                 ]); 
