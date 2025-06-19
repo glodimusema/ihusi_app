@@ -230,6 +230,8 @@ import TransfertStock from './views/backend/Ventes/TransfertStock.vue'
 import VenteTVA from './views/backend/Ventes/VenteTVA.vue'
 import VenteUserService from './views/backend/Ventes/VenteUserService.vue'
 import VenteDevise from './views/backend/Ventes/VenteDevise.vue'
+import StatistiqueVente from './views/backend/Ventes/StatistiqueVente.vue'
+// StatistiqueVente
 import CreateVentes from './views/backend/Ventes/CreateVentes.vue'
 import VenteEntetePaieVente from './views/backend/Ventes/VenteEntetePaieVente.vue'
 import VenteTables from './views/backend/Ventes/VenteTables.vue'
@@ -1073,7 +1075,12 @@ const Router = new VueRouter({
         name: 'VenteDevise',
         component: VenteDevise,
     },
-    { //VenteEntetePaieVente
+    { 
+        path: '/admin/StatistiqueVente',
+        name: 'StatistiqueVente',
+        component: StatistiqueVente,
+    },
+    { //StatistiqueVente
         path: '/admin/CreateVentes',
         name: 'CreateVentes',
         component: CreateVentes,

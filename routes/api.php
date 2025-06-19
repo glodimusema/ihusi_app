@@ -974,8 +974,10 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_detail_requisition/{id}", 'tvente_detail_requisitionController@delete_data');
     Route::get("fetch_detail_requisition_vente/{id}", 'tvente_detail_requisitionController@fetch_detail_requisition_vente');
 
+    //ventesParMois
 
     Route::get("fetch_vente_detail_vente", 'tvente_detail_venteController@all');
+    Route::get("fetch_vente_detail_parmois", 'tvente_detail_venteController@ventesParMois');
     Route::get("fetch_vente_detail_vente/{refEntete}", 'tvente_detail_venteController@fetch_data_entete');
     Route::get("fetch_single_vente_detail_vente/{id}", 'tvente_detail_venteController@fetch_single_data');    
     Route::post("insert_vente_detail_vente", 'tvente_detail_venteController@insert_data');

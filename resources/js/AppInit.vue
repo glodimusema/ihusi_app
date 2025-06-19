@@ -884,8 +884,14 @@ export default {
                   href: "/admin/VenteEnteteVente",
                 },
                 {
+                  // StatistiqueVente
                   text: "Paiement Ventes",
                   href: "/admin/VenteEntetePaieVente",
+                },
+                {
+                  // 
+                  text: "Statistique des Ventes",
+                  href: "/admin/StatistiqueVente",
                 },
                 {
                   text: "Les Clients",
@@ -936,7 +942,7 @@ export default {
           listGaz: [
             {
               text: "Kit Gaz",
-              icon: "mdi-cards",
+              icon: "mdi-battery",
               items: [
                 {
                   text: "Création Vente",

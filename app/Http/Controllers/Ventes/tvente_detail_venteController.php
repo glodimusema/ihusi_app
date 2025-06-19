@@ -407,6 +407,20 @@ class tvente_detail_venteController extends Controller
         ]);
     }
 
+    public function ventesParMois($annee = null)
+    {
+        $annee = $annee ?? Carbon::now()->year;
+
+        $ventes = DB::table('tvente_entete_vente')
+            ->selectRaw("DATE_FORMAT(dateVente, '%M') as mois, COUNT(*) as total_ventes")
+            ->whereYear('dateVente', $annee)
+            ->groupByRaw("MONTH(dateVente), DATE_FORMAT(dateVente, '%M')")
+            ->orderByRaw("MONTH(dateVente)")
+            ->get();
+
+        return response()->json($ventes);
+    }
+
     function insert_data(Request $request)
     {
         $current = Carbon::now();
