@@ -154,7 +154,7 @@
                             <tr>
                             <th class="text-left">Action</th>
                             <th class="text-left">N°Prod</th>
-                            <th class="text-left">DateProduction</th>
+                            <th class="text-left">DateAssemblage</th>
                             <th class="text-left">Service</th>
                             <th class="text-left">Téléphone</th>
                             <th class="text-left">Libellé</th>
@@ -263,7 +263,7 @@ export default {
                 id: '',
                 refService: 0,
                 dateProduction: "",
-                libelle_production: "Production des Kits",
+                libelle_production: "Assemblage des Kits",
                 author: "",
                 refUser: 0,
                 totalInvoice:0,

@@ -957,11 +957,11 @@ export default {
                   href: "/admin/GazEntetepaiementVente",
                 },
                 {
-                  text: "Création Production",
+                  text: "Création Assemblage",
                   href: "/admin/GazCreateProduction",
                 },
                 {
-                  text: "Liste des Productions",
+                  text: "Liste des Assemblages",
                   href: "/admin/GazEnteteProduction",
                 },
                 {
@@ -989,6 +989,10 @@ export default {
                   href: "/admin/GazEnteteUsage",
                 },
                 {
+                  text: "Produits",
+                  href: "/admin/Produits",
+                },
+                {
                   //GazCategorieLot
                   text: "Parametre Kit",
                   href: "/admin/Lot",
@@ -1000,8 +1004,13 @@ export default {
                 },
                 {
                   icon: "store",
-                  text: "Rapports",
+                  text: "Rapports Kit",
                   href: "/admin/RapportGaz",
+                },
+                {
+                  icon: "store",
+                  text: "Rapports Prod.",
+                  href: "/admin/RapportsJour_Vente",
                 },
               ],
             },

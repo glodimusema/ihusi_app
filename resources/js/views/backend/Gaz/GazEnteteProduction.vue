@@ -105,7 +105,7 @@
                     <thead>
                       <tr>
                         <th class="text-left">N°FAC</th>
-                        <th class="text-left">DateProduction</th>
+                        <th class="text-left">DateAssemblage</th>
                         <th class="text-left">Service</th>
                         <th class="text-left">Libellé</th>
                         <th class="text-left">Author</th>
