@@ -217,7 +217,7 @@
             this.svData.refUser = this.userData.id;
             this.svData.libelle= "Invetaire des Prosuits";
             this.insertOrUpdate(
-              `${this.apiBaseURL}/update_vente_entete_inventaire/${this.svData.id}`,
+              `${this.apiBaseURL}/update_gaz_entete_inventaire/${this.svData.id}`,
               JSON.stringify(this.svData)
             )
               .then(({ data }) => {
@@ -236,9 +236,9 @@
           else {
             this.svData.author = this.userData.name;
             this.svData.refUser = this.userData.id;
-            this.svData.libelle= "Inventaire des Produits";
+            this.svData.libelle= "Inventaire des Kits";
             this.insertOrUpdate(
-              `${this.apiBaseURL}/insert_vente_entete_inventaire`,
+              `${this.apiBaseURL}/insert_gaz_entete_inventaire`,
               JSON.stringify(this.svData)
             )
               .then(({ data }) => {
@@ -265,7 +265,7 @@
        );
     },
       editData(id) {
-        this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_entete_inventaire/${id}`).then(
+        this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_entete_inventaire/${id}`).then(
           ({ data }) => {
   
             this.titleComponent = "modification des informations";
@@ -278,7 +278,7 @@
       },
       deleteData(id) {
         this.confirmMsg().then(({ res }) => {
-          this.delGlobal(`${this.apiBaseURL}/delete_vente_entete_inventaire/${id}`).then(
+          this.delGlobal(`${this.apiBaseURL}/delete_gaz_entete_inventaire/${id}`).then(
             ({ data }) => {
               this.showMsg(data.data);
               this.fetchDataList();
@@ -287,7 +287,7 @@
         });
       },
       fetchDataList() {
-        this.fetch_data(`${this.apiBaseURL}/fetch_vente_entete_inventaire?page=`);
+        this.fetch_data(`${this.apiBaseURL}/fetch_gaz_entete_inventaire?page=`);
       },
       showDetailInvetaire(refEnteteVente, name, refService) {
   

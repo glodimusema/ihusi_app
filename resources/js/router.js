@@ -247,6 +247,9 @@ import GazCreateProduction from './views/backend/Gaz/GazCreateProduction.vue'
 import GazEnteteProduction from './views/backend/Gaz/GazEnteteProduction.vue'
 import GazTransfertStock from './views/backend/Gaz/GazTransfertStock.vue'
 import GazEnteteTransfert from './views/backend/Gaz/GazEnteteTransfert.vue'
+import GazCreateRestoreKit from './views/backend/Gaz/GazCreateRestoreKit.vue'
+
+// GazCreateRestoreKit
 
 import GazCreateUsage from './views/backend/Gaz/GazCreateUsage.vue'
 import GazCreateInventaire from './views/backend/Gaz/GazCreateInventaire.vue'
@@ -1748,10 +1751,16 @@ const Router = new VueRouter({
         name: 'GazCreateUsage',
         component: GazCreateUsage,
     },
-    {       
+    { 
+      //GazCreateRestoreKit      
         path: '/admin/GazEnteteTransfert',
         name: 'GazEnteteTransfert',
         component: GazEnteteTransfert,
+    },
+    {     
+        path: '/admin/GazCreateRestoreKit',
+        name: 'GazCreateRestoreKit',
+        component: GazCreateRestoreKit,
     },
     {   
         path: '/admin/RapportGaz',

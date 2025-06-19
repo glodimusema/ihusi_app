@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Ventes;
+namespace App\Http\Controllers\Gaz;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Ventes\tgaz_detail_utilisation;
-use App\Models\Ventes\tgaz_entete_utilisation;
-use App\Models\Ventes\tgaz_mouvement_stock_service_lot;
+use App\Models\Gaz\tgaz_detail_utilisation;
+use App\Models\Gaz\tgaz_entete_utilisation;
+use App\Models\Gaz\tgaz_mouvement_stock_service_lot;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
 use Carbon\Carbon;

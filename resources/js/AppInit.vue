@@ -981,6 +981,10 @@ export default {
                   href: "/admin/GazEnteteInventaire",
                 },
                 {
+                  text: "Innitiaise Stock Kit",
+                  href: "/admin/GazCreateRestoreKit",
+                },
+                {
                   text: "Création Usage",
                   href: "/admin/GazCreateUsage",
                 },
