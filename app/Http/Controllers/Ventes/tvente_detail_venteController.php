@@ -412,7 +412,7 @@ class tvente_detail_venteController extends Controller
         $annee = $annee ?? Carbon::now()->year;
 
         $ventes = DB::table('tvente_entete_vente')
-            ->selectRaw("DATE_FORMAT(dateVente, '%M') as mois, COUNT(*) as total_ventes")
+            ->selectRaw("DATE_FORMAT(dateVente, '%M') as mois, SUM(montant) as total_ventes")
             ->whereYear('dateVente', $annee)
             ->groupByRaw("MONTH(dateVente), DATE_FORMAT(dateVente, '%M')")
             ->orderByRaw("MONTH(dateVente)")
@@ -1127,11 +1127,11 @@ class tvente_detail_venteController extends Controller
                 'uniteMvt'    =>  $uniteVente,
                 'compte_vente'    =>  $compte_vente,
                 'compte_variationstock'    =>  $compte_variationstock,
-                // 'compte_perte'    =>  $compte_perte,
+                'compte_perte'    =>  $compte_perte,
                 'compte_produit'    =>  $compte_produit,
                 'compte_destockage'    =>  $compte_destockage,
-                // 'compte_achat'    =>  $compte_achat,
-                // 'compte_stockage'    =>  $compte_stockage,
+                'compte_achat'    =>  $compte_achat,
+                'compte_stockage'    =>  $compte_stockage,
                 'puVente'    =>  $montants,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,

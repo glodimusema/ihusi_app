@@ -142,9 +142,9 @@
                     <div class="mr-1">
                         <v-select label="Etat de Facture" :items="[
                             { designation: 'Cash' },
-                            // { designation: 'Compte Maison' },
-                            // { designation: 'Chambre' },
-                            // { designation: 'Crédit' },
+                             { designation: 'Crédit' },
+                            { designation: 'Compte Maison' },
+                            // { designation: 'Chambre' },                           
                             // { designation: 'Location' }
                             ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
                             item-text="designation" item-value="designation" v-model="svData.etat_facture">
@@ -221,8 +221,8 @@
             <table>
                 <tr>
                     <td>
-                        <!-- <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div> -->
-                        <!-- <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear> -->
+                        <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate" color="success">Enregistrer</v-btn></div>
+                        <v-progress-linear v-if="loadings" :value="progress" indeterminate color="green"></v-progress-linear>
                     </td>
                     <td>
                         <div style="text-align: right; margin-top: 20px;"> <v-btn @click="validate2" color="success">Payer Cash</v-btn></div>  

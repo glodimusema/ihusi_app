@@ -879,9 +879,13 @@ export default {
                   text: "Création Vente",
                   href: "/admin/CreateVentes",
                 },
-                {
+                { //VenteEnteteDette
                   text: "Liste des Ventes",
                   href: "/admin/VenteEnteteVente",
+                },
+                { //
+                  text: "Liste des Dettes",
+                  href: "/admin/VenteEnteteDette",
                 },
                 {
                   // StatistiqueVente

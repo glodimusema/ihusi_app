@@ -215,10 +215,11 @@ import RapportSortie from './views/backend/Ventes/RapportSortie.vue'
 
 import VenteEnteteFactureGroupe from './views/backend/Ventes/VenteEnteteFactureGroupe.vue'
 import CreateFactureGroupe from './views/backend/Ventes/CreateFactureGroupe.vue'
-
+//VenteEnteteDette
 import CategorieFournisseur from './views/backend/Ventes/CategorieFournisseur.vue'
 import VenteAutorisation from './views/backend/Ventes/VenteAutorisation.vue'
 import VenteModules from './views/backend/Ventes/VenteModules.vue'
+import VenteEnteteDette from './views/backend/Ventes/VenteEnteteDette.vue'
 import VenteServices from './views/backend/Ventes/VenteServices.vue'
 import VenteUnite from './views/backend/Ventes/VenteUnite.vue'
 import Commandes from './views/backend/Ventes/Commandes.vue'
@@ -1283,10 +1284,15 @@ const Router = new VueRouter({
         name: 'VenteAutorisation',
         component: VenteAutorisation,
     },
-    {
+    { //VenteEnteteDette
         path: '/admin/VenteModules',
         name: 'VenteModules',
         component: VenteModules,
+    },
+    { //
+        path: '/admin/VenteEnteteDette',
+        name: 'VenteEnteteDette',
+        component: VenteEnteteDette,
     },
     {   path: '/admin/VenteServices',
         name: 'VenteServices',

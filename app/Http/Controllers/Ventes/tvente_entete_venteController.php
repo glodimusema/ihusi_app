@@ -78,6 +78,58 @@ class tvente_entete_venteController extends Controller
         
     }
 
+    public function all_dette(Request $request)
+    {      
+
+        $data = DB::table('tvente_entete_vente')
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
+        ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_client.compte_client')
+        ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
+        ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
+        ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
+        ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
+        ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+        ->select('tvente_entete_vente.id','tvente_entete_vente.code','refClient','refService','refReservation','module_id',
+        'dateVente','libelle','tvente_entete_vente.montant','tvente_entete_vente.paie','tvente_entete_vente.author',
+        'tvente_entete_vente.refUser','serveur_id','table_id','etat_facture',
+        'tvente_entete_vente.created_at','reduction','totaltva'
+        
+        ,'nom_service', "tvente_module.nom_module",'date_paie_current','nombre_print'
+
+        ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
+        'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
+        'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug','tvente_client.author',
+        'tvente_entete_vente.updated_at', "tvente_categorie_client.designation",
+        "compte_client",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte',
+        'numero_souscompte','refCompte','nom_compte','numero_compte','refClasse','refTypecompte','refPosition',
+        'nom_classe','numero_classe','nom_typeposition',"nom_typecompte"        
+        )
+        ->selectRaw('CONCAT("F",YEAR(dateVente),"",MONTH(dateVente),"00",tvente_entete_vente.id) as codeFacture')
+        ->selectRaw('ROUND(IFNULL((IFNULL(montant,0) + IFNULL(totaltva,0) - IFNULL(reduction,0)),0),2) as totalFacture')
+        ->selectRaw('IFNULL(paie,0) as totalPaie')
+        ->selectRaw('ROUND((IFNULL((IFNULL(montant,0) + IFNULL(totaltva,0) - IFNULL(reduction,0)),0) - IFNULL(paie,0)),2) as RestePaie')
+        ->selectRaw('TIMESTAMPDIFF(DAY, dateVente, CURDATE()) as jour_paiement')
+        ->whereRaw('ROUND((IFNULL((IFNULL(montant,0) + IFNULL(totaltva,0) - IFNULL(reduction,0)),0) - IFNULL(paie,0)),2) > 0');
+       
+        if (!is_null($request->get('query'))) {
+            # code...
+            $query = $this->Gquery($request);
+
+            $data->where('noms', 'like', '%'.$query.'%')          
+            ->orderBy("tvente_entete_vente.created_at", "desc");
+
+            return $this->apiData($data->paginate(10));
+           
+
+        }
+        $data->orderBy("tvente_entete_vente.created_at", "desc");
+        return $this->apiData($data->paginate(10));
+        
+    }
+
 
     public function fetch_data_entete(Request $request,$refEntete)
     {
