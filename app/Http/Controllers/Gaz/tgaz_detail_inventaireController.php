@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gaz\tgaz_detail_inventaire;
 use App\Models\Gaz\tgaz_entete_inventaire;
 use App\Models\Gaz\tgaz_mouvement_stock_service_lot;
+use App\Models\Gaz\tgaz_entete_production;
 use App\Models\Gaz\tgaz_detail_production;
 use App\Traits\{GlobalMethod,Slug};
 use DB;
@@ -48,7 +49,7 @@ class tgaz_detail_inventaireController extends Controller
         'tgaz_stock_service_lot.refLot','tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','refService',
+        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','tgaz_entete_inventaire.refService',
         'module_id','dateVente','libelle','priseencharge'
        )
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
@@ -89,7 +90,7 @@ class tgaz_detail_inventaireController extends Controller
         'tgaz_stock_service_lot.refLot','tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','refService',
+        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','tgaz_entete_inventaire.refService',
         'module_id','dateVente','libelle','priseencharge'
        )
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
@@ -128,7 +129,7 @@ class tgaz_detail_inventaireController extends Controller
         'tgaz_stock_service_lot.refLot','tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','refService',
+        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','tgaz_entete_inventaire.refService',
         'module_id','dateVente','libelle','priseencharge'
        )
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
@@ -162,7 +163,7 @@ class tgaz_detail_inventaireController extends Controller
         'tgaz_stock_service_lot.refLot','tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot',
         'tgaz_stock_service_lot.active','nom_lot','code_lot','unite_lot','stock_alerte',
 
-        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','refService',
+        'nom_service', "tvente_module.nom_module",'tgaz_entete_inventaire.code','tgaz_entete_inventaire.refService',
         'module_id','dateVente','libelle','priseencharge'
        )
        ->selectRaw('ROUND(((qteVente*puVente) - montantreduction),2) as PTVente')
@@ -225,7 +226,7 @@ class tgaz_detail_inventaireController extends Controller
         $refService=0;        
 
         $data33=DB::table('tgaz_entete_inventaire') 
-         ->select('id','code','refService','module_id','dateVente','libelle','author','refUser')
+         ->select('id','code','tgaz_entete_inventaire.refService','module_id','dateVente','libelle','author','refUser')
          ->where([
             ['tgaz_entete_inventaire.id','=', $request->refEnteteVente]
         ])      
@@ -327,7 +328,7 @@ class tgaz_detail_inventaireController extends Controller
         $refService=0;        
 
         $data33=DB::table('tgaz_entete_inventaire') 
-         ->select('id','code','refService','module_id','dateVente','libelle','author','refUser')
+         ->select('id','code','tgaz_entete_inventaire.refService','module_id','dateVente','libelle','author','refUser')
          ->where([
             ['tgaz_entete_inventaire.id','=', $request->refEnteteVente]
         ])      
@@ -659,6 +660,14 @@ class tgaz_detail_inventaireController extends Controller
                 ['qteEntree' => $qteVente,'idStockService' => $data['idStockService']]
             );
 
+            $compte_vente = 0;
+            $compte_variationstock = 0;
+            $compte_perte = 0;
+            $compte_produit = 0;
+            $compte_destockage = 0;
+            $compte_achat = 0;
+            $compte_stockage = 0;
+
             
             $data203 = tgaz_detail_production::create([                
                 'refEnteteProduction'       =>  $idmaxs,
@@ -717,7 +726,7 @@ class tgaz_detail_inventaireController extends Controller
                 'puProduction'    =>  $montants,
                 'devise'    =>  $devises,
                 'taux'    =>  $taux,
-                'cmupMvt'    =>  $cmupProduction
+                'cmupMvt'    =>  $cmupVente
             ]);
 
 

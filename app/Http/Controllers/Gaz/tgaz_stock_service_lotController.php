@@ -426,10 +426,10 @@ class tgaz_stock_service_lotController extends Controller
             'tgaz_stock_service_lot.refUser','tgaz_stock_service_lot.author' ,
             "tvente_services.nom_service","stock_alerte","tgaz_stock_service_lot.created_at",
             'nom_lot','code_lot','unite_lot','refCategorieLot','nom_categorie_lot')
-            ->selectRaw('IFNULL(tvente_stock_service.qte_lot,0) as qte')
-            ->selectRaw('ROUND(tvente_stock_service.pu_lot,2) as pu')
-            ->selectRaw('ROUND(tvente_stock_service.cmup_lot,2) as cmup')
-            ->selectRaw('ROUND(IFNULL((tvente_stock_service.cmup_lot * tvente_stock_service.qte_lot),0),2) as PTCmup')          
+            ->selectRaw('IFNULL(tgaz_stock_service_lot.qte_lot,0) as qte')
+            ->selectRaw('ROUND(tgaz_stock_service_lot.pu_lot,2) as pu')
+            ->selectRaw('ROUND(tgaz_stock_service_lot.cmup_lot,2) as cmup')
+            ->selectRaw('ROUND(IFNULL((tgaz_stock_service_lot.cmup_lot * tgaz_stock_service_lot.qte_lot),0),2) as PTCmup')          
             ->where([
                 ['tgaz_lot.refCategorieLot','=', $refCategorie],
                 ['tgaz_stock_service_lot.refService','=', $refService]
