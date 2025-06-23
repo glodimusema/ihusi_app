@@ -1055,6 +1055,7 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_rapport_detailvente_date_etat_facture_service", 'PdfVenteController@fetch_rapport_detailvente_date_etat_facture_service'); 
     Route::get("fetch_rapport_paiementfacture_date", 'PdfVenteController@fetch_rapport_paiementfacture_date'); 
     Route::get("fetch_rapport_paiementfacture_date_banque", 'PdfVenteController@fetch_rapport_paiementfacture_date_banque'); 
+    Route::get("fetch_rapport_paiementfacture_date_etat_facture", 'PdfVenteController@fetch_rapport_paiementfacture_date_etat_facture'); 
     Route::get("fetch_rapport_detailentree_date_fss", 'PdfVenteController@fetch_rapport_detailentree_date_fss'); 
     Route::get("fetch_rapport_detailcmd_date_fss", 'PdfVenteController@fetch_rapport_detailcmd_date_fss'); 
     Route::get("fetch_pdf_rapport_detail_vente_date_service", 'PdfVenteController@fetch_rapport_detailvente_date_service');

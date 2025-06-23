@@ -78,7 +78,7 @@
                                     <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
                                             <v-btn @click="PrintshowPaiementFactureByDate" block color="blue" dark>
-                                                <v-icon>print</v-icon> PAIEMENTS DES FACTURES
+                                                <v-icon>print</v-icon> PAIEMENTS DES FACTURES CLIENTS
                                             </v-btn>
                                         </span>
                                     </template>
@@ -92,6 +92,29 @@
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowPaiementCommandeFactureByDate" block color="blue" dark>
                                             <v-icon>print</v-icon> PAIEMENTS DES FACTURES FOURNISSEURS
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                            <div class="mr-1">
+                                <v-select label="Etat de Facture" :items="[
+                                    { designation: 'Cash' },
+                                    { designation: 'Crédit' },
+                                    { designation: 'Compte Maison' },
+                                    // { designation: 'Chambre' },                           
+                                    // { designation: 'Location' }
+                                    ]" prepend-inner-icon="extension" :rules="[(v) => !!v || 'Ce champ est requis']" outlined dense
+                                    item-text="designation" item-value="designation" v-model="svData.etat_facture">
+                                </v-select>
+                            </div>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintshowPaiementEtatFactureByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORT DES PAIEMENT/CREDIT/CASH
                                         </v-btn>
                                     </span>
                                 </template>
@@ -281,6 +304,7 @@ export default {
 
                 refRubEntree: 0,
                 refRubSortie: 0,
+                etat_facture : "",
                 
             },
             stataData: {
@@ -398,6 +422,16 @@ export default {
                 var date2 = this.dates[1];
                 if (date1 <= date2) {
                     window.open(`${this.apiBaseURL}/fetch_rapport_sortie_compte_date_rubrique?date1=` + date1 + "&date2=" + date2+"&refCompte="+this.svData.refRubSortie);
+                    //window.open(`${this.apiBaseURL}/fetch_rapport_depense_date?date1=` + date1+"&date2="+date2);
+                } else {
+                    this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+                }
+        },
+        PrintshowPaiementEtatFactureByDate() {
+                var date1 = this.dates[0];
+                var date2 = this.dates[1];
+                if (date1 <= date2) {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_paiementfacture_date_etat_facture?date1=` + date1 + "&date2=" + date2+"&etat_facture="+this.svData.etat_facture);
                     //window.open(`${this.apiBaseURL}/fetch_rapport_depense_date?date1=` + date1+"&date2="+date2);
                 } else {
                     this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
