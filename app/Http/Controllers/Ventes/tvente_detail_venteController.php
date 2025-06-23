@@ -1159,6 +1159,265 @@ class tvente_detail_venteController extends Controller
        
     }
 
+    function insert_dataGlobalGros(Request $request)
+    {
+        $id_module = 4;
+        $active = "OUI";
+
+        $code = $this->GetCodeData('tvente_param_systeme','module_id',$id_module);
+        $data11 = tvente_entete_vente::create([
+            'code'       =>  $code,
+            'refClient'       =>  $request->refClient,
+            'refService'       =>  $request->refService,  
+            'refReservation'       =>  0,          
+            'module_id'       =>  $id_module,
+            'dateVente'    =>  $request->dateVente,
+            'libelle'    =>  $request->libelle,
+            'serveur_id'    =>  $request->serveur_id,
+            'table_id'    =>  $request->table_id,
+            'etat_facture'    =>  $request->etat_facture,
+            'author'       =>  $request->author,
+            'refUser'       =>  $request->refUser
+        ]);
+
+        $idmax=0;
+        $maxid = DB::table('tvente_entete_vente')       
+        ->selectRaw('MAX(tvente_entete_vente.id) as code_entete')
+        ->where([
+            ['tvente_entete_vente.refUser','=', $request->refUser],
+            ['tvente_entete_vente.refClient','=', $request->refClient]
+         ])
+        ->get();
+        foreach ($maxid as $list) {
+            $idmax= $list->code_entete;
+        }
+
+        $detailData = $request->detailData;
+
+        foreach ($detailData as $data) {
+
+            $cmup_data = floatval($this->calculerCoutMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
+
+            $active = "OUI";
+
+            $taux=0;
+            $data5 =  DB::table("tvente_taux")
+            ->select("tvente_taux.id", "tvente_taux.taux", 
+            "tvente_taux.created_at", "tvente_taux.author")
+             ->get(); 
+             $output='';
+             foreach ($data5 as $row) 
+             {                                
+                $taux=$row->taux;                           
+             }
+    
+            $montants=0;
+            $devises='';
+            if($request->devise != 'USD')
+            {
+                $montants = ($data['puVente'])/$taux;
+                $devises='USD';
+            }
+            else
+            {
+                $montants = $data['puVente'];
+                $devises = $request->devise;
+            }  
+
+         $cmup_data = 0;
+         $refProduit=0;
+         $data99=DB::table('tvente_stock_service') 
+         ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
+         'devise','taux','active','refUser','author')
+         ->where([
+            ['tvente_stock_service.id','=', $data['idStockService']]
+         ])      
+         ->get();
+         foreach ($data99 as $row) 
+         {
+             $refProduit =  $row->refProduit;
+             $cmup_data =  $row->cmup;           
+         }
+
+
+
+         $qte=$data['qteVente'];
+         $idDetail=$refProduit;
+         $idFacture=$idmax;
+ 
+         $compte_achat = 0;
+         $compte_vente =0;
+         $compte_variationstock=0;
+         $compte_perte=0;
+         $compte_produit=0;
+         $compte_destockage=0;
+         $compte_stockage=0;
+         $cmupVente=0;
+ 
+         $data3=DB::table('tvente_produit')
+          ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
+          ->select('compte_achat','compte_vente','compte_variationstock','tvente_categorie_produit.code',
+          'compte_perte','compte_produit','compte_destockage','compte_stockage','cmup')
+          ->where([
+             ['tvente_produit.id','=', $refProduit]
+         ])      
+         ->get();
+         foreach ($data3 as $row) 
+         {
+             $compte_achat =  $row->compte_achat;
+             $compte_vente = $row->compte_vente;
+             $compte_variationstock= $row->compte_variationstock;
+             $compte_perte= $row->compte_perte;
+             $compte_produit= $row->compte_produit;
+             $compte_destockage= $row->compte_destockage;
+             $compte_stockage= $row->compte_stockage; 
+         }
+ 
+
+ 
+         $uniteVente = '';
+         $uniteBase = '';
+         $puBase=0;
+         $qteBase=0;
+         $estunite='';
+
+        $data_unite=DB::table('tvente_detail_unite')
+        ->join('tvente_unite','tvente_unite.id','=','tvente_detail_unite.refUnite')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_unite.refProduit') 
+        ->select('tvente_detail_unite.id','refProduit','refUnite','puUnite','qteUnite','puBase','qteBase','estunite',
+        'tvente_detail_unite.active','tvente_detail_unite.author','tvente_detail_unite.refUser',
+        'nom_unite','uniteBase')
+        ->where([
+           ['tvente_detail_unite.id','=', $data['refDetailUnite']]
+        ])      
+        ->first();       
+           
+        if ($data_unite) 
+        {
+            $uniteVente = $data_unite->nom_unite;
+            $uniteBase = $data_unite->uniteBase;           
+            $qteBase=$data_unite->qteBase;
+            $puBase=$data_unite->puBase;      
+            $estunite=$data_unite->estunite;
+        }
+
+ 
+        $cmupVente = $cmup_data; 
+ 
+        $qteVente = $qteBase * floatval($data['qteVente']);
+        if($estunite = "OUI")
+        {
+           $puBase=  floatval($montants);
+        }
+        else
+        {
+           $puBase=  floatval($montants) / floatval($qteBase);
+        }
+        
+       $montanttva=0;
+       $pourtageTVA=0;
+ 
+       $data5=DB::table('tvente_tva')     
+       ->select('montant_tva')
+       ->where([
+         ['tvente_tva.id','=', $data['id_tva']],
+          ['tvente_tva.active','=', 'OUI']
+       ])      
+      ->get();
+      foreach ($data5 as $row) 
+      {
+          $pourtageTVA = $row->montant_tva;
+      }
+         
+         $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
+    
+            $data12 = tvente_detail_vente::create([
+                'refEnteteVente'       =>  $idmax,
+                'refProduit'    =>  $refProduit,
+                'qteVente'    =>  $data['qteVente'],            
+                'montantreduction'    =>  $data['montantreduction'],  
+                'idStockService'    =>  $data['idStockService'],                     
+                'author'       =>  $request->author,
+                'refUser'    =>  $request->refUser,
+    
+                'active'    =>  $active,
+                'uniteVente'    =>  $uniteVente,
+                'compte_vente'    =>  $compte_vente,
+                'compte_variationstock'    =>  $compte_variationstock,
+                'compte_perte'    =>  $compte_perte,
+                'compte_produit'    =>  $compte_produit,
+                'compte_destockage'    =>  $compte_destockage,
+                'puVente'    =>  $montants,
+                'devise'    =>  $devises,
+                'taux'    =>  $taux,
+                'puBase'    =>  $puBase,
+                'qteBase'    =>  $qteBase,
+                'uniteBase'    =>  $uniteBase,
+                'cmupVente'    =>  $cmup_data,
+                'montanttva'    =>  $montanttva,
+            ]);
+
+            $id_detail_max=0;
+            $detail_list = DB::table('tvente_detail_vente')       
+            ->selectRaw('MAX(id) as code_entete')
+            ->where([
+                ['refUser','=', $request->refUser],
+                ['idStockService','=', $data['idStockService']]
+             ]) 
+            ->get();
+            foreach ($detail_list as $list) {
+                $id_detail_max= $list->code_entete;
+            }
+          
+            $data99 = tvente_mouvement_stock::create([             
+                'idStockService'    =>  $data['idStockService'],             
+                'dateMvt'    =>   $request->dateVente,   
+                'type_mouvement'    =>  'Sortie',
+                'libelle_mouvement'    =>  'Vente des Produits',
+                'nom_table'    =>  'tvente_detail_vente',
+                'id_data'    =>  $id_detail_max, 
+                'qteMvt'    =>  $data['qteVente'],
+                'puMvt'    =>  $montants,                   
+                'author'       =>  $request->author,
+                'refUser'       =>  $request->refUser,
+                'type_sortie'    =>  'Sortie',
+    
+                'active'    =>  $active,
+                'uniteMvt'    =>  $uniteVente,
+                'compte_vente'    =>  $compte_vente,
+                'compte_variationstock'    =>  $compte_variationstock,
+                'compte_perte'    =>  $compte_perte,
+                'compte_produit'    =>  $compte_produit,
+                'compte_destockage'    =>  $compte_destockage,
+                'compte_achat'    =>  $compte_achat,
+                'compte_stockage'    =>  $compte_stockage,
+                'puVente'    =>  $montants,
+                'devise'    =>  $devises,
+                'taux'    =>  $taux,
+                'puBase'    =>  $puBase,
+                'qteBase'    =>  $qteBase,
+                'uniteBase'    =>  $uniteBase,
+                'cmupMvt'    =>  $cmupVente
+            ]); 
+    
+            $data2 = DB::update(
+                'update tvente_stock_service set qte = qte - :qteVente where id = :idStockService',
+                ['qteVente' => $qteVente,'idStockService' => $data['idStockService']]
+            );
+    
+            $data3 = DB::update(
+                'update tvente_entete_vente set montant = montant + (:pu * :qte),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
+                ['pu' => $montants,'qte' => $data['qteVente'],'reduction' => $data['montantreduction'],'totaltva' => $montanttva,'refEnteteVente' => $idmax]
+            );
+
+        }
+
+        return response()->json([
+            'data'  =>  "Insertion avec succès!!!",
+        ]);
+       
+    }
+
 
     function insert_dataGlobalCash(Request $request)
     {
@@ -1312,6 +1571,370 @@ class tvente_detail_venteController extends Controller
             $pourtageTVA = $row->montant_tva;
         }         
             $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
+    
+            $data12 = tvente_detail_vente::create([
+                'refEnteteVente'       =>  $idmax,
+                'refProduit'    =>  $refProduit,
+                'qteVente'    =>  $data['qteVente'],            
+                'montantreduction'    =>  $data['montantreduction'],  
+                'idStockService'    =>  $data['idStockService'],                     
+                'author'       =>  $request->author,
+                'refUser'    =>  $request->refUser,
+    
+                'active'    =>  $active,
+                'uniteVente'    =>  $uniteVente,
+                'compte_vente'    =>  $compte_vente,
+                'compte_variationstock'    =>  $compte_variationstock,
+                'compte_perte'    =>  $compte_perte,
+                'compte_produit'    =>  $compte_produit,
+                'compte_destockage'    =>  $compte_destockage,
+                'puVente'    =>  $montants,
+                'devise'    =>  $devises,
+                'taux'    =>  $taux,
+                'puBase'    =>  $puBase,
+                'qteBase'    =>  $qteBase,
+                'uniteBase'    =>  $uniteBase,
+                'cmupVente'    =>  $cmup_data,
+                'montanttva'    =>  $montanttva,
+            ]);
+
+            $id_detail_max=0;
+            $detail_list = DB::table('tvente_detail_vente')       
+            ->selectRaw('MAX(id) as code_entete')
+            ->where([
+                ['refUser','=', $request->refUser],
+                ['idStockService','=', $data['idStockService']]
+             ]) 
+            ->get();
+            foreach ($detail_list as $list) {
+                $id_detail_max= $list->code_entete;
+            }
+          
+            $data99 = tvente_mouvement_stock::create([             
+                'idStockService'    =>  $data['idStockService'],             
+                'dateMvt'    =>   $request->dateVente,   
+                'type_mouvement'    =>  'Sortie',
+                'libelle_mouvement'    =>  'Vente des Produits',
+                'nom_table'    =>  'tvente_detail_vente',
+                'id_data'    =>  $id_detail_max, 
+                'qteMvt'    =>  $data['qteVente'],
+                'puMvt'    =>  $montants,                   
+                'author'       =>  $request->author,
+                'refUser'       =>  $request->refUser,
+                'type_sortie'    =>  'Sortie',
+    
+                'active'    =>  $active,
+                'uniteMvt'    =>  $uniteVente,
+                'compte_vente'    =>  $compte_vente,
+                'compte_variationstock'    =>  $compte_variationstock,
+                'compte_perte'    =>  0,
+                'compte_produit'    =>  $compte_produit,
+                'compte_destockage'    =>  $compte_destockage,
+                'compte_achat'    =>  0,
+                'compte_stockage'    =>  0,
+                'puVente'    =>  $montants,
+                'devise'    =>  $devises,
+                'taux'    =>  $taux,
+                'puBase'    =>  $puBase,
+                'qteBase'    =>  $qteBase,
+                'uniteBase'    =>  $uniteBase,
+                'cmupMvt'    =>  $cmup_data
+            ]); 
+    
+            $data2 = DB::update(
+                'update tvente_stock_service set qte = qte - :qteVente where id = :idStockService',
+                ['qteVente' => $qteVente,'idStockService' => $data['idStockService']]
+            );
+    
+            $data3 = DB::update(
+                'update tvente_entete_vente set montant = montant + (:pu * :qte),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
+                ['pu' => $montants,'qte' => $data['qteVente'],'reduction' => $data['montantreduction'],'totaltva' => $montanttva,'refEnteteVente' => $idmax]
+            );
+
+        }
+
+        //PAIEMENT DE LA FACTURE ===================================================================
+
+
+        
+        $montants=0;
+        $ventes = DB::table('tvente_entete_vente')
+        ->selectRaw('(tvente_entete_vente.montant - tvente_entete_vente.reduction + tvente_entete_vente.totaltva) as montant')
+        ->Where('id',$idmax)->get(); 
+        foreach ($ventes as $vente) {
+            $montants = $vente->montant;
+        }
+
+
+        $current = Carbon::now(); 
+        $refEntetepaie=0; 
+        $refService = $request->refService;
+        $module_id_paie = 5;      
+
+        $codepaie = $this->GetCodeData('tvente_param_systeme','module_id',$module_id_paie); 
+
+        $data13 = tvente_entete_paievente::create([
+            'code'       =>  $codepaie,
+            'date_entete_paie'    =>  $current,
+            'refService'    =>  $refService,
+            'module_id'    =>  $module_id_paie,
+            'author'       =>  $request->author,
+            'refUser'       =>  $request->refUser
+        ]);
+        
+        $idmax_paie=0;
+        $maxid = DB::table('tvente_entete_paievente')       
+        ->selectRaw('MAX(tvente_entete_paievente.id) as code_entete')
+        ->where([
+            ['tvente_entete_paievente.refUser','=', $request->refUser],
+            ['tvente_entete_paievente.refService','=', $refService]
+         ])
+        ->get();
+        foreach ($maxid as $list) {
+            $idmax_paie= $list->code_entete;
+        }
+
+        $datetest='';
+        $data3 = DB::table('tfin_cloture_caisse')
+       ->select('date_cloture')
+       ->where('date_cloture','=', $request->dateVente)
+       ->take(1)
+       ->orderBy('id', 'desc')         
+       ->get();    
+       foreach ($data3 as $row) 
+       {                           
+          $datetest=$row->date_cloture;          
+       }
+
+       if($datetest == $request->dateVente)
+       {
+            return response()->json([
+                'data'  =>  "La Caisse est déja cloturée pour cette date svp!!! Veuillez prendre la date du jour suivant!!!",
+            ]);            
+       }
+       else
+       {
+            $taux=0;
+            $data5 =  DB::table("tvente_taux")
+            ->select("tvente_taux.id", "tvente_taux.taux", 
+            "tvente_taux.created_at", "tvente_taux.author")
+            ->get(); 
+            $output='';
+            foreach ($data5 as $row) 
+            {                                
+                $taux=$row->taux;                           
+            }
+
+            $modepaie = 'CASH';
+            $libellepaie = 'Paiement vente Cash';
+            $refBanque = 0;
+            $numeroBordereau = '0000000000';
+
+            $data44 = DB::table('tconf_banque')
+            ->select('id','nom_banque','numerocompte','nom_mode','refSscompte')
+            ->where('nom_mode','=', $modepaie)
+            ->get();    
+            foreach ($data44 as $row) 
+            {                           
+                $refBanque=$row->id;          
+            }
+
+            $data14 = tvente_paiement::create([
+                'refEntetepaie'       =>  $idmax_paie,
+                'refEnteteVente'       => $idmax,
+                'montant_paie'    =>  $montants,
+                'devise'    =>  $devises,
+                'taux'    =>  $taux,
+                'date_paie'    =>  $request->dateVente,
+                'modepaie'       =>  $modepaie,
+                'libellepaie'       =>  $libellepaie, 
+                'refBanque'       =>  $refBanque,
+                'numeroBordereau'       =>  $numeroBordereau,
+                'author'       =>  $request->author,
+                'refUser'       =>  $request->refUser,
+                'active'       =>  $active
+            ]);
+
+            $data3 = DB::update(
+                'update tvente_entete_vente set paie = paie + (:paiement) where id = :refEnteteVente',
+                ['paiement' => $montants,'refEnteteVente' => $idmax]
+            );       
+
+       }
+
+        return response()->json([
+            'data'  =>  "Insertion avec succès!!!",
+        ]);
+       
+    }
+
+    function insert_dataGlobalGrosCash(Request $request)
+    {
+        $id_module = 4;
+        $active = "OUI";
+
+        $code = $this->GetCodeData('tvente_param_systeme','module_id',$id_module);
+        $data11 = tvente_entete_vente::create([
+            'code'       =>  $code,
+            'refClient'       =>  $request->refClient,
+            'refService'       =>  $request->refService,  
+            'refReservation'       =>  0,          
+            'module_id'       =>  $id_module,
+            'dateVente'    =>  $request->dateVente,
+            'libelle'    =>  $request->libelle,
+            'serveur_id'    =>  $request->serveur_id,
+            'table_id'    =>  $request->table_id,
+            'etat_facture'    =>  $request->etat_facture,
+            'author'       =>  $request->author,
+            'refUser'       =>  $request->refUser
+        ]);
+
+        $idmax=0;
+        $maxid = DB::table('tvente_entete_vente')       
+        ->selectRaw('MAX(tvente_entete_vente.id) as code_entete')
+        ->where([
+            ['tvente_entete_vente.refUser','=', $request->refUser],
+            ['tvente_entete_vente.refClient','=', $request->refClient]
+         ])
+        ->get();
+        foreach ($maxid as $list) {
+            $idmax= $list->code_entete;
+        }
+
+        $detailData = $request->detailData;
+
+        foreach ($detailData as $data) {
+
+            $cmup_data = floatval($this->calculerCoutMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
+
+            $active = "OUI";
+
+            $taux=0;
+            $data5 =  DB::table("tvente_taux")
+            ->select("tvente_taux.id", "tvente_taux.taux", 
+            "tvente_taux.created_at", "tvente_taux.author")
+             ->get(); 
+             $output='';
+             foreach ($data5 as $row) 
+             {                                
+                $taux=$row->taux;                           
+             }
+    
+            $montants=0;
+            $devises='';
+            if($request->devise != 'USD')
+            {
+                $montants = ($data['puVente'])/$taux;
+                $devises='USD';
+            }
+            else
+            {
+                $montants = $data['puVente'];
+                $devises = $request->devise;
+            }
+
+            $refProduit=0;
+            $data99=DB::table('tvente_stock_service') 
+            ->select('id','refService','refProduit','pu','qte','uniteBase','cmup',
+            'devise','taux','active','refUser','author')
+            ->where([
+               ['tvente_stock_service.id','=', $data['idStockService']]
+            ])      
+            ->get();
+            foreach ($data99 as $row) 
+            {
+                $refProduit =  $row->refProduit; 
+            }
+
+
+
+         $qte=$data['qteVente'];
+         $idDetail=$refProduit;
+         $idFacture=$idmax;
+ 
+         $compte_achat = 0;
+         $compte_vente =0;
+         $compte_variationstock=0;
+         $compte_perte=0;
+         $compte_produit=0;
+         $compte_destockage=0;
+         $compte_stockage=0;
+         $cmupVente = $cmup_data;
+ 
+         $data3=DB::table('tvente_produit')
+          ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
+          ->select('compte_achat','compte_vente','compte_variationstock','tvente_categorie_produit.code',
+          'compte_perte','compte_produit','compte_destockage','compte_stockage','cmup')
+          ->where([
+             ['tvente_produit.id','=', $refProduit]
+         ])      
+         ->get();
+         foreach ($data3 as $row) 
+         {
+             $compte_achat =  $row->compte_achat;
+             $compte_vente = $row->compte_vente;
+             $compte_variationstock= $row->compte_variationstock;
+             $compte_perte= $row->compte_perte;
+             $compte_produit= $row->compte_produit;
+             $compte_destockage= $row->compte_destockage;
+             $compte_stockage= $row->compte_stockage;      
+         }
+ 
+
+ 
+         $uniteVente = '';
+         $uniteBase = '';
+         $puBase=0;
+         $qteBase=0;
+         $estunite='';
+
+        $data_unite=DB::table('tvente_detail_unite')
+        ->join('tvente_unite','tvente_unite.id','=','tvente_detail_unite.refUnite')
+        ->join('tvente_produit','tvente_produit.id','=','tvente_detail_unite.refProduit') 
+        ->select('tvente_detail_unite.id','refProduit','refUnite','puUnite','qteUnite','puBase','qteBase','estunite',
+        'tvente_detail_unite.active','tvente_detail_unite.author','tvente_detail_unite.refUser',
+        'nom_unite','uniteBase')
+        ->where([
+           ['tvente_detail_unite.id','=', $data['refDetailUnite']]
+        ])      
+        ->first();       
+           
+        if ($data_unite) 
+        {
+            $uniteVente = $data_unite->nom_unite;
+            $uniteBase = $data_unite->uniteBase;           
+            $qteBase=$data_unite->qteBase;
+            $puBase=$data_unite->puBase;      
+            $estunite=$data_unite->estunite;
+        }
+        
+        $cmupVente = $cmup_data; 
+ 
+        $qteVente = $qteBase * floatval($data['qteVente']);
+        if($estunite = "OUI")
+        {
+           $puBase=  floatval($montants);
+        }
+        else
+        {
+           $puBase=  floatval($montants) / floatval($qteBase);
+        }
+        
+       $montanttva=0;
+       $pourtageTVA=0;
+ 
+       $data5=DB::table('tvente_tva')     
+       ->select('montant_tva')
+       ->where([
+         ['tvente_tva.id','=', $data['id_tva']],
+         ['tvente_tva.active','=', 'OUI']
+       ])      
+       ->get();
+        foreach ($data5 as $row) 
+        {
+            $pourtageTVA = $row->montant_tva;
+        }         
+        $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
     
             $data12 = tvente_detail_vente::create([
                 'refEnteteVente'       =>  $idmax,

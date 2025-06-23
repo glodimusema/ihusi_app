@@ -7,7 +7,7 @@
   <meta charset="utf-8" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>IHUSI-GROUP</title>
-  {{-- <title>HOTEL</title> --}}
+  {{-- <title>Ets.MEILLEUR</title> --}}
   <meta name="description" content="" />
 
   <meta name="csrf-token" content="{{csrf_token() }} ">

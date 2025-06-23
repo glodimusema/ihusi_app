@@ -975,7 +975,8 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("delete_vente_detail_requisition/{id}", 'tvente_detail_requisitionController@delete_data');
     Route::get("fetch_detail_requisition_vente/{id}", 'tvente_detail_requisitionController@fetch_detail_requisition_vente');
 
-    //ventesParMois
+    //insert_dataGlobalGros
+//insert_dataGlobalGrosCash
 
     Route::get("fetch_vente_detail_vente", 'tvente_detail_venteController@all');
     Route::get("fetch_vente_detail_parmois", 'tvente_detail_venteController@ventesParMois');
@@ -983,6 +984,8 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_single_vente_detail_vente/{id}", 'tvente_detail_venteController@fetch_single_data');    
     Route::post("insert_vente_detail_vente", 'tvente_detail_venteController@insert_data');
     Route::post("insert_vente_globale_vente", 'tvente_detail_venteController@insert_dataGlobal');
+    Route::post("insert_vente_globale_gros_vente", 'tvente_detail_venteController@insert_dataGlobalGros');
+    Route::post("insert_vente_globale_gros_vente_cash", 'tvente_detail_venteController@insert_dataGlobalGrosCash');
     Route::post("insert_vente_cash_vente/{id}", 'tvente_detail_venteController@insert_paiement_cash');
     Route::post("insert_vente_globale_vente_cash", 'tvente_detail_venteController@insert_dataGlobalCash');
     Route::get('/fetch_detail_facture/{id}', 'tvente_detail_venteController@fetch_detail_facture');

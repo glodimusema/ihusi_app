@@ -879,7 +879,11 @@ export default {
                   text: "Création Vente",
                   href: "/admin/CreateVentes",
                 },
-                { //VenteEnteteDette
+                {
+                  text: "Création Vente(Gros)",
+                  href: "/admin/CreateVenteGros",
+                },
+                { //
                   text: "Liste des Ventes",
                   href: "/admin/VenteEnteteVente",
                 },
