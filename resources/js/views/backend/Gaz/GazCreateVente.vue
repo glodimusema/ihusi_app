@@ -116,6 +116,7 @@
                 <thead>
                     <tr>
                         <th>N°</th>
+                        <th>Nbr</th>
                         <th>Kit</th>
                         <th>Produit</th>
                         <th>Unité</th>
@@ -148,6 +149,9 @@
                     <tr v-for="(item, index) in svData.detailData" :key="index">
                         <td class="short-cell">
                             <v-text-field v-model="item.idParamLot" label="Id" readonly></v-text-field>
+                        </td>
+                        <td class="long-cell">
+                            <v-text-field v-model="item.qte_kit" label="Kit" readonly></v-text-field>
                         </td>
                         <td class="long-cell">
                             <v-text-field v-model="item.code_lot" label="Kit" readonly></v-text-field>
@@ -417,6 +421,7 @@ export default {
                     idStockService : 0,
                     code_lot : '',
                     nom_unite : '',
+                    qte_kit : 0,
 
                     idParamLot : 0,
                     produit_param : "",
@@ -477,6 +482,7 @@ export default {
                 nom_unite : '',
                 idParamLot : 0,
                 produit_param : "",
+                qte_kit : 0,
 
                 uniteList: [],
                 tvaList: [],
@@ -590,6 +596,7 @@ export default {
                     nom_unite : '',
                     idParamLot : 0,
                     produit_param : "",
+                    qte_kit : 0,
             }];
             this.$refs.form.reset(); // Reset the form validation state            
             this.fetchListTVA();
@@ -988,18 +995,19 @@ export default {
 
                 const newRow = {
                 ...item,
-                qteVente: item.qte_param * qte_kit,
-                puVente: item.pu_param,
-                devise: item.devise,
-                montantreduction: 0,
-                idStockService,
-                            code_lot: item.code_lot,
-                pt: (item.qte_param * qte_kit) * item.pu_param,
-                tva: 0,
-                montant_tva: 0,
-                nom_unite: item.uniteBase,
-                idParamLot: item.id,
-                produit_param: item.designation
+                    qteVente: item.qte_param * qte_kit,
+                    puVente: item.pu_param,
+                    devise: item.devise,
+                    montantreduction: 0,
+                    idStockService,
+                    code_lot: item.code_lot,
+                    pt: (item.qte_param * qte_kit) * item.pu_param,
+                    tva: 0,
+                    montant_tva: 0,
+                    nom_unite: item.uniteBase,
+                    idParamLot: item.id,
+                    produit_param: item.designation,
+                    qte_kit : qte_kit
                 };
 
                 if (index !== -1) {this.svData.detailData.splice(index, 1, newRow); // mettre à jour

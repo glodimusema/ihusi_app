@@ -58,7 +58,7 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.puVente','tgaz_detail_vente.qteVente','tgaz_detail_vente.uniteVente',
         'tgaz_detail_vente.cmupVente','tgaz_detail_vente.devise','tgaz_detail_vente.taux',
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
-        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
+        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser','qte_kit',
         //Stock service
         'tgaz_stock_service_lot.refService as refService_StockServ',
         'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
@@ -126,7 +126,7 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.puVente','tgaz_detail_vente.qteVente','tgaz_detail_vente.uniteVente',
         'tgaz_detail_vente.cmupVente','tgaz_detail_vente.devise','tgaz_detail_vente.taux',
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
-        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
+        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser','qte_kit',
         //Stock service
         'tgaz_stock_service_lot.refService as refService_StockServ',
         'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
@@ -191,7 +191,7 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.puVente','tgaz_detail_vente.qteVente','tgaz_detail_vente.uniteVente',
         'tgaz_detail_vente.cmupVente','tgaz_detail_vente.devise','tgaz_detail_vente.taux',
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
-        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
+        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser','qte_kit',
         //Stock service
         'tgaz_stock_service_lot.refService as refService_StockServ',
         'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
@@ -251,7 +251,7 @@ class tgaz_detail_venteController extends Controller
         'tgaz_detail_vente.puVente','tgaz_detail_vente.qteVente','tgaz_detail_vente.uniteVente',
         'tgaz_detail_vente.cmupVente','tgaz_detail_vente.devise','tgaz_detail_vente.taux',
         'tgaz_detail_vente.montanttva','tgaz_detail_vente.montantreduction','tgaz_detail_vente.priseencharge',
-        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser',
+        'tgaz_detail_vente.active','tgaz_detail_vente.author','tgaz_detail_vente.refUser','qte_kit',
         //Stock service
         'tgaz_stock_service_lot.refService as refService_StockServ',
         'tgaz_stock_service_lot.refLot','pu_lot','qte_lot','cmup_lot',
@@ -832,10 +832,11 @@ class tgaz_detail_venteController extends Controller
                 'qteVente'    =>  $data['qteVente'],            
                 'montantreduction'    =>  $data['montantreduction'],  
                 'idStockService'    =>  $data['idStockService'],
-                'idParamLot'    =>  $data['idParamLot'],                     
+                'idParamLot'    =>  $data['idParamLot'], 
+                'qte_kit'    =>  $data['qte_kit'],                     
                 'author'       =>  $request->author,
                 'refUser'    =>  $request->refUser,
-            
+                
                 'active'    =>  $active,
                 'uniteVente'    =>  $uniteVente,
                 'compte_vente'    =>  $compte_vente,
@@ -863,7 +864,7 @@ class tgaz_detail_venteController extends Controller
         $total_pu = 0;
 
         $data_qte_lot = DB::table('tgaz_detail_vente')       
-        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        ->selectRaw('MAX(tgaz_detail_vente.qte_kit) as qte_kit,
         SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
         SUM(tgaz_detail_vente.puVente) as total_pu,
         SUM(tgaz_detail_vente.montanttva) as total_tva,

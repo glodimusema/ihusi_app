@@ -23,6 +23,7 @@ class CreateTgazDetailVenteTable extends Migration
             $table->foreignId('compte_destockage')->constrained('tfin_ssouscompte')->restrictOnUpdate()->restrictOnDelete();
             $table->foreignId('idStockService')->constrained('tgaz_stock_service_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
             $table->foreignId('idParamLot')->constrained('tgaz_parametre_lot')->restrictOnUpdate()->restrictOnDelete()->default(0);
+            $table->double('qte_kit')->default(0);
             $table->double('puVente');
             $table->double('qteVente');
             $table->string('uniteVente');
