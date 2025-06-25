@@ -27567,17 +27567,18 @@ function pdf_detail_vente_service_excel(Request $request)
 //========================================================================================================
 
 
-public function fetch_rapport_entete_facture_client_date_etat_facture(Request $request)
+public function fetch_rapport_entete_facture_client_date_etat_facture_agent(Request $request)
 {
     //refDepartement
 
-    if ($request->get('date1') && $request->get('date2')&& $request->get('refFournisseur')) {
+    if ($request->get('date1') && $request->get('date2') && $request->get('etat_facture') && $request->get('serveur_id')) {
         // code...
         $date1 = $request->get('date1');
         $date2 = $request->get('date2');
-        $refFournisseur = $request->get('refFournisseur');
+        $etat_facture = $request->get('etat_facture');
+        $serveur_id = $request->get('serveur_id');
         
-        $html = $this->printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFournisseur);
+        $html = $this->printRapportEnteteFactureClient_EtatFactureAgent($date1, $date2,$etat_facture);
         $pdf = \App::make('dompdf.wrapper');
         // echo($html);
         // $pdf->loadHTML($html);
@@ -27589,7 +27590,7 @@ public function fetch_rapport_entete_facture_client_date_etat_facture(Request $r
     }  
     
 }
-function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFournisseur)
+function printRapportEnteteFactureClient_EtatFactureAgent($date1, $date2,$etat_facture)
 {
 
          //Info Entreprise
@@ -27653,14 +27654,14 @@ function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFourniss
          $totalReste=0;
                  
          //
-         $data2 = DB::table('tvente_entete_requisition') 
+         $data2 = DB::table('tvente_entete_vente') 
          ->selectRaw('ROUND(SUM( IFNULL(montant,0)),2) as TotalFacture')
          ->selectRaw('ROUND(SUM( IFNULL(paie,0)),2) as TotalPaie')
-         ->selectRaw('ROUND(SUM(IFNULL((IFNULL(montant,0) - IFNULL(paie,0)),0)),2) as TotalReste')
+         ->selectRaw('ROUND(SUM(IFNULL((IFNULL(montant,0) - IFNULL(reduction,0) - IFNULL(paie,0)),0)),2) as TotalReste')
          ->where([
-            ['dateCmd','>=', $date1],
-            ['dateCmd','<=', $date2],
-            ['refFournisseur','=', $refFournisseur]
+            ['dateVente','>=', $date1],
+            ['dateVente','<=', $date2],
+            ['tvente_entete_vente.etat_facture','=', $etat_facture]
         ])    
          ->first(); 
          $output='';
@@ -27671,21 +27672,21 @@ function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFourniss
             $totalReste=$data2->TotalReste;                           
          }
 
-         $nom_departement='';
-         $code_departement='';
+         $nom_departement= $etat_facture;
+         $code_departement= '-';
 
-         $data3= DB::table('tvente_fournisseur') 
-         ->select('id','refCategorieFss','noms','contact','mail','adresse','author')
-         ->where([
-            ['tvente_fournisseur.id','=', $refFournisseur]
-        ])      
-        ->first();      
-        $output='';
-        if ($data3) 
-        {
-            $nom_departement=$data3->noms; 
-            $code_departement='';              
-        }
+        //  $data3= DB::table('tvente_fournisseur') 
+        //  ->select('id','refCategorieFss','noms','contact','mail','adresse','author')
+        //  ->where([
+        //     ['tvente_fournisseur.id','=', $refFournisseur]
+        // ])      
+        // ->first();      
+        // $output='';
+        // if ($data3) 
+        // {
+        //     $nom_departement=$data3->noms; 
+        //     $code_departement='';              
+        // }
 
 
 
@@ -27879,7 +27880,7 @@ function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFourniss
                 <td style="width:0px;height:24px;"></td>
                 <td></td>
                 <td class="cs9FE9304F" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;FACTURE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:230px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>FOURNISSEUR</nobr></td>
+                <td class="cs9FE9304F" colspan="3" style="width:230px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CLIENT</nobr></td>
                 <td class="cs9FE9304F" colspan="2" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE&nbsp;FACTURE</nobr></td>
                 <td class="cs9FE9304F" style="width:128px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL&nbsp;FACTURE($)</nobr></td>
                 <td class="cs9FE9304F" style="width:113px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL&nbsp;PAIE($)</nobr></td>
@@ -27888,7 +27889,7 @@ function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFourniss
             </tr>
             ';
 
-            $output .= $this->showDetailFacturationClient_EtatFacture($date1,$date2,$refFournisseur); 
+            $output .= $this->showDetailFacturationClient_EtatFacture($date1,$date2,$etat_facture); 
 
             $output.='
             <tr style="vertical-align:top;">
@@ -27937,38 +27938,44 @@ function printRapportEnteteFactureClient_EtatFacture($date1, $date2,$refFourniss
         return $output; 
 
 }
-function showDetailFacturationClient_EtatFacture($date1,$date2,$refFournisseur)
+function showDetailFacturationClient_EtatFactureAgent($date1,$date2,$etat_facture)
 {
-        $data = DB::table('tvente_entete_requisition')
-        ->join('tvente_module','tvente_module.id','=','tvente_entete_requisition.module_id')
-        ->join('tvente_services','tvente_services.id','=','tvente_entete_requisition.refService')
-        ->join('tvente_fournisseur','tvente_fournisseur.id','=','tvente_entete_requisition.refFournisseur')
-        ->join('tvente_categorie_fournisseur','tvente_categorie_fournisseur.id','=','tvente_fournisseur.refCategorieFss')
-        ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_fournisseur.compte_fss_bl')
+        $data = DB::table('tvente_entete_vente')
+        ->join('tvente_module','tvente_module.id','=','tvente_entete_vente.module_id')
+        ->join('tvente_services','tvente_services.id','=','tvente_entete_vente.refService')
+        ->join('tvente_client','tvente_client.id','=','tvente_entete_vente.refClient')
+        ->join('tvente_categorie_client','tvente_categorie_client.id','=','tvente_client.refCategieClient')  
+        ->join('tfin_ssouscompte','tfin_ssouscompte.id','=','tvente_categorie_client.compte_client')
         ->join('tfin_souscompte','tfin_souscompte.id','=','tfin_ssouscompte.refSousCompte')
         ->join('tfin_compte','tfin_compte.id','=','tfin_souscompte.refCompte')
         ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
         ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
         ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
-        ->select('tvente_entete_requisition.id','tvente_entete_requisition.code','refFournisseur','module_id',
-        'refService','dateCmd','libelle','cloture',
-        'niveau1','niveaumax','tvente_entete_requisition.active','montant','paie','tvente_entete_requisition.author','tvente_entete_requisition.refUser',
-        'tvente_entete_requisition.created_at',"tvente_fournisseur.noms","tvente_fournisseur.contact",
-        "tvente_fournisseur.mail","tvente_fournisseur.adresse",'refCategorieFss', "tvente_categorie_fournisseur.nom_categoriefss",
-        "compte_fss_bl",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte','numero_souscompte','refCompte','nom_compte',
-        'numero_compte','refClasse','refTypecompte','refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte"
-        ,"tvente_module.nom_module","tvente_services.nom_service")
-        ->selectRaw('CONCAT("F",YEAR(dateCmd),"",MONTH(dateCmd),"00",tvente_entete_requisition.id) as codeFacture')
+        ->select('tvente_entete_vente.id','tvente_entete_vente.code','refClient','refService','refReservation','module_id',
+        'dateVente','libelle','tvente_entete_vente.montant','tvente_entete_vente.paie','tvente_entete_vente.author',
+        'tvente_entete_vente.refUser','serveur_id','table_id','etat_facture',
+        'tvente_entete_vente.created_at','reduction','totaltva'
+        
+        ,'nom_service', "tvente_module.nom_module",'date_paie_current','nombre_print'
+
+        ,'noms','sexe','contact','mail','adresse','pieceidentite','numeroPiece','dateLivrePiece',
+        'lieulivraisonCarte','nationnalite','datenaissance','lieunaissance','profession','occupation',
+        'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug','tvente_client.author',
+        'tvente_entete_vente.updated_at', "tvente_categorie_client.designation",
+        "compte_client",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte',
+        'numero_souscompte','refCompte','nom_compte','numero_compte','refClasse','refTypecompte','refPosition',
+        'nom_classe','numero_classe','nom_typeposition',"nom_typecompte")
+        ->selectRaw('CONCAT("F",YEAR(dateVente),"",MONTH(dateVente),"00",tvente_entete_vente.id) as codeFacture')
         ->selectRaw(' IFNULL(montant,0) as totalFacture')
         ->selectRaw(' IFNULL(paie,0) as totalPaie')
         ->selectRaw('(IFNULL((IFNULL(montant,0) - IFNULL(paie,0)),0)) as RestePaie') 
-        ->selectRaw('TIMESTAMPDIFF(DAY, dateCmd, CURDATE()) as nombreJr')
+        ->selectRaw('TIMESTAMPDIFF(DAY, dateVente, CURDATE()) as nombreJr')
         ->where([
-            ['dateCmd','>=', $date1],
-            ['dateCmd','<=', $date2],
-            ['refFournisseur','=', $refFournisseur]
+            ['dateVente','>=', $date1],
+            ['dateVente','<=', $date2],
+            ['tvente_entete_vente.etat_facture','=', $etat_facture]
         ])
-        ->orderBy("tvente_entete_requisition.created_at", "asc")
+        ->orderBy("tvente_entete_vente.created_at", "asc")
         ->get();
         $output='';
 
@@ -27976,16 +27983,16 @@ function showDetailFacturationClient_EtatFacture($date1,$date2,$refFournisseur)
         {
             $output .='
             <tr style="vertical-align:top;">
-            <td style="width:0px;height:24px;"></td>
-            <td></td>
-            <td class="cs6E02D7D2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
-            <td class="cs6E02D7D2" colspan="3" style="width:230px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->noms.'</td>
-            <td class="cs6E02D7D2" colspan="2" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateCmd.'</td>
-            <td class="cs6E02D7D2" style="width:128px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->totalFacture.'$</td>
-            <td class="cs6E02D7D2" style="width:113px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->totalPaie.'$</td>
-            <td class="cs6E02D7D2" colspan="3" style="width:112px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->RestePaie.'$</td>
-            <td class="cs6C28398D" style="width:102px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$row->nombreJr.'J</nobr></td>
-        </tr>
+                <td style="width:0px;height:24px;"></td>
+                <td></td>
+                <td class="cs6E02D7D2" style="width:101px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeFacture.'</nobr></td>
+                <td class="cs6E02D7D2" colspan="3" style="width:230px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->noms.'</td>
+                <td class="cs6E02D7D2" colspan="2" style="width:107px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateVente.'</td>
+                <td class="cs6E02D7D2" style="width:128px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->totalFacture.'$</td>
+                <td class="cs6E02D7D2" style="width:113px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->totalPaie.'$</td>
+                <td class="cs6E02D7D2" colspan="3" style="width:112px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->RestePaie.'$</td>
+                <td class="cs6C28398D" style="width:102px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$row->nombreJr.'J</nobr></td>
+            </tr>
             '; 
            
    
