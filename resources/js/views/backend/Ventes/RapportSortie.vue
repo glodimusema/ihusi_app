@@ -43,12 +43,36 @@
                                 prepend-icon="mdi-calendar"
                                 readonly
                             ></v-text-field>
+
+                             <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showListeClient" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS LISTE DES CLIENTS
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
                           
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showDetailDetailSortieByDate" block color="  blue" dark>
                                             <v-icon>print</v-icon> RAPPORTS DES VENTES
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                             <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showEnteteVenteDetteByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS DES DETTES CLIENT
                                         </v-btn>
                                     </span>
                                 </template>
@@ -485,6 +509,51 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
+                             <br>
+                              <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showEnteteVenteByDate_EtatFacture" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS DES FACTURES/ETAT FACT
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                            <v-flex xs12 sm12 md12 lg12>
+                                <div class="mr-1">
+                                    <v-autocomplete label="Selectionnez l'Agent" prepend-inner-icon="map"
+                                        :rules="[(v) => !!v || 'Ce champ est requis']" :items="serveurList"
+                                        item-text="noms_agent" item-value="id" dense outlined v-model="svData.serveur_id" clearable
+                                        chips>
+                                    </v-autocomplete>
+                                </div>
+                            </v-flex>
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showEnteteVenteByDate_Serveur_EtatFacture" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS FACTURE/AGENT/ETAT FACT
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                             <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showEnteteVenteDetteByDate_Serveur" block color="  blue" dark>
+                                            <v-icon>print</v-icon> RAPPORTS DES DETTES/AGENT
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+
                             <br>
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
@@ -602,7 +671,8 @@ export default {
                 idService:0,
                 etat_facture : '',
                 type_sortie : '',
-                statut : ''               
+                statut : '',
+                serveur_id : 0              
             },
             stataData: {                
             },
@@ -613,6 +683,7 @@ export default {
             categorieProList: [],
             serviceList: [],
             produitList: [],
+            serveurList: [],
             organisationList: [],
             filterValue:'',
             dates:[],
@@ -638,6 +709,15 @@ export default {
         ({ data }) => {
           var donnees = data.data;
           this.fournisseurList = donnees;
+
+        }
+      );
+    },
+    fetchListServeur() {
+      this.editOrFetch(`${this.apiBaseURL}/fetch_list_agent`).then(
+        ({ data }) => {
+          var donnees = data.data;
+          this.serveurList = donnees;
 
         }
       );
@@ -754,6 +834,70 @@ export default {
             }
 
        },
+       showEnteteVenteByDate_EtatFacture() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+                //fetch_rapport_detailvente_date_etat_facture_service
+                if(this.svData.etat_facture!="")
+                {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_entete_facture_client_date_etat_facture?date1=` + date1+"&date2="+date2+"&etat_facture="+this.svData.etat_facture);
+                }else
+                {
+                    this.showError("Veillez selectionner l'etat de la facture svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showEnteteVenteByDate_Serveur_EtatFacture() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+                //fetch_rapport_detailvente_date_etat_facture_service
+                if(this.svData.etat_facture !="" && this.svData.serveur_id !="" )
+                {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_entete_facture_client_date_etat_facture_agent?date1=` + date1+"&date2="+date2+"&etat_facture="+this.svData.etat_facture+"&serveur_id="+this.svData.serveur_id);
+                }else
+                {
+                    this.showError("Veillez selectionner l'etat de la facture svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showEnteteVenteDetteByDate() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+              window.open(`${this.apiBaseURL}/fetch_rapport_entete_facture_dette_client_date?date1=` + date1+"&date2="+date2);               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showEnteteVenteDetteByDate_Serveur() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+                //fetch_rapport_detailvente_date_etat_facture_service
+                if(this.svData.serveur_id !="" )
+                {
+                    window.open(`${this.apiBaseURL}/fetch_rapport_entete_facture_dette_client_date_agent?date1=` + date1+"&date2="+date2+"&serveur_id="+this.svData.serveur_id);
+                }else
+                {
+                    this.showError("Veillez selectionner l'etat de la facture svp");
+                }               
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showListeClient() {
+            window.open(`${this.apiBaseURL}/fetch_rapport_liste_client`); 
+        },
         showFicheStockUniteByDate() {
 
             var date1 =  this.dates[0] ;
@@ -1756,6 +1900,7 @@ export default {
         this.fetchListCategorieProduit();
         this.fetchListServiceVente();
         this.fetchListFournisseur();
+        this.fetchListServeur();
         this.GetProduit();
         this.showDate=true;
     },

@@ -1065,8 +1065,11 @@ Route::group(['namespace'   =>  "Ventes"], function(){
     Route::get("fetch_rapport_detailusage_date_service_bycategorie", 'PdfVenteController@fetch_rapport_detailusage_date_service_bycategorie'); 
  
 
-    //pdf_detail_vente_service_excel
-    //fetch_rapport_detailvente_date_service_byproduit
+    Route::get("fetch_rapport_liste_client", 'PdfVenteController@fetch_rapport_liste_client'); 
+    Route::get("fetch_rapport_entete_facture_dette_client_date_agent", 'PdfVenteController@fetch_rapport_entete_facture_dette_client_date_agent'); 
+    Route::get("fetch_rapport_entete_facture_dette_client_date", 'PdfVenteController@fetch_rapport_entete_facture_dette_client_date'); 
+    Route::get("fetch_rapport_entete_facture_client_date_etat_facture_agent", 'PdfVenteController@fetch_rapport_entete_facture_client_date_etat_facture_agent'); 
+    Route::get("fetch_rapport_entete_facture_client_date_etat_facture", 'PdfVenteController@fetch_rapport_entete_facture_client_date_etat_facture'); 
 
     Route::get("fetch_rapport_paiementfacture_commande_date", 'PdfVenteController@fetch_rapport_paiementfacture_commande_date'); 
     Route::get("fetch_rapport_paiementfacture_commande_date_banque", 'PdfVenteController@fetch_rapport_paiementfacture_commande_date_banque'); 
