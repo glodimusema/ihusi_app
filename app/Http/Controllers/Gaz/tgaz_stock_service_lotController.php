@@ -169,8 +169,7 @@ class tgaz_stock_service_lotController extends Controller
         ->select('tgaz_stock_service_lot.id','tgaz_stock_service_lot.refService','tgaz_stock_service_lot.refLot',
         'tgaz_stock_service_lot.pu_lot','qte_lot','cmup_lot','tgaz_stock_service_lot.devise',
         'tgaz_stock_service_lot.taux','tgaz_stock_service_lot.active','tgaz_stock_service_lot.refUser',
-        'tgaz_stock_service_lot.author' ,"tvente_services.nom_service","stock_alerte"  
-        
+        'tgaz_stock_service_lot.author' ,"tvente_services.nom_service","stock_alerte"
          ,'nom_lot','code_lot','unite_lot','stock_alerte')
          ->selectRaw('ROUND((qte_lot * cmup_lot),2) as PTcmup_lot')
         ->where('tgaz_stock_service_lot.refService', $refService)

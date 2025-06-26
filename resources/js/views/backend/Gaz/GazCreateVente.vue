@@ -135,7 +135,7 @@
                             <v-autocomplete v-model="svData.idStockService" :items="kitList"
                                 label="Selectionnez le Kit" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="nom_lot" item-value="id"
-                               ></v-autocomplete>
+                            ></v-autocomplete>
                         </td>
                         <td class="short-cell">
                             <v-text-field v-model="svData.qte_kit" label="Quantité" 
@@ -497,14 +497,14 @@ export default {
         async get_produit_for_service(refService) {
           this.isLoading(true);
             await axios
-                .get(`${this.apiBaseURL}/fetch_gaz_service_stock_byservice/${refService}`)
+                .get(`${this.apiBaseURL}/fetch_gaz_stock_data_byservice/${refService}`)
                 .then((res) => {
                 var chart = res.data.data;
                 if (chart) {
-                    this.lotList = chart;
+                    //this.lotList = chart;
                     this.kitList = chart;
                 } else {
-                    this.lotList = [];
+                    //this.lotList = [];
                     this.kitList = [];
                 }
                 this.isLoading(false);
