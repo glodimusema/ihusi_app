@@ -83,7 +83,7 @@
                             </v-tooltip>
                             <br>
 
-                            <v-tooltip bottom color="black">
+                            <!-- <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="show_fetch_rapport_journal_caisse" block color="  blue" dark>
@@ -95,9 +95,9 @@
                             </v-tooltip>
                             <br>
 
-                            <br>
+                            <br> -->
 
-                            <v-flex xs12 sm12 md12 lg12>
+                            <!-- <v-flex xs12 sm12 md12 lg12>
                             <div class="mr-1">
                                 <v-autocomplete label="Selectionnez le Compte" prepend-inner-icon="home"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="this.stataData.CompteList"
@@ -114,9 +114,9 @@
                                 chips>
                                 </v-autocomplete>
                             </div>
-                            </v-flex>
+                            </v-flex> -->
 
-                            <br>
+                            <!-- <br>
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
@@ -138,7 +138,7 @@
                                     </span>
                                 </template>
                                 <span>Imprimer le rapport</span>
-                            </v-tooltip>
+                            </v-tooltip> -->
                             <br>
                             
                             </v-col>
@@ -323,9 +323,10 @@ export default {
         },
         show_fetch_livre_caisse() {
             var date1 =  this.dates[0] ;
-            if (date1 != '') {
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
 
-                window.open(`${this.apiBaseURL}/pdf_livre_caisse?dateOperation=` + date1);                         
+                window.open(`${this.apiBaseURL}/pdf_livre_caisse_par_banque_caisse?date1=` + date1+"&date2="+date2+"&refBanque="+this.svData.refTresorerie);                         
                
             } else {
                this.showError("Veillez sélectionner la date");
@@ -333,9 +334,9 @@ export default {
         },
         show_fetch_livre_banque() {
             var date1 =  this.dates[0] ;
-            if (date1 != '') {
-
-                window.open(`${this.apiBaseURL}/pdf_livre_banque?dateOperation=` + date1);                         
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+                window.open(`${this.apiBaseURL}/pdf_livre_caisse_par_banque_caisse?date1=` + date1+"&date2="+date2+"&refBanque="+this.svData.refTresorerie);                         
                
             } else {
                this.showError("Veillez sélectionner la date");
