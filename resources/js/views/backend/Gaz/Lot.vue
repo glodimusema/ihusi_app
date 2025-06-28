@@ -6,6 +6,8 @@
 
           <ParametreLot ref="ParametreLot" />
           <StockServiceGaz ref="StockServiceGaz" />
+          <GazAffectationKit ref="GazAffectationKit" />
+          <!--  -->
           <!-- modal --> 
           <v-dialog v-model="dialog" max-width="400px" scrollable transition="dialog-bottom-transition">
             <v-card :loading="loading">
@@ -145,6 +147,16 @@
                                 </v-list-item-title>
                               </v-list-item>
 
+                              <v-list-item v-if="item.nom_categorie_lot != 'Gaz'" link @click="showGazAffectationKit(item.id, item.nom_lot)">
+                                <v-list-item-icon>
+                                  <v-icon>mdi-file-cog</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title style="margin-left: -20px">Associer le Gaz
+                                </v-list-item-title>
+                              </v-list-item>
+
+                              <!-- showStockServiceGaz -->
+
                               <v-list-item link @click="showStockServiceGaz(item.id, item.nom_lot)">
                                 <v-list-item-icon>
                                   <v-icon>mdi-cart-outline</v-icon>
@@ -194,12 +206,14 @@
   import { mapGetters, mapActions } from "vuex";
   import ParametreLot from "./ParametreLot.vue";
   import StockServiceGaz from "./StockServiceGaz.vue";
+  import GazAffectationKit from "./GazAffectationKit.vue";
   
 
   export default {
     components: {
       ParametreLot,
-      StockServiceGaz
+      StockServiceGaz,
+      GazAffectationKit
     },
     data() {
       return {
@@ -315,7 +329,7 @@
         });
       },
       showParametreLot(refLot, name) {
-        //StockServiceGaz
+        //GazAffectationKit
         if (refLot != '') {  
           this.$refs.ParametreLot.$data.etatModal = true;
           this.$refs.ParametreLot.$data.refLot = refLot;
@@ -325,6 +339,22 @@
           this.onPageChange();  
           this.$refs.ParametreLot.$data.titleComponent =
             "Parametre pour " + name;
+  
+        } else {
+          this.showError("Personne n'a fait cette action");
+        }  
+      },
+      showGazAffectationKit(id_kit_lot, name) {
+        //
+        if (id_kit_lot != '') {  
+          this.$refs.GazAffectationKit.$data.etatModal = true;
+          this.$refs.GazAffectationKit.$data.id_kit_lot = id_kit_lot;
+          this.$refs.GazAffectationKit.$data.svData.id_kit_lot = id_kit_lot;
+          this.$refs.GazAffectationKit.fetchDataList();
+          this.$refs.GazAffectationKit.fetchListGaz();
+          this.onPageChange();  
+          this.$refs.GazAffectationKit.$data.titleComponent =
+            "Affectation Gaz pour " + name;
   
         } else {
           this.showError("Personne n'a fait cette action");
@@ -340,7 +370,7 @@
           this.$refs.StockServiceGaz.fetchListService();
           this.onPageChange();  
           this.$refs.StockServiceGaz.$data.titleComponent =
-            "Detail Stock pour " + name;
+            "Stock service pour " + name;
   
         } else {
           this.showError("Personne n'a fait cette action");

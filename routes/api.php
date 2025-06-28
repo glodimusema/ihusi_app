@@ -808,7 +808,15 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::post("update_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@update_data');
     Route::get("delete_gaz_parametre_lot/{id}", 'tgaz_parametre_lotController@delete_data');
 
-    //fetch_stock_data_gaz_byserviceAndCategorie
+    Route::get("fetch_gaz_affectation_kits", 'tgaz_affectation_kitController@all');
+    Route::get("fetch_gaz_affectation_kit/{refEntete}", 'tgaz_affectation_kitController@fetch_data_entete');
+    Route::get("fetch_single_gaz_affectation_kit/{id}", 'tgaz_affectation_kitController@fetch_single_data');
+    Route::get("fetch_data_gaz_affectation_byKit/{refLot}", 'tgaz_affectation_kitController@fetch_affectation_kit');       
+    Route::post("insert_gaz_affectation_kit", 'tgaz_affectation_kitController@insert_data');
+    Route::post("update_gaz_affectation_kit/{id}", 'tgaz_affectation_kitController@update_data');
+    Route::get("delete_gaz_affectation_kit/{id}", 'tgaz_affectation_kitController@delete_data');
+
+    //tgaz_affectation_kitController
     Route::get("fetch_gaz_service_stock", 'tgaz_stock_service_lotController@all');
     Route::get("fetch_stock_data_gaz_byserviceAndCategorie", 'tgaz_stock_service_lotController@fetch_stock_data_gaz_byserviceAndCategorie');
     Route::get("fetch_gaz_stock_fiche_byservice/{refService}", 'tgaz_stock_service_lotController@getStockFinal');
