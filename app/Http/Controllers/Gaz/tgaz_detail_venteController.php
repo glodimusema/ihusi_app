@@ -717,8 +717,8 @@ class tgaz_detail_venteController extends Controller
 
     function insert_dataGlobal(Request $request)
     {
-        $id_module = 13;
         $active = "OUI";
+        $id_module = 13;
 
         $code = $this->GetCodeData('tvente_param_systeme','module_id',$id_module);
         $data11 = tgaz_entete_vente::create([
@@ -815,7 +815,7 @@ class tgaz_detail_venteController extends Controller
        $data5=DB::table('tvente_tva')     
        ->select('montant_tva')
        ->where([
-         ['tvente_tva.id','=', $data['id_tva']],
+          ['tvente_tva.id','=', $request->id_tva],
           ['tvente_tva.active','=', 'OUI']
        ])      
       ->get();
@@ -943,8 +943,8 @@ class tgaz_detail_venteController extends Controller
 
     function insert_dataGlobalCash(Request $request)
     {
-        $id_module = 13;
         $active = "OUI";
+        $id_module = 13;
 
         $code = $this->GetCodeData('tvente_param_systeme','module_id',$id_module);
         $data11 = tgaz_entete_vente::create([
@@ -989,7 +989,6 @@ class tgaz_detail_venteController extends Controller
                 $taux=$row->taux;                           
              }
     
-            $cmup_data = floatval($this->calculerCoutGazMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
             $montants=0;
             $devises='';
             if($request->devise != 'USD')
@@ -1003,6 +1002,7 @@ class tgaz_detail_venteController extends Controller
                 $devises = $request->devise;
             }  
 
+         $cmup_data = floatval($this->calculerCoutGazMoyen($data['idStockService'], $request->dateVente, $request->dateVente));
          $refLot=0;
          $cmupVente= $cmup_data;
          $data99=DB::table('tgaz_stock_service_lot') 
@@ -1014,7 +1014,7 @@ class tgaz_detail_venteController extends Controller
          ->get();
          foreach ($data99 as $row) 
          {
-             $refLot =  $row->refLot;       
+             $refLot =  $row->refLot;     
          }
 
          $qte=$data['qteVente'];
@@ -1041,7 +1041,7 @@ class tgaz_detail_venteController extends Controller
        $data5=DB::table('tvente_tva')     
        ->select('montant_tva')
        ->where([
-         ['tvente_tva.id','=', $data['id_tva']],
+          ['tvente_tva.id','=', $request->id_tva],
           ['tvente_tva.active','=', 'OUI']
        ])      
       ->get();
@@ -1058,10 +1058,11 @@ class tgaz_detail_venteController extends Controller
                 'qteVente'    =>  $data['qteVente'],            
                 'montantreduction'    =>  $data['montantreduction'],  
                 'idStockService'    =>  $data['idStockService'],
-                'idParamLot'    =>  $data['idParamLot'],                     
+                'idParamLot'    =>  $data['idParamLot'], 
+                'qte_kit'    =>  $data['qte_kit'],                     
                 'author'       =>  $request->author,
                 'refUser'    =>  $request->refUser,
-            
+                
                 'active'    =>  $active,
                 'uniteVente'    =>  $uniteVente,
                 'compte_vente'    =>  $compte_vente,
@@ -1077,6 +1078,7 @@ class tgaz_detail_venteController extends Controller
             ]);
 
 
+
         }
 
         $qteParLot = 0;
@@ -1088,7 +1090,7 @@ class tgaz_detail_venteController extends Controller
         $total_pu = 0;
 
         $data_qte_lot = DB::table('tgaz_detail_vente')       
-        ->selectRaw('SUM(tgaz_detail_vente.qteVente) as qte_kit,
+        ->selectRaw('MAX(tgaz_detail_vente.qte_kit) as qte_kit,
         SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
         SUM(tgaz_detail_vente.puVente) as total_pu,
         SUM(tgaz_detail_vente.montanttva) as total_tva,
@@ -1116,7 +1118,6 @@ class tgaz_detail_venteController extends Controller
                 'update tgaz_entete_vente set montant = montant + (:montant),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
                 ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idmax]
             );
-
 
             $id_detail_max=0;
             $detail_list = DB::table('tgaz_detail_vente')       
@@ -1158,13 +1159,12 @@ class tgaz_detail_venteController extends Controller
                 'cmupMvt'    =>  $total_pu
             ]); 
 
-        }      
+        }    
 
 
         //PAIEMENT DE LA FACTURE ===================================================================
 
-
-        
+      
         $montants=0;
         $Gaz = DB::table('tgaz_entete_vente')
         ->selectRaw('(tgaz_entete_vente.montant - tgaz_entete_vente.reduction + tgaz_entete_vente.totaltva) as montant')

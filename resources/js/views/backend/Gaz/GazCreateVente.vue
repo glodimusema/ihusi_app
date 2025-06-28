@@ -108,6 +108,14 @@
                         </v-select>
                     </div>
                 </v-flex>
+                <v-flex xs12 sm12 md6 lg6>
+                    <div class="mr-1">
+                        <v-autocomplete label="Selectionnez la TVA" prepend-inner-icon="mdi-map"
+                            :rules="[(v) => !!v || 'Ce champ est requis']" :items="tvaList" item-text="libelle_tva"
+                            item-value="id" dense outlined v-model="svData.id_tva" chips clearable>
+                        </v-autocomplete>
+                    </div>
+                </v-flex>
                 
 
             </v-layout>
@@ -123,7 +131,7 @@
                         <th>Qté</th>
                         <th>Pu</th>
                         <th>Reduction</th>
-                        <th>TVA</th>
+                        <!-- <th>TVA</th> -->
                         <th>PT</th>
                         <th>TVA(%)</th>
                         <th>Actions</th>
@@ -135,15 +143,18 @@
                             <v-autocomplete v-model="svData.idStockService" :items="kitList"
                                 label="Selectionnez le Kit" :rules="[(v) => !!v || 'Ce champ est requis']"
                                 hide-no-data hide-selected item-text="nom_lot" item-value="id"
+                                @change="getQuantite(svData.idStockService)"
                             ></v-autocomplete>
-                        </td>
-                        <td class="short-cell">
-                            <v-text-field v-model="svData.qte_kit" label="Quantité" 
-                             @change="getPrice(svData.idStockService, svData.qte_kit)"></v-text-field>
                         </td>
                         <td class="short-cell">
                             <v-text-field v-model="svData.qteDisponible" label="Qté Dispo" readonly></v-text-field>
                         </td>
+                        <!-- getQuantite -->
+                        <td class="short-cell">
+                            <v-text-field v-model="svData.qte_kit" label="Quantité" 
+                             @change="getPrice(svData.idStockService, svData.qte_kit)"></v-text-field>
+                        </td>
+                        
                         
                     </tr>
                     <tr v-for="(item, index) in svData.detailData" :key="index">
@@ -164,21 +175,15 @@
                         </td>                       
                         <td class="short-cell">
                             <v-text-field v-model="item.qteVente" type="number" label="Qté" :rules="[rules.required]"
-                                required></v-text-field>
+                                required @change="updateTVA(index)"></v-text-field>
                         </td>
                         <td class="short-cell">
-                            <v-text-field v-model="item.puVente" type="number" label="PU" :rules="[rules.required]"
+                            <v-text-field v-model="item.puVente" type="number" label="PU" :rules="[rules.required]" @change="updateTVA(index)"
                                 required ></v-text-field>
                         </td>                      
                         <td class="short-cell">
-                            <v-text-field v-model="item.montantreduction" type="number" label="Reduction"
+                            <v-text-field v-model="item.montantreduction" type="number" label="Reduction" @change="updateTVA(index)"
                                 ></v-text-field>
-                        </td>
-                        <td class="medium-cell">
-                            <v-autocomplete v-model="item.id_tva" :items="item.tvaList"
-                                label="Selectionnez la TVA" :rules="[(v) => !!v || 'Ce champ est requis']"
-                                hide-no-data hide-selected item-text="libelle_tva" item-value="id" @change="updateTVA(index)"
-                                ></v-autocomplete>                            
                         </td>
                         <td>{{ item.pt }}</td>
                         <td>{{ item.tva }}</td>
@@ -410,6 +415,7 @@ export default {
                 qteDisponible : 0,
                 id_kit : 0,
                 qte_kit : 0,
+                id_tva : 0,
 
                 detailData: [{                    
                     qteVente: 0,
@@ -428,7 +434,7 @@ export default {
                     
                     
                     uniteList: [],
-                    tvaList: [],
+                    
                 }],                
             },
             fetchData: [],
@@ -440,7 +446,7 @@ export default {
             CmdList: [],  
             deviseList: [],
             serveurList: [],
-        
+            tvaList: [],
 
             query: "",
 
@@ -478,7 +484,6 @@ export default {
                 pt:0,
                 tva:0,
                 montant_tva:0,
-                id_tva:0,
                 nom_unite : '',
                 idParamLot : 0,
                 produit_param : "",
@@ -536,7 +541,7 @@ export default {
             {
                 try {
                     // Fetch the unit detail for the specified reference
-                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_tva/${this.svData.detailData[index].id_tva}`);
+                    const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_single_vente_tva/${this.svData.id_tva}`);
                     // Extract data from the response
                     const donnees = response.data.data;
                     // Assuming you want to get the first item
@@ -743,14 +748,10 @@ export default {
             );
         },
         fetchListTVA() {
-        //
-            this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_tva_2`).then(
+             this.editOrFetch(`${this.apiBaseURL}/fetch_tvente_tva_2`).then(
                 ({ data }) => {
-                    const donnees = data.data;
-                    this.svData.detailData = this.svData.detailData.map(item => ({
-                        ...item, // Spread existing properties
-                        tvaList: donnees // Update 
-                    }));
+                    var donnees = data.data;
+                    this.tvaList = donnees;
                 }
             );
         },
@@ -913,6 +914,18 @@ export default {
             
               
           },
+          getQuantite(idStockService) {
+              this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_service_stock/${idStockService}`).then(
+                  ({ data }) => {
+                      var donnees = data.data;
+                      donnees.map((item) => {
+                        this.svData.qteDisponible = item.qte_lot;
+                      }); 
+                  }                  
+              );
+            
+              
+          },
           
        async getDataProduct(idStockService, qte_kit)
        {
@@ -920,63 +933,6 @@ export default {
          this.fetchListDataKit(idStockService, qte_kit)
        }
        ,
-    //    async fetchListDataKit(idStockService, qte_kit) {        
-
-    //     // if(this.svData.qteDisponible >= qte_kit)
-    //     // {
-    //         try { 
-    //             // Vérifier si les données de ce lot existent déjà
-    //             const existeDeja = this.svData.detailData.some(row => row.idStockService === idStockService);
-    //             if (existeDeja) {
-    //                 alert('Les données de ce Kit ont déjà été ajoutées.');
-    //                 return;
-    //                 // console.error('Les données de ce lot ont déjà été ajoutées.');
-    //             }
-    //             else
-    //             {
-    //                 const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
-    //                 const { data } = response;
-
-    //                 // Vérifiez si les données existent
-    //                 if (data && data.data) {
-    //                     const donnees = data.data;
-    //                     this.svData.detailData = [
-    //                         ...this.svData.detailData.filter(row => row && row.produit_param),
-    //                         ...donnees.map((item) => ({
-    //                             ...item,
-    //                             qteVente: item.qte_param * qte_kit,
-    //                             puVente: item.pu_param,
-    //                             devise: item.devise,
-    //                             montantreduction: 0,
-    //                             idStockService,
-    //                             code_lot: item.code_lot,
-    //                             pt: (item.qte_param * qte_kit) * item.pu_param,
-    //                             tva: 0,
-    //                             montant_tva: 0,
-    //                             nom_unite: item.uniteBase,
-    //                             idParamLot: item.id,
-    //                             produit_param: item.designation
-    //                           }))
-    //                         ];
-    //                         this.fetchListTVA();
-
-    //                 } else {
-    //                     console.error('Aucune donnée trouvée dans la réponse API.');
-    //                 }   
-    //             }
-
-    //         } 
-    //         catch (error) {
-    //             console.error('Erreur lors de la récupération des données:', error.message || error);
-    //         }
-
-    //     // }
-    //     // else
-    //     // {
-    //     //     this.showError("La quantité demandée est supérieur à la quantité disponible en stock !!!!");
-    //     //     this.svData.detailData[index].qteVente = 0;
-    //     // }
-    //    },
         async fetchListDataKit(idStockService, qte_kit) {
         try {
             const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);

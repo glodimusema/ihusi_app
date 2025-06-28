@@ -821,10 +821,13 @@ class tgaz_detail_productionController extends Controller
             foreach ($detail_list as $list) {
                 $id_detail_max= $list->code_entete;
             }
+
+            //$request->dateProduction
           
             $data99 = tgaz_mouvement_stock_service_lot::create([             
                 'idStockService'    =>  $data['idStockService'],             
-                'dateMvt'    =>   $current,   
+                // 'dateMvt'    =>   $current,  
+                'dateMvt'    =>   $request->dateProduction, 
                 'type_mouvement'    =>  'Entree',
                 'libelle_mouvement'    =>  'Productions des Gaz',
                 'nom_table'    =>  'tgaz_detail_production',
@@ -919,9 +922,11 @@ class tgaz_detail_productionController extends Controller
                 $nom_table = 'tgaz_detail_production';
                 $qte_base = 1;
         
+                //$request->dateProduction
                 $data_mvt = tvente_mouvement_stock::create([             
                     'idStockService'    =>  $id_stock_services,             
-                    'dateMvt'    =>   $current,   
+                    // 'dateMvt'    =>   $current,
+                    'dateMvt'    =>   $request->dateProduction,   
                     'type_mouvement'    =>  'Sortie',
                     'libelle_mouvement'    =>  'Production des kits des Gaz',
                     'nom_table'    =>  'tgaz_detail_production',
