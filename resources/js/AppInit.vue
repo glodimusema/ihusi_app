@@ -914,11 +914,16 @@ export default {
                   text: "Fournisseurs",
                   href: "/admin/Fournisseur",
                 },
-                {
+                { //
                   icon: "store",
                   text: "Rapports",
                   href: "/admin/RapportSortie",
                 },
+                // { //
+                //   icon: "store",
+                //   text: "Rapports",
+                //   href: "/admin/RaportVenteAcces",
+                // },
               ],
             },
           ],
@@ -1227,6 +1232,11 @@ export default {
                 { 
                   text: "Cloture de la Comptabilité",
                   href: "/admin/ClotureComptabilite",
+                },
+                {
+                  icon: "store",
+                  text: "Rapports Ventes",
+                  href: "/admin/RapportsJour_Vente",
                 },
                 {
                   text: "Rapport Comptabilité",
