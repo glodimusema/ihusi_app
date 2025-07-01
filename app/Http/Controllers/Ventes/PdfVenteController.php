@@ -26488,7 +26488,8 @@ function pdf_fiche_stock_vente_service_sans_prix_excel(Request $request)
 //=============== FICHE DE STOCK DES SERVICES BY CATEGORIE EXCEL=======================================================================================
 function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
 {
-    if ($request->get('date1') && $request->get('date2') && $request->get('idCategorie') && $request->get('idService')) {
+    if ($request->get('date1') && $request->get('date2') && $request->get('idCategorie') && $request->get('idService')) 
+    {
         $date1 = $request->get('date1');
         $date2 = $request->get('date2');
         $refCategorie = $request->get('idCategorie');
@@ -26741,7 +26742,7 @@ function pdf_fiche_stock_vente_service_bycategorie_excel(Request $request)
     
         return response()->json($data_return);
     
-        }
+    }
  
     return response()->json(['error' => 'Invalid parameters'], 400);
 }

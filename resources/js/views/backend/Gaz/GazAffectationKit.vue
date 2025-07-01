@@ -296,7 +296,7 @@
     
         fetchListGaz() {
           //deviseList
-          this.editOrFetch(`${this.apiBaseURL}/fetch_gaz_lot_2`).then(
+          this.editOrFetch(`${this.apiBaseURL}/fetch_tgaz_lot_2_only_gaz`).then(
             ({ data }) => {
               var donnees = data.data;
               this.gazList = donnees;

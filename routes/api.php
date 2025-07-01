@@ -792,6 +792,8 @@ Route::group(['namespace'   =>  "Gaz"], function(){
     Route::get("delete_gaz_lot/{id}", 'tgaz_lotController@destroy');
     Route::post("insert_gaz_lot", 'tgaz_lotController@store');
     Route::get("fetch_gaz_lot_2", 'tgaz_lotController@fetch_tgaz_lot_2');
+    Route::get("fetch_tgaz_lot_2_only_gaz", 'tgaz_lotController@fetch_tgaz_lot_2_only_gaz');
+    Route::get("fetch_tgaz_lot_2_without_gaz", 'tgaz_lotController@fetch_tgaz_lot_2_without_gaz');
 
     Route::get("fetch_gaz_categorie_lot", 'tgaz_categorie_lotController@index');
     Route::get("fetch_single_gaz_categorie_lot/{id}", 'tgaz_categorie_lotController@edit');

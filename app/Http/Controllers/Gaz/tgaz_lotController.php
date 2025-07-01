@@ -57,6 +57,34 @@ class tgaz_lotController extends Controller
 
     }
 
+
+    function fetch_tgaz_lot_2_only_gaz()
+    {
+         $data = DB::table("tgaz_lot")
+        ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
+        ->select("tgaz_lot.id",'refCategorieLot','nom_categorie_lot','nom_lot','code_lot',
+        'unite_lot','stock_alerte','author','refUser',"tgaz_lot.created_at")
+        ->where('nom_categorie_lot', "Gaz")
+        ->get();
+        
+        return response()->json(['data' => $data]);
+
+    }
+
+
+    function fetch_tgaz_lot_2_without_gaz()
+    {
+         $data = DB::table("tgaz_lot")
+        ->join('tgaz_categorie_lot','tgaz_categorie_lot.id','=','tgaz_lot.refCategorieLot')
+        ->select("tgaz_lot.id",'refCategorieLot','nom_categorie_lot','nom_lot','code_lot',
+        'unite_lot','stock_alerte','author','refUser',"tgaz_lot.created_at")
+        ->where('nom_categorie_lot','!=', "Gaz")
+        ->get();
+        
+        return response()->json(['data' => $data]);
+
+    }
+
     
     /**
      * Store a newly created resource in storage.

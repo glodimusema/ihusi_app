@@ -639,10 +639,6 @@ class tvente_detail_inventaireController extends Controller
           $pourtageTVA = $row->montant_tva;
       }
 
-
-
-      //qteObs
-
          $montantreduction = 0;
          
          $montanttva = (((floatval($data['qteVente']) * floatval($montants))*floatval($pourtageTVA))/100);
