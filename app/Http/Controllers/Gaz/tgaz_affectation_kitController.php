@@ -131,8 +131,65 @@ class tgaz_affectation_kitController extends Controller
         ]);
     }
 
+    function fetch_affectation_kit_gaz_stock_service($idStockService)
+    { 
+        $id_lot = 0;
+        $id_service = 0;
+        $stockservice = DB::table('tgaz_stock_service_lot')       
+        ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
+        'devise','taux','active','refUser','author')
+        ->where([
+           ['tgaz_stock_service_lot.id','=',  $idStockService]
+        ])
+        ->first();
+        if ($stockservice) {
+            $id_lot = $stockservice->refLot;
+            $id_service = $stockservice->refService;
+        }
 
-   // 'id','id_kit_lot','id_gaz','qte_gaz','author','refUser'
+        $id_gaz = 0;
+        $id_stock_serv_gaz = 0;
+        $affect_kit = DB::table('tgaz_affectation_kit')       
+        ->select('id','id_kit_lot','id_gaz','qte_gaz','author','refUser')
+        ->where([
+           ['tgaz_affectation_kit.id_kit_lot','=',  $id_lot]
+        ])
+        ->first();
+        if ($affect_kit) {
+            $id_gaz = $affect_kit->id_gaz;
+        }
+
+
+        $data_gaz_st = DB::table('tgaz_stock_service_lot')       
+        ->select('id','refService','refLot','pu_lot','qte_lot','cmup_lot',
+        'devise','taux','active','refUser','author')
+        ->where([
+           ['tgaz_stock_service_lot.refService','=',  $id_service],
+           ['tgaz_stock_service_lot.refLot','=',  $id_gaz]
+        ])
+        ->first();
+        if ($data_gaz_st) {
+            $id_stock_serv_gaz = $data_gaz_st->id;
+        }
+
+        $data = DB::table('tgaz_parametre_lot')
+        ->join('tgaz_lot','tgaz_lot.id','=','tgaz_parametre_lot.refLot')
+        ->join('tvente_produit','tvente_produit.id','=','tgaz_parametre_lot.refProduit')
+        ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie')  
+        ->select('tgaz_parametre_lot.id','refProduit','refLot','pu_param','qte_param','autre_detail',
+        'tgaz_parametre_lot.author','tgaz_parametre_lot.refUser','nom_lot','code_lot','unite_lot'
+        ,"tvente_produit.designation as designation",'refCategorie','pu','qte',
+        'cmup','devise','taux','Oldcode','Newcode','tvaapplique','estvendable','uniteBase',
+        "tvente_categorie_produit.designation as Categorie",DB::raw($id_stock_serv_gaz . ' as id_gaz'))                     
+        ->Where('refLot',$id_gaz)
+        ->get();
+
+        return response()->json([
+            'data'  => $data
+        ]);
+    }
+
+
     function insert_data(Request $request)
     {       
         $data = tgaz_affectation_kit::create([

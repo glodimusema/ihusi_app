@@ -150,7 +150,7 @@
                               </thead>
                               <tbody>
                                 <tr v-for="item in fetchData" :key="item.id">
-                                  <td>{{ item.nom_lot }}</td>
+                                  <td>{{ item.designation }}</td>
                                   <td>{{ item.qteVente }}</td>
                                   <td>{{ item.uniteVente }}</td>
                                   <td>{{ item.puVente }}$</td>

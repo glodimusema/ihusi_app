@@ -892,7 +892,7 @@ export default {
             "Un nouveau Client";
 
         },
-          getPrice(idStockService, qte_kit) {
+        getPrice(idStockService, qte_kit) {
               this.editOrFetch(`${this.apiBaseURL}/fetch_single_gaz_service_stock/${idStockService}`).then(
                   ({ data }) => {
                       var donnees = data.data;
@@ -902,7 +902,7 @@ export default {
                       
                        if(this.svData.qteDisponible >= qte_kit)
                        {
-                           this.fetchListDataKit(idStockService, qte_kit);
+                           this.getDataProduct(idStockService, qte_kit);
                        }
                        else
                        {
@@ -929,11 +929,12 @@ export default {
           
        async getDataProduct(idStockService, qte_kit)
        {
-         this.getPrice(idStockService);
+        //  this.getPrice(idStockService);
          this.fetchListDataKit(idStockService, qte_kit)
+         this.fetchListDataGaz(idStockService, qte_kit);
        }
        ,
-        async fetchListDataKit(idStockService, qte_kit) {
+       async fetchListDataKit(idStockService, qte_kit) {
         try {
             const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_parametre_byLotStockService/${idStockService}`);
             const { data } = response;
@@ -979,7 +980,54 @@ export default {
         } catch (error) {
             console.error('Erreur lors de la récupération des données:', error.message || error);
         }
+       },
+       async fetchListDataGaz(idStockService, qte_kit) {
+        try {
+            const response = await this.editOrFetch(`${this.apiBaseURL}/fetch_data_gaz_affectation_byLotStockService/${idStockService}`);
+            const { data } = response;
+
+            if (data && data.data) {
+            const donnees = data.data;
+
+            // Filtrer les lignes valides (supprimer les lignes vides avant tout)
+            this.svData.detailData = this.svData.detailData.filter(row => row && row.produit_param);
+
+            donnees.forEach(item => {
+                const index = this.svData.detailData.findIndex(
+                row => row.idStockService === idStockService && row.idParamLot === item.id
+                );
+
+                const newRow = {
+                ...item,
+                    qteVente: item.qte_param * qte_kit,
+                    puVente: item.pu_param,
+                    devise: item.devise,
+                    montantreduction: 0,
+                    idStockService : item.id_gaz,
+                    code_lot: item.code_lot,
+                    pt: (item.qte_param * qte_kit) * item.pu_param,
+                    tva: 0,
+                    montant_tva: 0,
+                    nom_unite: item.uniteBase,
+                    idParamLot: item.id,
+                    produit_param: item.designation,
+                    qte_kit : qte_kit
+                };
+
+                if (index !== -1) {this.svData.detailData.splice(index, 1, newRow); // mettre à jour
+                } else {
+                this.svData.detailData.push(newRow); // ajouter
+                }
+            });
+
+            this.fetchListTVA();
+            } else {
+            console.error('Aucune donnée trouvée dans la réponse API.');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données:', error.message || error);
         }
+       }
        ,
         // VISUALISATION DES DONNEES DES COMMANDES============================================================
 

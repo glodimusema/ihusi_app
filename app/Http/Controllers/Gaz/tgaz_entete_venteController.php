@@ -143,6 +143,7 @@ class tgaz_entete_venteController extends Controller
         ->join('tfin_classe','tfin_classe.id','=','tfin_compte.refClasse')
         ->join('tfin_typecompte','tfin_typecompte.id','=','tfin_compte.refTypecompte')
         ->join('tfin_typeposition','tfin_typeposition.id','=','tfin_compte.refPosition')
+
         ->select('tgaz_entete_vente.id','tgaz_entete_vente.code','refClient','refService',
         'module_id','serveur_id','etat_facture','dateVente','libelle',
         'tgaz_entete_vente.montant','reduction','totaltva','tgaz_entete_vente.paie',
@@ -156,9 +157,8 @@ class tgaz_entete_venteController extends Controller
         'nombreEnfant','dateArriverGoma','arriverPar','refCategieClient','photo','slug','tvente_client.author',
         'tgaz_entete_vente.updated_at', "tvente_categorie_client.designation",
         "compte_client",'refSousCompte','nom_ssouscompte','numero_ssouscompte','nom_souscompte',
-        'numero_souscompte','refCompte','nom_compte','numero_compte','refClasse','refTypecompte','refPosition',
-        'nom_classe','numero_classe','nom_typeposition',"nom_typecompte"        
-        )
+        'numero_souscompte','refCompte','nom_compte','numero_compte','refClasse','refTypecompte',
+        'refPosition','nom_classe','numero_classe','nom_typeposition',"nom_typecompte")
         ->selectRaw('CONCAT("F",YEAR(dateVente),"",MONTH(dateVente),"00",tgaz_entete_vente.id) as codeFacture')
         ->selectRaw('ROUND(IFNULL((IFNULL(montant,0) + IFNULL(totaltva,0) - IFNULL(reduction,0)),0),2) as totalFacture')
         ->selectRaw('IFNULL(paie,0) as totalPaie')

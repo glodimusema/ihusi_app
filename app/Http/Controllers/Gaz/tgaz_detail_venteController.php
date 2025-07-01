@@ -863,77 +863,72 @@ class tgaz_detail_venteController extends Controller
         $total_tva = 0;
         $total_pu = 0;
 
-        $data_qte_lot = DB::table('tgaz_detail_vente')       
-        ->selectRaw('MAX(tgaz_detail_vente.qte_kit) as qte_kit,
-        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
-        SUM(tgaz_detail_vente.puVente) as total_pu,
-        SUM(tgaz_detail_vente.montanttva) as total_tva,
-        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
-         idStockService')
-        ->where([
-            ['tgaz_detail_vente.refEnteteVente','=', $idmax]
-         ])
-        ->groupby('idStockService')
+         $data_qte_lot = DB::table('tgaz_detail_vente')
+        ->where('refEnteteVente', $idmax)
         ->get();
+
         foreach ($data_qte_lot as $list) {
-            $qteParLot= $list->qte_kit;
-            $priceParLot= $list->prix_total_kit;
-            $idStockLot= $list->idStockService;
-            $total_red = $list->total_reduction;
-            $total_tva = $list->total_tva;
-            $total_pu = $list->total_pu;
 
-            $data2 = DB::update(
-            'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteLot where id = :idStockService',
-            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            $qteParLot = $list->qte_kit;
+            $priceParLot = $list->qteVente * $list->puVente;
+            $idStockLot = $list->idStockService;
+            $total_red = $list->montantreduction;
+            $total_tva = $list->montanttva;
+            $total_pu = $list->puVente;
+
+            DB::update(
+                'UPDATE tgaz_stock_service_lot 
+                SET qte_lot = qte_lot - :qteLot 
+                WHERE id = :idStockService',
+                [
+                    'qteLot' => $qteParLot,
+                    'idStockService' => $idStockLot
+                ]
             );
-        
-            $data3 = DB::update(
-                'update tgaz_entete_vente set montant = montant + (:montant),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
-                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idmax]
+
+            DB::update(
+                'UPDATE tgaz_entete_vente 
+                SET montant = montant + :montant, 
+                    reduction = reduction + :reduction, 
+                    totaltva = totaltva + :totaltva 
+                WHERE id = :refEnteteVente',
+                [
+                    'montant' => $priceParLot,
+                    'reduction' => $total_red,
+                    'totaltva' => $total_tva,
+                    'refEnteteVente' => $idmax
+                ]
             );
 
-            $id_detail_max=0;
-            $detail_list = DB::table('tgaz_detail_vente')       
-            ->selectRaw('MAX(id) as code_entete')
-            ->where([
-                ['refUser','=', $request->refUser],
-                ['idStockService','=', $idStockLot]
-             ]) 
-            ->get();
-            foreach ($detail_list as $list) {
-                $id_detail_max= $list->code_entete;
-            }
-          
-            $data99 = tgaz_mouvement_stock_service_lot::create([             
-                'idStockService'    =>  $idStockLot,             
-                'dateMvt'    =>   $request->dateVente,   
-                'type_mouvement'    =>  'Sortie',
-                'libelle_mouvement'    =>  'Vente des Gaz et Accesseoires',
-                'nom_table'    =>  'tgaz_detail_vente',
-                'id_data'    =>  $id_detail_max, 
-                'qteMvt'    =>  $qteParLot,
-                'puMvt'    =>  $total_pu,                   
-                'author'       =>  $request->author,
-                'refUser'       =>  $request->refUser,
-                'type_sortie'    =>  'Sortie',
-    
-                'active'    =>  $active,
-                'uniteMvt'    =>  $uniteVente,
-                'compte_vente'    =>  $compte_vente,
-                'compte_variationstock'    =>  $compte_variationstock,
-                // 'compte_perte'    =>  $compte_perte,
-                'compte_produit'    =>  $compte_produit,
-                'compte_destockage'    =>  $compte_destockage,
-                // 'compte_achat'    =>  $compte_achat,
-                // 'compte_stockage'    =>  $compte_stockage,
-                'puVente'    =>  $total_pu,
-                'devise'    =>  $devises,
-                'taux'    =>  $taux,
-                'cmupMvt'    =>  $total_pu
-            ]); 
+            $id_detail_max = DB::table('tgaz_detail_vente')
+            ->where('refUser', $request->refUser)
+            ->where('idStockService', $idStockLot)
+            ->max('id');
 
-        }      
+            tgaz_mouvement_stock_service_lot::create([
+                'idStockService' => $idStockLot,
+                'dateMvt' => $request->dateVente,
+                'type_mouvement' => 'Sortie',
+                'libelle_mouvement' => 'Vente des Gaz et Accessoires',
+                'nom_table' => 'tgaz_detail_vente',
+                'id_data' => $id_detail_max,
+                'qteMvt' => $qteParLot,
+                'puMvt' => $total_pu,
+                'author' => $request->author,
+                'refUser' => $request->refUser,
+                'type_sortie' => 'Sortie',
+                'active' => $active,
+                'uniteMvt' => $uniteVente,
+                'compte_vente' => $compte_vente,
+                'compte_variationstock' => $compte_variationstock,
+                'compte_produit' => $compte_produit,
+                'compte_destockage' => $compte_destockage,
+                'puVente' => $total_pu,
+                'devise' => $devises,
+                'taux' => $taux,
+                'cmupMvt' => $total_pu
+            ]);
+        }
 
         return response()->json([
             'data'  =>  "Insertion avec succès!!!",
@@ -1089,77 +1084,72 @@ class tgaz_detail_venteController extends Controller
         $total_tva = 0;
         $total_pu = 0;
 
-        $data_qte_lot = DB::table('tgaz_detail_vente')       
-        ->selectRaw('MAX(tgaz_detail_vente.qte_kit) as qte_kit,
-        SUM(tgaz_detail_vente.qteVente * tgaz_detail_vente.puVente) as prix_total_kit,
-        SUM(tgaz_detail_vente.puVente) as total_pu,
-        SUM(tgaz_detail_vente.montanttva) as total_tva,
-        SUM(tgaz_detail_vente.montantreduction) as total_reduction,
-         idStockService')
-        ->where([
-            ['tgaz_detail_vente.refEnteteVente','=', $idmax]
-         ])
-        ->groupby('idStockService')
+         $data_qte_lot = DB::table('tgaz_detail_vente')
+        ->where('refEnteteVente', $idmax)
         ->get();
+
         foreach ($data_qte_lot as $list) {
-            $qteParLot= $list->qte_kit;
-            $priceParLot= $list->prix_total_kit;
-            $idStockLot= $list->idStockService;
-            $total_red = $list->total_reduction;
-            $total_tva = $list->total_tva;
-            $total_pu = $list->total_pu;
 
-            $data2 = DB::update(
-            'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteLot where id = :idStockService',
-            ['qteLot' => $qteParLot,'idStockService' => $idStockLot]
+            $qteParLot = $list->qte_kit;
+            $priceParLot = $list->qteVente * $list->puVente;
+            $idStockLot = $list->idStockService;
+            $total_red = $list->montantreduction;
+            $total_tva = $list->montanttva;
+            $total_pu = $list->puVente;
+
+            DB::update(
+                'UPDATE tgaz_stock_service_lot 
+                SET qte_lot = qte_lot - :qteLot 
+                WHERE id = :idStockService',
+                [
+                    'qteLot' => $qteParLot,
+                    'idStockService' => $idStockLot
+                ]
             );
-        
-            $data3 = DB::update(
-                'update tgaz_entete_vente set montant = montant + (:montant),reduction = reduction + :reduction,totaltva = totaltva + :totaltva where id = :refEnteteVente',
-                ['montant' => $priceParLot,'reduction' => $total_red,'totaltva' => $total_tva,'refEnteteVente' => $idmax]
+
+            DB::update(
+                'UPDATE tgaz_entete_vente 
+                SET montant = montant + :montant, 
+                    reduction = reduction + :reduction, 
+                    totaltva = totaltva + :totaltva 
+                WHERE id = :refEnteteVente',
+                [
+                    'montant' => $priceParLot,
+                    'reduction' => $total_red,
+                    'totaltva' => $total_tva,
+                    'refEnteteVente' => $idmax
+                ]
             );
 
-            $id_detail_max=0;
-            $detail_list = DB::table('tgaz_detail_vente')       
-            ->selectRaw('MAX(id) as code_entete')
-            ->where([
-                ['refUser','=', $request->refUser],
-                ['idStockService','=', $idStockLot]
-             ]) 
-            ->get();
-            foreach ($detail_list as $list) {
-                $id_detail_max= $list->code_entete;
-            }
-          
-            $data99 = tgaz_mouvement_stock_service_lot::create([             
-                'idStockService'    =>  $idStockLot,             
-                'dateMvt'    =>   $request->dateVente,   
-                'type_mouvement'    =>  'Sortie',
-                'libelle_mouvement'    =>  'Vente des Gaz et Accesseoires',
-                'nom_table'    =>  'tgaz_detail_vente',
-                'id_data'    =>  $id_detail_max, 
-                'qteMvt'    =>  $qteParLot,
-                'puMvt'    =>  $total_pu,                   
-                'author'       =>  $request->author,
-                'refUser'       =>  $request->refUser,
-                'type_sortie'    =>  'Sortie',
-    
-                'active'    =>  $active,
-                'uniteMvt'    =>  $uniteVente,
-                'compte_vente'    =>  $compte_vente,
-                'compte_variationstock'    =>  $compte_variationstock,
-                // 'compte_perte'    =>  $compte_perte,
-                'compte_produit'    =>  $compte_produit,
-                'compte_destockage'    =>  $compte_destockage,
-                // 'compte_achat'    =>  $compte_achat,
-                // 'compte_stockage'    =>  $compte_stockage,
-                'puVente'    =>  $total_pu,
-                'devise'    =>  $devises,
-                'taux'    =>  $taux,
-                'cmupMvt'    =>  $total_pu
-            ]); 
+            $id_detail_max = DB::table('tgaz_detail_vente')
+            ->where('refUser', $request->refUser)
+            ->where('idStockService', $idStockLot)
+            ->max('id');
 
-        }    
+            tgaz_mouvement_stock_service_lot::create([
+                'idStockService' => $idStockLot,
+                'dateMvt' => $request->dateVente,
+                'type_mouvement' => 'Sortie',
+                'libelle_mouvement' => 'Vente des Gaz et Accessoires',
+                'nom_table' => 'tgaz_detail_vente',
+                'id_data' => $id_detail_max,
+                'qteMvt' => $qteParLot,
+                'puMvt' => $total_pu,
+                'author' => $request->author,
+                'refUser' => $request->refUser,
+                'type_sortie' => 'Sortie',
+                'active' => $active,
+                'uniteMvt' => $uniteVente,
+                'compte_vente' => $compte_vente,
+                'compte_variationstock' => $compte_variationstock,
+                'compte_produit' => $compte_produit,
+                'compte_destockage' => $compte_destockage,
+                'puVente' => $total_pu,
+                'devise' => $devises,
+                'taux' => $taux,
+                'cmupMvt' => $total_pu
+            ]);
+        }
 
 
         //PAIEMENT DE LA FACTURE ===================================================================
