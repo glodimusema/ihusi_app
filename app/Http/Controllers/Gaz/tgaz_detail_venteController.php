@@ -864,17 +864,26 @@ class tgaz_detail_venteController extends Controller
         $total_pu = 0;
 
          $data_qte_lot = DB::table('tgaz_detail_vente')
+        ->select(
+            DB::raw('MAX(qte_kit) as qte_kit'),
+            DB::raw('SUM(qteVente * puVente) as priceParLot'),
+            DB::raw('SUM(montantreduction) as total_red'),
+            DB::raw('SUM(montanttva) as total_tva'),
+            DB::raw('SUM(puVente) as total_pu'),
+            'idStockService'
+        )
         ->where('refEnteteVente', $idmax)
+        ->groupBy('idStockService')
         ->get();
 
         foreach ($data_qte_lot as $list) {
 
             $qteParLot = $list->qte_kit;
-            $priceParLot = $list->qteVente * $list->puVente;
+            $priceParLot = $list->priceParLot;
             $idStockLot = $list->idStockService;
-            $total_red = $list->montantreduction;
-            $total_tva = $list->montanttva;
-            $total_pu = $list->puVente;
+            $total_red = $list->total_red;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
 
             DB::update(
                 'UPDATE tgaz_stock_service_lot 
@@ -1085,17 +1094,27 @@ class tgaz_detail_venteController extends Controller
         $total_pu = 0;
 
          $data_qte_lot = DB::table('tgaz_detail_vente')
+        ->select(
+            DB::raw('MAX(qte_kit) as qte_kit'),
+            DB::raw('SUM(qteVente * puVente) as priceParLot'),
+            DB::raw('SUM(montantreduction) as total_red'),
+            DB::raw('SUM(montanttva) as total_tva'),
+            DB::raw('SUM(puVente) as total_pu'),
+            'idStockService'
+        )
         ->where('refEnteteVente', $idmax)
+        ->groupBy('idStockService')
         ->get();
 
         foreach ($data_qte_lot as $list) {
 
             $qteParLot = $list->qte_kit;
-            $priceParLot = $list->qteVente * $list->puVente;
+            $priceParLot = $list->priceParLot;
             $idStockLot = $list->idStockService;
-            $total_red = $list->montantreduction;
-            $total_tva = $list->montanttva;
-            $total_pu = $list->puVente;
+            $total_red = $list->total_red;
+            $total_tva = $list->total_tva;
+            $total_pu = $list->total_pu;
+
 
             DB::update(
                 'UPDATE tgaz_stock_service_lot 
