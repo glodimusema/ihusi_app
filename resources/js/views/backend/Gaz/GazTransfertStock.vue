@@ -177,7 +177,7 @@ export default {
         async get_produit_for_service(refService) {
             this.isLoading(true);
             await axios
-                .get(`${this.apiBaseURL}/fetch_gaz_service_stock_byservice/${refService}`)
+                .get(`${this.apiBaseURL}/fetch_gaz_stock_data_byservice/${refService}`)
                 .then((res) => {
                 var chart = res.data.data;
                 if (chart) {

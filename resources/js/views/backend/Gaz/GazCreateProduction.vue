@@ -504,10 +504,10 @@ export default {
         },
         fetchListService() {
             //deviseList
-            this.editOrFetch(`${this.apiBaseURL}/fetch_service_magasin_user_by_user/${this.userData.id}`).then(
+            this.editOrFetch(`${this.apiBaseURL}/fetch_service_user_by_user/${this.userData.id}`).then(
                 ({ data }) => {
                     var donnees = data.data;
-                    this.serviceList = donnees;
+                    this.serviceList = donnees; 
                 }
             );
         },
