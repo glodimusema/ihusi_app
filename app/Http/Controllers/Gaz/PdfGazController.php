@@ -1109,7 +1109,7 @@ function showDetailVente_Service($date1,$date2,$idService)
                 <td class="csD06EB5B2" style="width:83px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->codeFacture.'</td>
                 <td class="csD06EB5B2" colspan="3" style="width:172px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->noms.'</td>
                 <td class="csD06EB5B2" style="width:72px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->dateVente.'</td>
-                <td class="csD06EB5B2" colspan="2" style="width:147px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->Categorie.'</td>
+                <td class="csD06EB5B2" colspan="2" style="width:147px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->nom_lot.'</td>
                 <td class="csD06EB5B2" style="width:178px;height:22px;line-height:11px;text-align:left;vertical-align:middle;">'.$row->designation.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:36px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->qteVente.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:39px;height:22px;line-height:11px;text-align:center;vertical-align:middle;">'.$row->puVente.'$</td>
