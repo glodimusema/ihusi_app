@@ -31,9 +31,7 @@ class tgaz_detail_venteController extends Controller
       return str_replace(" ", "%", $request->get('query'));
       // return $request->get('query');
 
-    }
-
-  
+    }  
 
     public function all(Request $request)
     { 
@@ -286,7 +284,6 @@ class tgaz_detail_venteController extends Controller
             'data'  => $data,
         ]);
     }
-
 
     function insert_data(Request $request)
     {
@@ -1284,8 +1281,6 @@ class tgaz_detail_venteController extends Controller
         ]);
        
     }
-
-
 
     function insert_paiement_cash(Request $request, $id)
     {

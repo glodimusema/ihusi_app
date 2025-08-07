@@ -2837,7 +2837,6 @@ public function fetch_rapport_detail_production_date(Request $request)
     }
     
 }
-
 function printRapportDetailProduction($date1, $date2)
 {
 
@@ -3344,7 +3343,6 @@ function showDetailProduction($date1, $date2)
     return $output;
 
 }
-
 //==================== RAPPORT DETAIL Vente BY MEDICAMENT =======================================
 
 public function fetch_rapport_detail_production_date_produit(Request $request)
@@ -4449,7 +4447,6 @@ function pdf_fiche_stock_vente_service(Request $request)
     else{
     }    
 }
-
 function getInfoFicheStockServices($date1,$date2,$idService)
 {
            //Info Entreprise
@@ -4789,8 +4786,7 @@ function getInfoFicheStockServices($date1,$date2,$idService)
 
     return $output;
 
-} 
-
+}
 function showCategorieFicheStockService($date1,$date2,$idService)
 {
     $data = DB::table("tgaz_categorie_lot")
@@ -4818,7 +4814,6 @@ function showCategorieFicheStockService($date1,$date2,$idService)
     return $output;
 
 }
-
 function showDetailFicheStockServiceByCat($date1, $date2, $refCategorie, $idService)
 {
     // Récupérer les données de stock, mouvements et ventes en une seule requête 
