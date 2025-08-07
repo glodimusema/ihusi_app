@@ -172,10 +172,9 @@ class tgaz_entete_productionController extends Controller
             {
                 $refService = $data_entete->refService;
             }
-
    
             $data2 = DB::update(
-                'update tgaz_stock_service_lot set qte_lot = qte_lot + :qteProd where id = :id',
+                'update tgaz_stock_service_lot set qte_lot = qte_lot - :qteProd where id = :id',
                 ['qteProd' => $qte,'id' => $idStockService]
             ); 
 
@@ -198,22 +197,27 @@ class tgaz_entete_productionController extends Controller
                 $qte_total = floatval($qte_param) * floatval($qte);
 
                 $data_stock = DB::update(
-                    'update tgaz_stock_service_lot set qte = qte + :qteVente where refProduit = :refProduit and refService = :refService',
+                    'update tvente_stock_service set qte = qte + :qteVente where refProduit = :refProduit and refService = :refService',
                     ['qteVente' => $qte_total,'refProduit' => $idProduit,'refService' => $refService]
                 );
-        
+
+                // Récupérer les détails de vente correspondants
+                $id_detail_max = DB::table('tgaz_detail_production')
+                    ->select('id')
+                    ->where('refEnteteProduction', $id)
+                    ->where('idStockService', $idStockService)
+                    ->get();
+
                 $nom_table = 'tgaz_detail_production';
-        
-                $data_mvt = DB::update(
-                    'delete from tvente_mouvement_stock where tvente_mouvement_stock.id_data = :id and nom_table=:nom_table',
-                    ['id' => $id, 'nom_table' => $nom_table]
-                );
 
-            
+                // Supprimer les mouvements de stock liés à chaque détail de vente trouvé
+                foreach ($id_detail_max as $list_max) {
+                    DB::table('tvente_mouvement_stock')
+                        ->where('id_data', $list_max->id)
+                        ->where('nom_table', $nom_table)
+                        ->delete();
+                }            
             }
-
-            $data1 = tgaz_detail_production::where('id',$idDetail)->delete();
-
         }
 
         $data1 = tgaz_detail_production::where('refEnteteProduction',$id)->delete();
