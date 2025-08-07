@@ -141,7 +141,7 @@
                                       <span>Modifier</span>
                                     </v-tooltip> -->
     
-                                    <v-tooltip  top color="black">
+                                    <!-- <v-tooltip  top color="black">
                                       <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
                                           <v-btn @click="deleteData(item.id)" fab small>
@@ -150,7 +150,7 @@
                                         </span>
                                       </template>
                                       <span>Suppression</span>
-                                    </v-tooltip>
+                                    </v-tooltip> -->
     
                                     <v-tooltip  top color="black">
                                       <template v-slot:activator="{ on, attrs }">
