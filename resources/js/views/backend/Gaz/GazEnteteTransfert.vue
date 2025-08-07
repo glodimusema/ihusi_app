@@ -156,7 +156,7 @@
                                 <v-list-item-icon>
                                   <v-icon color="  red">delete</v-icon>
                                 </v-list-item-icon>
-                                <v-list-item-title style="margin-left: -20px">Suppression
+                                <v-list-item-title style="margin-left: -20px">Annuler le Transfert
                                 </v-list-item-title>
                               </v-list-item>
   
