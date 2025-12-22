@@ -560,7 +560,7 @@ class tvente_detail_transfertController extends Controller
             $uniteBase='';
             $estunite = '';
     
-            $data4=DB::table('tvente_detail_unite')
+            $data_unite=DB::table('tvente_detail_unite')
             ->join('tvente_unite','tvente_unite.id','=','tvente_detail_unite.refUnite')
             ->join('tvente_produit','tvente_produit.id','=','tvente_detail_unite.refProduit')
             ->join('tvente_categorie_produit','tvente_categorie_produit.id','=','tvente_produit.refCategorie') 
@@ -570,16 +570,15 @@ class tvente_detail_transfertController extends Controller
              ->where([
                 ['tvente_detail_unite.id','=',  $data['refDetailUnite']]
             ])      
-            ->get();      
-            
-            foreach ($data4 as $row) 
+            ->first();
+            if ($data_unite) 
             {                 
-                 $qteTransfert=$row->qteUnite;               
-                 $uniteTransfert=$row->nom_unite;                 
-                 $qteBase=$row->qteBase;
-                 $uniteBase=$row->uniteBase;
-                 $id_produit = $row->refProduit;
-                 $estunite = $row->estunite;
+                 $qteTransfert=$data_unite->qteUnite;               
+                 $uniteTransfert=$data_unite->nom_unite;                 
+                 $qteBase=$data_unite->qteBase;
+                 $uniteBase=$data_unite->uniteBase;
+                 $id_produit = $data_unite->refProduit;
+                 $estunite = $data_unite->estunite;
             }
     
            $stockservicedest = DB::table('tvente_stock_service')       
@@ -707,9 +706,6 @@ class tvente_detail_transfertController extends Controller
             foreach ($detail_list1 as $list) {
                 $id_detail_max1 = $list->code_entete;
             }
-
-            // $nom_service_source
-            // $nom_service_destination
           
             $data999 = tvente_mouvement_stock::create([             
                 'idStockService'    =>  $refIdStockSource,             
